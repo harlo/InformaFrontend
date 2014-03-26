@@ -1,0 +1,3 @@
+[submodule "lib/Server"]
+	path = lib/Server
+	url = git@github.com:harlo/UnveillanceServer.git
