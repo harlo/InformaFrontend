@@ -1,0 +1,46 @@
+#c_panel_holder #c_panel_1 div div {
+	width:100%;
+	height:100%;
+	position:absolute;
+	margin:0;
+}
+
+#c_panel_holder #c_panel_1 div div.c_obj_handle {
+	position:relative !important;
+	height:auto !important;
+}
+
+#c_panel_holder #c_panel_1 div div.c_obj_handle a.c_obj_delete {
+	float:right;
+	padding:1%;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_0 {
+	height:5%;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_1 {
+	height:15%;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_1 #c_object_holder {
+	overflow-y:auto;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_2 {
+	height:78%;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_2 #c_script_holder {
+	height:99%;
+}
+
+#c_panel_holder #c_panel_1 div.c_frame_2 #c_script_holder textarea {
+	height:100%;
+	width:100%;
+	border:none;
+	padding:0;
+	margin:0;
+}

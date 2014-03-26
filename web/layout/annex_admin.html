@@ -1,0 +1,56 @@
+<h1>Init Annex</h1>
+<ol id="c_annex_values_holder" class="c_form_elements">
+	<li>
+		<div>
+			<p class="c_mandatory">Local Folder: <input name="unveillance.local_remote.folder" type="text" /></p>
+			<p class="c_mandatory">Password: <input name="unveillance.local_remote.password" type="password" /></p>
+			<p class="c_mandatory">Confirm Password: <input name="unveillance.local_remote.password.confirm" type="password" /></p>
+		</div>
+	</li>
+	
+	<li>
+		<div>
+			<p>Set up Informa:</p>
+		</div>
+		<ol>
+			<li>
+				<div>
+					<p>Organization Name: <input name="informacam.ictd.organizationName" type="text" /></p>
+					<p>Organization Details: <input name="informacam.ictd.organizationDetails" type="text" /></p>
+					<p>Private GPG Key: <input name="informacam.gpg_private_key.file" type="file" /></p>
+					<p>Password: <input name="informacam.gpg_private_key.password" type="password" /></p>
+					<p>Confirm Password: <input rel="c_confirm" name="informacam.gpg_private_key.password.confirm" type="password" /></p>
+				</div>
+			</li>
+	
+			<li>
+				<div id="c_form_dz_holder">
+					<p>Add forms:</p>
+					<input name="informacam.form" type="file" />			
+				</div>
+			</li>
+	
+			<li>
+				<div>
+					<p>Add a sync:</p>
+					<!-- informacam.ictd.repositories -->
+					<table>
+						<tr>
+							<td>
+								<select id="c_sync_chooser">
+									<option value="null">--------------</option>
+									<option value="google_drive">Google Drive</option>
+									<option value="globaleaks">Globaleaks</option>
+								</select>
+							</td>
+							<td>
+								<div id="c_sync_cred_holder"></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</li>
+		</ol>
+	</li>
+</ol>
+<a onclick="annex.initAnnex();">Save</a>

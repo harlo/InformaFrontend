@@ -1,0 +1,1 @@
+INFORMA_SYNC_TYPES = ['google_drive', 'globaleaks']

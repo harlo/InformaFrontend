@@ -1,0 +1,4 @@
+.DS_Store
+*.pyc
+
+conf/local.config.yaml

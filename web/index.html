@@ -1,0 +1,110 @@
+<html>
+	<head>
+		<title>Unveillance 2.0</title>
+		<script type="text/javascript" src="/web/js/lib/jquery.js"></script>
+		<script type="text/javascript" src="/web/js/lib/underscore-min.js"></script>
+		<script type="text/javascript" src="/web/js/lib/backbone-min.js"></script>
+		<script type="text/javascript" src="/web/js/lib/mustache.js"></script>
+		<script type="text/javascript" src="/web/js/lib/fabric.min.js"></script>
+		<script type="text/javascript" src="/web/js/lib/crossfilter.min.js"></script>
+
+		<script type="text/javascript" src="/web/js/conf.js"></script>
+
+		<script type="text/javascript" src="/web/js/models/compass_ui_handle.js"></script>
+		<script type="text/javascript" src="/web/js/models/compass_canvas.js"></script>
+		<script type="text/javascript" src="/web/js/models/compass_document.js"></script>
+		<script type="text/javascript" src="/web/js/models/compass_console.js"></script>
+		<script type="text/javascript" src="/web/js/models/compass_stage.js"></script>
+		<script type="text/javascript" src="/web/js/models/compass_module.js"></script>
+		
+		<script type="text/javascript" src="/web/js/unveillance.js"></script>
+		<script type="text/javascript" src="/web/js/test.js"></script>
+		<script type="text/javascript" src="/web/js/main.js"></script>
+		${ on_loader }
+		<link rel="stylesheet" type="text/css" href="/web/css/unveillance.css" />
+		<link rel="stylesheet" type="text/css" href="/web/css/type.css" />
+		<link rel="stylesheet" type="text/css" href="/web/css/index.css" />
+		<link rel="stylesheet" type="text/css" href="/web/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="/web/css/console.css" />
+		<link rel="stylesheet" type="text/css" href="/web/css/stage.css" />
+	</head>
+	
+	<body>
+		<div id="header">
+			<h1>Unveillance 2.0</h1>
+		</div>
+		
+		<div id="c_panel_holder">
+			<div class="c_panel_restore" rel="c_panel_0">
+				<a onclick="restorePanel('c_panel_0');showFileHandlers();">&gt;</a>
+			</div>
+			<div id="c_panel_0" class="c_panel">
+				<div class="c_frame_0 c_header">
+					<h2 class="c_header"><span>Documents</span>
+						<span class="c_panel_collapse" rel="c_panel_0" onclick="collapsePanel('c_panel_0');hideFileHandlers();">[ x ]</span>
+					</h2>
+				</div>
+				<div class="c_frame_1 c_surface">
+					<div id="c_action_bar" rel="c_action_search">
+						<input id="c_search_holder" />
+					</div>
+					<div id="c_navigation_bar" rel=c_action_search">
+						<ul>
+							<li onclick="applyFilter();">F</li>
+							<li id="c_file_group_indicator" onclick="toggleGroup();">G</li>
+							<!--
+								group: getDocuments
+								single: getDocument
+							-->
+							<li onclick="compass_stage.loadStage('annex_admin', null)">M</li>
+							<li onclick="restorePanel('c_panel_1');initConsole();">C</li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="c_frame_2">
+					<div id="c_file_group_handle">
+						<span id="c_file_group_num"></span>&nbsp;
+						<span id="c_file_group_label"></span> selected.
+					</div>
+					<div id="c_file_list_holder" class="c_surface">
+						<ul>
+							<li><a>test file 1</a></li>
+							<li><a>test file 2</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			
+			<div id="c_panel_1" class="c_panel c_panel_full_collapse c_panel_is_collapsed" style="display:none;">
+				<div class="c_frame_0 c_header">
+					<h2 class="c_header"><span>Console</span>
+						<span class="c_panel_collapse" rel="c_panel_1" onclick="collapsePanel('c_panel_1');destroyConsole();">[ x ]</span>
+						<span class="c_panel_options" id="c_console_ctrl_holder">
+							<a onclick="compass_console.run();">run</a>
+							<a onclick="compass_console.save();">save</a>
+						</span>
+					</h2>
+				</div>
+				
+				<div class="c_frame_1 c_surface">
+					<div id="c_object_holder" class="c_linkable"></div>
+				</div>
+				
+				<div class="c_frame_2 c_surface">
+					<div id="c_script_holder">
+						<textarea></textarea>
+					</div>
+				</div>
+			</div>
+			
+			<div id="c_panel_2" class="c_panel ">
+				<div id="c_stage_hotzone" class="c_surface"></div>
+			</div>
+		</div>
+		
+		<div id="c_canvas"></div>		
+		
+		<div id="footer"></div>
+	</body>
+</html>

@@ -1,0 +1,67 @@
+#c_panel_holder #c_panel_0 div.c_frame_1 {
+	margin-bottom:2%;
+	height:22%;
+}
+
+#c_panel_holder #c_panel_0 #c_action_bar {
+	height:50%;
+	border:1px solid #999;
+	background-color:#fff;
+}
+
+#c_panel_holder #c_panel_0 #c_action_bar:hover {
+	width:300% !important;
+}
+
+#c_panel_holder #c_panel_0 #c_navigation_bar {
+	height:40%;
+}
+
+#c_panel_holder #c_panel_0 #c_navigation_bar ul {
+	list-style-type:none;
+	width:auto;
+	margin:0;
+	padding:0;
+}
+
+#c_panel_holder #c_panel_0 #c_navigation_bar ul li {
+	float:left;
+	text-align:center;
+	background-color:#000;
+	color:#fff;
+	margin:1%;
+	width:23%;
+	height:60%;
+	padding-top:6%;
+	cursor:pointer;
+}
+
+#c_panel_holder #c_panel_0 div.c_frame_2 {
+	height:70%;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+#c_panel_holder #c_panel_0 div.c_frame_2 #c_file_list_holder ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+
+#c_panel_holder #c_panel_0 div.c_frame_2 #c_file_list_holder ul li {
+	border:2px solid #ccc;
+	margin:1% 0 4% 0;
+	padding:0 0.3em;
+	cursor:pointer;
+}
+
+#c_panel_holder #c_panel_0 div.c_frame_2 #c_file_list_holder ul li.c_selected {
+	background-color:#ccc;
+}
+
+#c_panel_holder #c_panel_0 div.c_frame_2 #c_file_group_handle {
+	width:100%;
+	background-color:#ccc;
+	margin:0 0 3.5% 0;
+	padding:0;
+}
