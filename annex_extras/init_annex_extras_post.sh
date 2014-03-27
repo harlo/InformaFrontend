@@ -1,3 +1,4 @@
+#! /bin/bash
 OLD_DIR=$1
 ICTD=/home/unveillance/conf/ictd.yaml
 GNUPG_HOME=/root/.gpg
