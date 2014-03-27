@@ -40,7 +40,7 @@ do
 done
 
 echo informacam.forms_root: $FORMS_ROOT >> $USER_CONFIG
-python -c "from init import initForms;initForms('"$FORMS_ROOT"')"
+python -c "from init_annex_extra import initForms;initForms('"$FORMS_ROOT"')"
 
 echo "**************************************************"
 echo "Initing keys..."
@@ -51,10 +51,10 @@ gpg --homedir $GNUPG_HOME --allow-secret-key-import --import config_extras/priva
 echo $(gpg --homedir $GNUPG_HOME --fingerprint) >> fingerprint_readout.txt
 
 # set fingerprint
-echo organizationFingerprint: $(python -c "from init import scrapeFingerprint;scrapeFingerprint('"$OLD_DIR/fingerprint_readout.txt"')") >> $ICTD
+echo organizationFingerprint: $(python -c "from init_annex_extra import scrapeFingerprint;scrapeFingerprint('"$OLD_DIR/fingerprint_readout.txt"')") >> $ICTD
 
 # create ICTD
 source /home/unveillance/.bashrc
-python -c "from init import initICTD;initICTD()"
+python -c "from init_annex_extra import initICTD;initICTD()"
 
 cd $OLD_DIR
