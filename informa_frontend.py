@@ -6,7 +6,7 @@ from conf import INFORMA_BASE_DIR
 from api import InformaAPI
 
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
-from lib.Server.lib.Core.Utils.uv_result import Result
+from lib.Frontend.lib.Core.Utils.uv_result import Result
 
 class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	def __init__(self):
@@ -15,6 +15,11 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		
 		self.reserved_routes.extend(["ictd"])
 		self.routes.extend([(r"/ictd/", self.ICTDHandler)])
+				
+		self.on_loads['setup'].extend([
+			'/web/js/models/ic_annex.js',
+			'/web/js/modules/ic_setup.js'
+		])
 	
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
