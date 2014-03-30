@@ -2,7 +2,7 @@ import os, json, re, tornado.web, requests
 from sys import exit, argv
 from time import sleep
 
-from conf import INFORMA_BASE_DIR
+from conf import INFORMA_BASE_DIR, DEBUG
 from api import InformaAPI
 
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
@@ -25,45 +25,38 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		@tornado.web.asynchronous
 		def get(self):
 			self.finish("ICTD GOES HERE")
+	
+	def do_post_batch(self, request):
+		if DEBUG: print "PRE-PROCESSING POST_BATCH FILES FIRST"
+		
+		"""
+		we have to pre-prepare some of the files as they come in. so...
+		"""
+		if "informacam.gpg_private_key.file" not in request.files.keys():
+			return super(InformaFrontend, self).do_post_batch(request)
+		
+		"""
+		1. gpg key has to be split into public and private
+		"""
+		res = Result()
+		
+		private_key = request.files['informacam.gpg_private_key.file']['body']
+		private_key_stub = PostBatchStub(
+			{'informacam.gpg_private_key.file' : private_key},
+			request.uri)
+			
+		pk_start = "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+		public_key = private_key[:private_key.index(pk_start)]
+		public_key_stub = PostBatchStub(
+			{'informacam.gpg_public_key.file' : public_key},
+			request.uri)
+		
+		from lib.Frontend.vars import PostBatchStub
+		if super(InformaFrontend, self).do_post_batch(private_key_stub) is not None:
+			if super(InformaFrontend, self).do_post_batch(public_key_stub) is not None:
+				res.result = 200
 
-	'''
-	def buildAnnexTmp(uuid, batch_root):
-		annex_tmp = super(InformaServer, self).buildAnnexTmp(uuid, batch_root)
-		
-		config_extras = os.path.join(annex_tmp, "inc", "config_extras")
-		form_extras = os.path.join(annex_tmp, "inc", "form_extras")
-		os.makedirs(form_extras)
-		
-		for root, dir, files in os.walk(annex_tmp):
-			for file in files:
-				if root != annex_tmp: continue
-				
-				cmds = []
-				
-				if re.match(r'^informacam.form[0-9]*', file):
-					cmds.append(["mv", os.path.join(root, file), 
-						os.path.join(form_extras, file)])
-				elif file == "informacam.gpg_private_key.file":
-					# split into a public and call it
-					# gpg_public.asc and gpg_private.asc (in config_extras)
-					with open(os.path.join(root, file), 'rb') as pk:
-						private_key = pk.read()
-					
-					pk_start = "-----BEGIN PGP PRIVATE KEY BLOCK-----"
-					public_key = private_key[:private_key.index(pk_start)]
-						
-					with open(os.path.join(config_extras, "gpg_public.asc"), 'wb+') as pk:
-						pk.write(public_key)
-					
-					cmds.append(["mv", os.path.join(root, file),
-						os.path.join(config_extras, "gpg_private.asc")])
-					
-				for cmd in cmds:
-					p = Popen(cmd)
-					p.wait()
-		
-		return annex_tmp
-	'''
+		return res
 	
 	'''
 	def initAnnex(self, credentials):

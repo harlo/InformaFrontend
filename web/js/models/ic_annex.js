@@ -4,10 +4,16 @@ var InformaCamAnnex = Backbone.Model.extend({
 	},
 	
 	buildOrganization: function() {
-		return annex.parseFields();
+		if(!annex.parseFields()) { return false; }
+		
+		
+		
+		return false;
 	},
 	
 	buildICTD: function() {
-		return annex.parseFields();
+		if(!annex.parseFields()) { return false; }
+		
+		return false;
 	}
 });
