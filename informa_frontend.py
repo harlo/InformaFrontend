@@ -1,26 +1,27 @@
 import os, json, re, tornado.web, requests
 from sys import exit, argv
 from time import sleep
-from mako.template import Template
 
 from conf import INFORMA_BASE_DIR
 from api import InformaAPI
 
-from Models.ic_annex import InformaAnnex
-from lib.Server.unveillance_server import UnveillanceServer
+from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Server.lib.Core.Utils.uv_result import Result
 
-class InformaServer(UnveillanceServer, InformaAPI):
+class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	def __init__(self):
-		UnveillanceServer.__init__(self)
+		UnveillanceFrontend.__init__(self)
 		InformaAPI.__init__(self)
 		
-		self.routes.extend([
-			(r"/(?:(?!web/|init/|status/|admin/|post_batch/))([a-zA-Z0-9_/]*/$)?", 
-				self.RouteHandler, dict(route=None)),
-			(r"/web/([a-zA-Z0-9\-/\._]+)", tornado.web.StaticFileHandler, 
-				{"path" : os.path.join(INFORMA_BASE_DIR, "web")})])
+		self.reserved_routes.extend(["ictd"])
+		self.routes.extend([(r"/ictd/", self.ICTDHandler)])
 	
+	class ICTDHandler(tornado.web.RequestHandler):
+		@tornado.web.asynchronous
+		def get(self):
+			self.finish("ICTD GOES HERE")
+
+	'''
 	def buildAnnexTmp(uuid, batch_root):
 		annex_tmp = super(InformaServer, self).buildAnnexTmp(uuid, batch_root)
 		
@@ -57,7 +58,9 @@ class InformaServer(UnveillanceServer, InformaAPI):
 					p.wait()
 		
 		return annex_tmp
+	'''
 	
+	'''
 	def initAnnex(self, credentials):
 		from subprocess import Popen
 		from conf import SSH_ROOT, BASE_DIR
@@ -165,96 +168,20 @@ class InformaServer(UnveillanceServer, InformaAPI):
 			#annex.create()
 			return annex
 		except Exception as e: print e
-		return None
+		return None	
+	'''
 	
-	class RouteHandler(tornado.web.RequestHandler):
-		def initialize(self, route): 
-			self.route = route
-		
-		@tornado.web.asynchronous
-		def get(self, route):
-			static_path = os.path.join(INFORMA_BASE_DIR, "web")
-			content = None
-			r = "main"
-			
-			if route is None:
-				idx = Template(filename=os.path.join(static_path, "index.html"))
-			else:
-				route = [r_ for r_ in route.split("/") if r_ != '']
-				r = route[0]
-				print r
-				
-				idx = Template(filename=os.path.join(static_path, "module.html"))
-				content = Template(
-					filename=os.path.join(static_path, "layout", "%s.html" % r)).render()
-			
-			self.finish(idx.render(on_loader=self.getOnLoad(r), content=content))
-		
-		def getOnLoad(self, route):
-			on_loads = {
-				'get_context' : [
-					"/web/js/modules/get_context.js"
-				],
-				'run_script' : [
-					"/web/js/models/compass_run_log.js",
-					"/web/js/modules/run_script.js"
-				],
-				'annex_admin' : [
-					"/web/js/lib/md5.js",
-					"/web/js/models/unveillance_annex.js",
-					"/web/js/models/informa_annex.js",
-					"/web/js/modules/init_annex.js",
-					"/web/js/lib/dropzone.js",
-					"/web/js/models/unveillance_dropzone.js"
-				]
-			}
-	
-			js = '<script type="text/javascript" src="%s"></script>'
-			if route in [k for k,v in on_loads.iteritems()]:
-				return "".join([js % v for v in on_loads[route]])
-
-			return ""
-		
-		@tornado.web.asynchronous
-		def post(self, route):
-			res = Result()
-			
-			if route is not None:
-				route = [r_ for r_ in route.split("/") if r_ != '']
-				r = "do_%s" % route[0]
-				
-				if hasattr(self.application, r):
-					print "doing %s with:\n" % r
-					res.result = 200
-	
-					func = getattr(self.application, r)
-					if len(self.request.body) > 0:
-						if not passesParameterFilter(self.request.body):
-							res.result = 404
-							
-							self.set_status(res.result)
-							self.finish(res.emit())
-							return
-							
-						print self.request.body				
-						res.data = func(json.loads(self.request.body))
-					else: res.data = func()
-					
-					if res.data is None: res.data = {}
-			
-			self.set_status(res.result)					
-			self.finish(res.emit())
 
 if __name__ == "__main__":
-	informa_server = InformaServer()
+	informa_frontend = InformaFrontend()
 	
-	if len(argv) != 2: exit("Usage: informa_server.py [-start, -stop, -restart]")
+	if len(argv) != 2: exit("Usage: informa_frontend.py [-start, -stop, -restart]")
 	
 	if argv[1] == "-start" or argv[1] == "-firstuse":
-		informa_server.startup()
+		informa_frontend.startup()
 	elif argv[1] == "-stop":
-		informa_server.shutdown()
+		informa_frontend.shutdown()
 	elif argv[1] == "-restart":
-		informa_server.shutdown()
+		informa_frontend.shutdown()
 		sleep(5)
-		informa_server.startup()
+		informa_frontend.startup()

@@ -1,3 +1,6 @@
 [submodule "lib/Server"]
 	path = lib/Server
 	url = git@github.com:harlo/UnveillanceServer.git
+[submodule "lib/Frontend"]
+	path = lib/Frontend
+	url = git@github.com:harlo/UnveillanceInterface.git
