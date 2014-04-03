@@ -6,6 +6,7 @@ from conf import INFORMA_BASE_DIR, DEBUG
 from api import InformaAPI
 
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
+from lib.Frontend.vars import PostBatchStub
 from lib.Frontend.lib.Core.Utils.uv_result import Result
 
 class InformaFrontend(UnveillanceFrontend, InformaAPI):
@@ -32,31 +33,37 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		"""
 		we have to pre-prepare some of the files as they come in. so...
 		"""
-		if "informacam.gpg_private_key.file" not in request.files.keys():
-			return super(InformaFrontend, self).do_post_batch(request, save_local)
+		save_local_files = ["informacam.gpg_private_key.file"]
+		file_stubs = []
 		
-		"""
-		1. gpg key has to be split into public and private
-		"""
-		res = Result()
-		
-		private_key = request.files['informacam.gpg_private_key.file']['body']
-		private_key_stub = PostBatchStub(
-			{'informacam.gpg_private_key.file' : private_key},
-			request.uri)
+		for file in save_local_files:
+			if file in request.files.keys():
+				"""
+				1. gpg key has to be split into public and private
+				"""
+				if file == "informacam.gpg_private_key.file":
+					private_key = request.files['informacam.gpg_private_key.file']['body']
+					file_stubs.append((PostBatchStub(
+						{'informacam.gpg_private_key.file' : private_key},
+						request.uri), save_local=True))
 			
-		pk_start = "-----BEGIN PGP PRIVATE KEY BLOCK-----"
-		public_key = private_key[:private_key.index(pk_start)]
-		public_key_stub = PostBatchStub(
-			{'informacam.gpg_public_key.file' : public_key},
-			request.uri)
+					pk_start = "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+					public_key = private_key[:private_key.index(pk_start)]
+					file_stubs.append((PostBatchStub(
+						{'informacam.gpg_public_key.file' : public_key},
+						request.uri), save_local=False))
 		
-		from lib.Frontend.vars import PostBatchStub
-		if super(InformaFrontend, self).do_post_batch(private_key_stub) is not None:
-			if super(InformaFrontend, self).do_post_batch(public_key_stub) is not None:
-				res.result = 200
-
-		return res
+		if len(file_stubs) == 0:
+			return super(InformaFrontend, self).do_post_batch(request, save_local)
+		else:
+			res = Result()
+			for file_stub in file_stubs:
+				if super(InformaFrontend, self).do_post_batch(file_stub) is None:
+					return res
+		
+			res.result = 200
+		
+		return None
 
 if __name__ == "__main__":
 	informa_frontend = InformaFrontend()

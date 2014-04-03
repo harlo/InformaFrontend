@@ -1,7 +1,7 @@
 import os
 from sys import argv, exit
 
-from conf import ANNEX_DIR
+from conf import ANNEX_DIR, SYNC_TYPES
 
 def intake(mode):
 	if mode not in ["sources","submissions"]: exit(1)
@@ -9,7 +9,7 @@ def intake(mode):
 	print "running watch... (mode=%s)" % mode
 	clients = []
 	
-	for sync_type in sync_types:
+	for sync_type in SYNC_TYPES:
 		if sync_type == "google_drive":
 			from InformaCam.Sync.drive_client import DriveClient
 			clients.append(DriveClient(mode=mode))
