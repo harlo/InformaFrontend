@@ -1,6 +1,8 @@
 import os
 from sys import argv, exit
 
+from conf import ANNEX_DIR
+
 def intake(mode):
 	if mode not in ["sources","submissions"]: exit(1)
 	
@@ -24,8 +26,12 @@ def intake(mode):
 			else:
 				if mode == "sources": continue
 			
-			with open(os.path.join(), 'wb+') as submission:
-				submission.write(client.pullFile(asset))
+			if not os.path.exists(os.path.join(ANNEX_DIR, mode)):
+				os.mkdir(os.path.join(ANNEX_DIR, mode))
+			
+			asset_path = os.path.join(ANNEX_DIR, mode, client.getFileName(asset))
+			with open(asset_path, 'wb+') as asset_file:
+				asset_file.write(client.pullFile(asset))
 				client.absorb(asset)
 				client.lockFile(asset)
 		
