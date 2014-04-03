@@ -2,7 +2,6 @@
 OLD_DIR=`pwd`
 LOCAL_CONFIG=$OLD_DIR/conf/informa.config.yaml
 
-
 #cd lib/Server
 #./setup.sh
 #cd $OLD_DIR
