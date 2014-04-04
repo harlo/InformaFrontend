@@ -12,6 +12,13 @@ try:
 			SYNC_TYPES.append("google_drive")
 		except KeyError as e:
 			print e
+			
+		try:
+			GLOBALEAKS_CONF = config['repository.globaleaks']
+			SYNC_TYPES.append("globaleaks")
+		except KeyError as e:
+			print e
+			
 except IOError as e:
 	print "NO INFORMA CONF YET"
 

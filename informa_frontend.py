@@ -4,7 +4,6 @@ from time import sleep
 
 from api import InformaAPI
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
-from lib.Frontend.vars import PostBatchStub
 from lib.Frontend.lib.Core.Utils.uv_result import Result
 
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG
@@ -46,16 +45,15 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		"""
 		we have to pre-prepare some of the files as they come in. so...
 		"""
-		repo_data_rx = r"informacam\.repository\.(?:(%s))\.\S+" %
-			"|".join(INFORMA_SYNC_TYPES)
+		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
 		ictd_rx = r"informacam\.ictd"
-		forms_rx = r"informacam\.forms\.(?:(.+))"
+		forms_rx = r"informacam\.form"
 		
 		local_file_rx = [ictd_rx, repo_data_rx, forms_rx]
 		
 		for file in request.files.keys():
-			for rx in [rx for rx in save_local_files if re.match(re.compile(rx), file)]:
-				return super(InformaFrontend, self).do_pos_batch(request, 
+			for rx in [rx for rx in local_file_rx if re.match(re.compile(rx), file)]:
+				return super(InformaFrontend, self).do_post_batch(request, 
 					save_local=True, save_to=INFORMA_CONF_ROOT)
 
 		return super(InformaFrontend, self).do_post_batch(request, save_local)
