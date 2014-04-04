@@ -5,7 +5,7 @@ CONF_DIR=$OLD_DIR/conf
 
 GEN_RANDOM="from lib.Frontend.lib.Core.Utils.funcs import generateSecureRandom;print generateSecureRandom();"
 INFORMA_CONF=$CONF_DIR/informacam.config.yaml
-INFORMA_SEC=$CONF_DIR/informacam.secrets.json
+INFORMA_SECRETS=$CONF_DIR/informacam.secrets.json
 INFORMA_ICTD=$CONF_DIR/informacam.ictd.yaml
 GPG_PRIV_KEY=$CONF_DIR/informacam.gpg.priv_key.file
 
@@ -24,7 +24,7 @@ echo $FINGERPRINT
 echo organizationFingerprint: $FINGERPRINT >> $INFORMA_ICTD
 
 # append password to secrets.json
-echo '{ "informacam.gpg.password" : "'$GPG_PWD'" }' > $INFORMA_SEC
+echo '{ "informacam.gpg.password" : "'$GPG_PWD'" }' > $INFORMA_SECRETS
 
 # write any p12s or jsons to secrets.json and delete them, or mv forms to annex
 ANNEX_DIR=$(python -c "from Utils.funcs import getAnnexDir; print getAnnexDir();")

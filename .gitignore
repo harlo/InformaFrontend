@@ -1,6 +1,7 @@
 .DS_Store
 *.pyc
 
+.users/
+
 conf/*.config.yaml
-conf/informacam.secrets.json
-conf/informacam.ictd.*
+conf/informacam.*

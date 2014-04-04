@@ -40,5 +40,3 @@ try:
 			
 except IOError as e:
 	if DEBUG: print "NO INFORMA CONF YET"
-
-getSecrets(password=None)

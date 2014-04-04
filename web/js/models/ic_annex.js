@@ -1,39 +1,44 @@
 var InformaCamAnnex = Backbone.Model.extend({
 	constructor: function() {
-		this.repository = {};
+		this.annex_bundle = {}
 	},
-	
 	buildDefaults: function() {
 		console.info("build defaults");
+		/*
 		if(!annex.parseFields()) { return false; }
-		// pgp password is saved to secrets
-		
-		
-		return false;
+		return true;
+		*/
+		return annex.parseFields();
 	},
-	
 	buildExtras: function() {
 		if(!annex.parseFields()) { return false; }
+		return informaCamAnnex.buildAll();
+	},
+	buildAll: function() {
+		for(var key in annex.annex_bundle) {
+			if(key.match(/^informacam/)) {
+				var val = annex.annex_bundle[key];
+				informaCamAnnex.annex_bundle[key] = val;
+				delete annex.annex_bundle[key];
+			}
+		}
 		
-		
-		
+		// send off informa stuff
+		doInnerAjax("init_informacam", "post",
+			JSON.stringify(informaCamAnnex.annex_bundle),
+			function(json) {
+				json = JSON.parse(json.responseText);
+				if(json.result == 200) {
+					
+				}
+			}
+		);
 		return false;
 	},
-	
-	addToRepository: function(file, res) {		
-		if(!this.repository) { return false; }		
-		if(res.data != 200) { return false; }
-		
-		for(var a=0; a<res.data.addedFiles.length; a++) {
-			if(!this.repository.assets) { this.repository.assets = []; }
-			this.repository.assets.push(res.data.addedFiles[a]);
-		}
-	},
-	
 	setRepository: function(repository) {
+		if(!this.repository) { this.repository = {}; }
 		this.repository.name = repository;
 	},
-	
 	clearForms: function() {
 	
 	}

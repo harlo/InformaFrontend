@@ -7,12 +7,7 @@ function onFormLoaded(pos) {
 			annex.buildSteps.push(informaCamAnnex.buildDefaults);
 			discoverDropzones(
 				{ url : "/post_batch/" + annex.batch_root + "/" }, 
-				"#uv_setup_view_holder",
-				function(files, res) {
-					console.info(files);
-					console.info(res);
-				}
-			);			
+				"#uv_setup_view_holder");			
 			break;
 		case 3:
 			console.info("form 3 loaded");
@@ -30,9 +25,7 @@ function onFormLoaded(pos) {
 						null, "#ic_sync_cred_holder", function() {
 							discoverDropzones(
 								{ url: ("/post_batch/" + annex.batch_root + "/") },
-								"#ic_sync_cred_holder",
-								informaCamAnnex.addToRepository
-							);
+								"#ic_sync_cred_holder");
 						}
 					);
 				}

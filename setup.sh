@@ -4,7 +4,7 @@ LOCAL_CONFIG=$OLD_DIR/conf/informa.config.yaml
 
 echo "**************************************************"
 echo "************** INFORMACAM SETUP **************"
-
+mkdir .users
 
 #cd lib/Server
 #./setup.sh
