@@ -4,7 +4,19 @@ function onFormLoaded(pos) {
 	switch(Number(pos)) {
 		case 2:
 			console.info("form 2 loaded");
-			annex.buildSteps.push(informaCamAnnex.build);
+			annex.buildSteps.push(informaCamAnnex.buildDefaults);
+			discoverDropzones(
+				{ url : "/post_batch/" + annex.batch_root + "/" }, 
+				"#uv_setup_view_holder",
+				function(files, res) {
+					console.info(files);
+					console.info(res);
+				}
+			);			
+			break;
+		case 3:
+			console.info("form 3 loaded");
+			annex.buildSteps.push(informaCamAnnex.buildExtras);
 			discoverDropzones(
 				{ url: ("/post_batch/" + annex.batch_root + "/") },
 				"#uv_setup_view_holder"
@@ -25,7 +37,5 @@ function onFormLoaded(pos) {
 					);
 				}
 			});
-			
-			break;
 	}
 }

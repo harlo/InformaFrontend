@@ -1,7 +1,6 @@
 INFORMA_SYNC_TYPES = ['google_drive', 'globaleaks']
 
 FILE_SALT = "alejrAYOwkngvbfhljqtnrjqTECHNOLOGY3glvufhara"
-
 from lib.Frontend.vars import *
 
 informacam_mime_types = {

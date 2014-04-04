@@ -12,24 +12,28 @@
 		Organization Details: 
 		<input name="informacam.ictd.organizationDetails" type="text" />
 	</p>
-	<p>Add Repository:</p>
-	<div id="ic_repository_holder">
-		<!-- informacam.ictd.repository -->
-		<table>
-			<tr>
-				<td>
-					<select id="ic_sync_chooser">
-						<option value="null">--------------</option>
-						<option value="google_drive">Google Drive</option>
-						<option value="globaleaks">Globaleaks</option>
-					</select>
-				</td>
-				<td>
-					<div id="ic_sync_cred_holder"></div>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<p>Add forms:</p>
-	<div id="ic_form_dropzone_holder"><input rel="5" name="informacam.form" type="file" /></div>
+	<p class="uv_mandatory">
+		GPG Private Key: 
+		<input 
+			name="informacam.gpg.priv_key.file" 
+			type="file" class="uv_mandatory"
+			uv_error_msg="File cannot be empty!" />
+		<span class="uv_error_msg"></span>
+	</p>
+	<p class="uv_mandatory">
+		Password: 
+		<input 
+			name="informacam.gpg.priv_key.password" 
+			class="uv_mandatory" type="password"
+			uv_error_msg="Invalid password!" />
+		<span class="uv_error_msg"></span>
+	</p>
+	<p class="uv_mandatory uv_confirm">
+		Confirm Password: 
+		<input 
+			name="informacam.gpg.priv_key.password.confirm" 
+			class="uv_confirm uv_mandatory" type="password"
+			uv_error_msg="Password must match!" />
+		<span class="uv_error_msg"></span>
+	</p>
 </div>

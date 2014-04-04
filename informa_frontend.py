@@ -21,6 +21,13 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
 		])
+		
+		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
+		ictd_rx = r"informacam\.ictd"
+		forms_rx = r"informacam\.form"
+		gpg_rx = r"informacam\.gpg\.priv_key\.file"
+		
+		self.local_file_rx = [ictd_rx, repo_data_rx, forms_rx, gpg_rx]
 	
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
@@ -31,12 +38,9 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		credentials, password = super(InformaFrontend, self).do_init_annex(request)
 		
 		"""
-			1. run init-informacam.sh with random password
+			1. run init-informacam.sh
 		"""
-		from lib.Frontend.lib.Core.Utils.funcs import generateSecureNonce
-		gpg_password = generateSecureNonce()
-		
-		p = Popen([os.path.join("init-informacam.sh"), gpg_password, password])
+		p = Popen([os.path.join("init-informacam.sh"), password])
 		p.wait()
 		
 	def do_post_batch(self, request, save_local=False):
@@ -45,14 +49,8 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		"""
 		we have to pre-prepare some of the files as they come in. so...
 		"""
-		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
-		ictd_rx = r"informacam\.ictd"
-		forms_rx = r"informacam\.form"
-		
-		local_file_rx = [ictd_rx, repo_data_rx, forms_rx]
-		
 		for file in request.files.keys():
-			for rx in [rx for rx in local_file_rx if re.match(re.compile(rx), file)]:
+			for rx in [rx for rx in self.local_file_rx if re.match(re.compile(rx), file)]:
 				return super(InformaFrontend, self).do_post_batch(request, 
 					save_local=True, save_to=INFORMA_CONF_ROOT)
 

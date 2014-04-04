@@ -3,7 +3,16 @@ var InformaCamAnnex = Backbone.Model.extend({
 		this.repository = {};
 	},
 	
-	build: function() {
+	buildDefaults: function() {
+		console.info("build defaults");
+		if(!annex.parseFields()) { return false; }
+		// pgp password is saved to secrets
+		
+		
+		return false;
+	},
+	
+	buildExtras: function() {
 		if(!annex.parseFields()) { return false; }
 		
 		
