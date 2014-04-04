@@ -2,12 +2,13 @@ import os, json, re, tornado.web, requests
 from sys import exit, argv
 from time import sleep
 
-from conf import INFORMA_BASE_DIR, DEBUG
 from api import InformaAPI
-
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.vars import PostBatchStub
 from lib.Frontend.lib.Core.Utils.uv_result import Result
+
+from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG
+from vars import INFORMA_SYNC_TYPES
 
 class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	def __init__(self):
@@ -27,43 +28,37 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		def get(self):
 			self.finish("ICTD GOES HERE")
 	
+	def do_init_annex(self, request):
+		credentials, password = super(InformaFrontend, self).do_init_annex(request)
+		
+		"""
+			1. run init-informacam.sh with random password
+		"""
+		from lib.Frontend.lib.Core.Utils.funcs import generateSecureNonce
+		gpg_password = generateSecureNonce()
+		
+		p = Popen([os.path.join("init-informacam.sh"), gpg_password, password])
+		p.wait()
+		
 	def do_post_batch(self, request, save_local=False):
 		if DEBUG: print "PRE-PROCESSING POST_BATCH FILES FIRST"
 		
 		"""
 		we have to pre-prepare some of the files as they come in. so...
 		"""
-		save_local_files = ["informacam.gpg_private_key.file"]
-		file_stubs = []
+		repo_data_rx = r"informacam\.repository\.(?:(%s))\.\S+" %
+			"|".join(INFORMA_SYNC_TYPES)
+		ictd_rx = r"informacam\.ictd"
+		forms_rx = r"informacam\.forms\.(?:(.+))"
 		
-		for file in save_local_files:
-			if file in request.files.keys():
-				"""
-				1. gpg key has to be split into public and private
-				"""
-				if file == "informacam.gpg_private_key.file":
-					private_key = request.files['informacam.gpg_private_key.file']['body']
-					file_stubs.append((PostBatchStub(
-						{'informacam.gpg_private_key.file' : private_key},
-						request.uri), save_local=True))
-			
-					pk_start = "-----BEGIN PGP PRIVATE KEY BLOCK-----"
-					public_key = private_key[:private_key.index(pk_start)]
-					file_stubs.append((PostBatchStub(
-						{'informacam.gpg_public_key.file' : public_key},
-						request.uri), save_local=False))
+		local_file_rx = [ictd_rx, repo_data_rx, forms_rx]
 		
-		if len(file_stubs) == 0:
-			return super(InformaFrontend, self).do_post_batch(request, save_local)
-		else:
-			res = Result()
-			for file_stub in file_stubs:
-				if super(InformaFrontend, self).do_post_batch(file_stub) is None:
-					return res
-		
-			res.result = 200
-		
-		return None
+		for file in request.files.keys():
+			for rx in [rx for rx in save_local_files if re.match(re.compile(rx), file)]:
+				return super(InformaFrontend, self).do_pos_batch(request, 
+					save_local=True, save_to=INFORMA_CONF_ROOT)
+
+		return super(InformaFrontend, self).do_post_batch(request, save_local)
 
 if __name__ == "__main__":
 	informa_frontend = InformaFrontend()

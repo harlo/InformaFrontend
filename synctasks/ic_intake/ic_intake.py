@@ -4,7 +4,7 @@ from sys import argv, exit
 from conf import ANNEX_DIR, SYNC_TYPES
 
 def intake(mode):
-	if mode not in ["sources","submissions"]: exit(1)
+	if mode not in ["sources", "submissions"]: exit(0)
 	
 	print "running watch... (mode=%s)" % mode
 	clients = []
