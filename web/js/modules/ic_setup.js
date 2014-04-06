@@ -32,3 +32,8 @@ function onFormLoaded(pos) {
 			});
 	}
 }
+
+function onAnnexInited(res) {
+	ic_user = new InformaCamUser(informaCamAnnex['informacam.config.admin.username'],
+		annex['unveillance.local_remote.password']);
+}

@@ -1,6 +1,10 @@
 INFORMA_SYNC_TYPES = ['google_drive', 'globaleaks']
+USER_CREDENTIAL_PACK = {
+	"username" : "",
+	"saved_searches" : [],
+	"session_log" : []
+}
 
-FILE_SALT = "alejrAYOwkngvbfhljqtnrjqTECHNOLOGY3glvufhara"
 from lib.Frontend.vars import *
 
 informacam_mime_types = {
