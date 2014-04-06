@@ -1,3 +1,8 @@
+from collections import namedtuple
+
+informacam_cookie = namedtuple("informacam_cookie", "ADMIN USER PUBLIC")
+InformaCamCookie = informacam_cookie("informacam_admin", "informacam_user", "informacam_public")
+
 INFORMA_SYNC_TYPES = ['google_drive', 'globaleaks']
 USER_CREDENTIAL_PACK = {
 	"username" : "",

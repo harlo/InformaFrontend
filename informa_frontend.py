@@ -6,8 +6,8 @@ from api import InformaAPI
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.Utils.uv_result import Result
 
-from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG
-from vars import INFORMA_SYNC_TYPES
+from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE
+from vars import INFORMA_SYNC_TYPES, InformaCamCookie
 
 class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	def __init__(self):
@@ -19,7 +19,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			(r"/login/", self.LoginHandler),
 			(r"/logout/", self.LogoutHandler)])
 		
-		self.default_on_loads = ['/web/js/models/ic_user.js']
+		self.default_on_loads = ['/web/js/informacam.js', '/web/js/models/ic_user.js']
 		self.on_loads['setup'].extend([
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
@@ -31,6 +31,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		gpg_rx = r"informacam\.gpg\.priv_key\.file"
 		
 		self.local_file_rx = [ictd_rx, repo_data_rx, forms_rx, gpg_rx]
+		self.WEB_TITLE = WEB_TITLE
 	
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
@@ -61,11 +62,11 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				res.data = do_login[0]
 				
 				if do_login[1]:
-					self.set_secure_cookie(ADMIN_COOKIE_TAG, 
+					self.set_secure_cookie(InformaCamCookie.ADMIN, 
 						"true", path="/", expires_days=1)
 				
 				from base64 import b64encode
-				self.set_secure_cookie(NORMAL_LOGIN_TAG, 
+				self.set_secure_cookie(InformaCamCookie.USER, 
 					b64encode(json.dumps(do_login[0])), path="/", expires_days=1)
 			
 			else: res.result = 412

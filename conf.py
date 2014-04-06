@@ -7,6 +7,7 @@ INFORMA_BASE_DIR = os.path.abspath(os.path.join(__file__, os.pardir))
 INFORMA_CONF_ROOT = os.path.join(INFORMA_BASE_DIR, "conf")
 INFORMA_USER_ROOT = os.path.join(INFORMA_BASE_DIR, ".users")
 INFORMA_GPG_ROOT = os.path.join(INFORMA_BASE_DIR, ".gpg")
+WEB_TITLE = "InformaCam 2.0"
 
 def getSecrets(password=None):
 	try:
