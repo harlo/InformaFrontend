@@ -38,10 +38,8 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		credentials, password = super(InformaFrontend, self).do_init_annex(request)
 		
 		"""
-			1. run init-informacam.sh
+			1. encrypt secrets to password, and login user here.
 		"""
-		p = Popen([os.path.join("init-informacam.sh"), password])
-		p.wait()
 		
 	def do_post_batch(self, request, save_local=False):
 		if DEBUG: print "PRE-PROCESSING POST_BATCH FILES FIRST"

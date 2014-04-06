@@ -1,16 +1,6 @@
 import os, json
 from base64 import b64encode, b64decode
 
-def parsePrivateKey(key_path):
-	try:
-		with open(key_path, 'rb') as key:
-			private_key = key.read()
-			fingerprint = "DERPIEDERP"
-			
-			
-			return fingerprint
-	except Exception as e: return None
-
 def b64(srcPath, mode, destPath=None):
 	with open(srcPath, 'rb') as file:
 		if mode == "e": content = b64encode(file.read())
@@ -20,13 +10,6 @@ def b64(srcPath, mode, destPath=None):
 			with open(destPath, 'wb+') as destFile: destFile.write(content)
 		else:
 			return content
-
-def packageInformaRepo(): pass
-
-def getAnnexDir():
-	DEBUG = False
-	from conf import ANNEX_DIR
-	return ANNEX_DIR
 
 def saveInformaCamDirective(path):
 	from conf import INFORMA_CONF_ROOT
