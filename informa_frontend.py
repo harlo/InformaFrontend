@@ -42,6 +42,12 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		def get(self):
 			self.finish("ICTD GOES HERE")
 	
+	def do_init_synctask(self, handler):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
+		return super(InformaFrontend, self).do_init_synctask(handler)
+	
 	def do_init_annex(self, handler):
 		status = self.do_get_status(handler)
 		if status == 0: return None
