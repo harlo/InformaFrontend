@@ -5,9 +5,27 @@ var InformaCamUser = Backbone.Model.extend({
 		} else {
 			doInnerAjax("get_status", "post", null, function(json) {
 				json = JSON.parse(json.responseText);
-				console.info(json);
 				if(json.result == 200) {
 					status = Number(json.data);
+					if(status == 0) { return; }
+					
+					var nav_ul = $("#ic_navigation").children('ul')[0];
+					var nav_child = document.createElement('li');
+					if(status == 1) { 
+						insertTemplate("nav_login.html", null, nav_child, 
+							function() { $(nav_ul).append(nav_child);}
+						);
+						
+					} else if(status == 2 || status == 3) {
+						if(!informacam_user.loadUser()) { return; }
+						insertTemplate(
+							"nav_logout.html",
+							{ username: informacam_user.username },
+							nav_child,
+							function() { $(nav_ul).append(nav_child); }
+						);
+					}
+						
 				}
 			});
 		}
@@ -20,6 +38,8 @@ var InformaCamUser = Backbone.Model.extend({
 		for(var key in user_data) {
 			this.set(key, user_data[key]);
 		}
+		
+		return true;
 	},
 	
 	setUser: function(user_data) {

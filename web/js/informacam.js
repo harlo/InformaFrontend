@@ -10,6 +10,10 @@ function initUser() {
 			alert("OMIGERD");
 		});
 		
+		this.get(/(.*)\#me/, function(context) {
+			alert("USER STUFF");
+		});
+		
 		this.get(/(.*)\#login/, function(context) {
 		
 		});
