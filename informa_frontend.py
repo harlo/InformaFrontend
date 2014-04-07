@@ -14,12 +14,10 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		UnveillanceFrontend.__init__(self)
 		InformaAPI.__init__(self)
 		
-		self.reserved_routes.extend(["ictd", "login", "logout"])
-		self.routes.extend([(r"/ictd/", self.ICTDHandler),
-			(r"/login/", self.LoginHandler),
-			(r"/logout/", self.LogoutHandler)])
+		self.reserved_routes.extend(["ictd"])
+		self.routes.extend([(r"/ictd/", self.ICTDHandler)])
 		
-		self.default_on_loads = ['/web/js/informacam.js', '/web/js/models/ic_user.js']
+		self.default_on_loads = ['/web/js/lib/sammy.js', '/web/js/informacam.js', '/web/js/models/ic_user.js']
 		self.on_loads['setup'].extend([
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
@@ -29,8 +27,14 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		ictd_rx = r"informacam\.ictd"
 		forms_rx = r"informacam\.form"
 		gpg_rx = r"informacam\.gpg\.priv_key\.file"
-		
 		self.local_file_rx = [ictd_rx, repo_data_rx, forms_rx, gpg_rx]
+		
+		tmpl_root = os.path.join(INFORMA_BASE_DIR, "web", "layout", "tmpl")
+		self.INDEX_HEADER = os.path.join(tmpl_root, "header.html")
+		self.INDEX_FOOTER = os.path.join(tmpl_root, "footer.html")
+		self.MODULE_HEADER = self.INDEX_HEADER
+		self.MODULE_FOOTER = self.INDEX_FOOTER
+
 		self.WEB_TITLE = WEB_TITLE
 	
 	class ICTDHandler(tornado.web.RequestHandler):
@@ -38,44 +42,11 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		def get(self):
 			self.finish("ICTD GOES HERE")
 	
-	class LogoutHandler(tornado.web.RequestHandler):
-		@tornado.web.asynchronous
-		def post(self):
-			res = Result()
-			do_logout = self.logout(self.request)
-			
-			if do_logout is not None:
-				if do_logout: res.result = 200
-				else: res.result = 412
-				
-			self.set_status(res.result)
-			self.finish(res.emit())
-			
-	class LoginHandler(tornado.web.RequestHandler):
-		@tornado.web.asynchronous
-		def post(self):
-			res = Result()
-			do_login = self.login(self.request)
-			
-			if do_login is not None: 
-				res.result = 200
-				res.data = do_login[0]
-				
-				if do_login[1]:
-					self.set_secure_cookie(InformaCamCookie.ADMIN, 
-						"true", path="/", expires_days=1)
-				
-				from base64 import b64encode
-				self.set_secure_cookie(InformaCamCookie.USER, 
-					b64encode(json.dumps(do_login[0])), path="/", expires_days=1)
-			
-			else: res.result = 412
-			
-			self.set_status(res.result)
-			self.finish(res.emit())
-	
-	def do_init_annex(self, request):
-		credentials, password = super(InformaFrontend, self).do_init_annex(request)
+	def do_init_annex(self, handler):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
+		credentials, password = super(InformaFrontend, self).do_init_annex(handler)
 		
 		"""
 			1. create new informacam admin user
@@ -83,18 +54,21 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		from conf import ADMIN_USERNAME
 		return self.createNewUser(ADMIN_USERNAME, password, as_admin=True)
 		
-	def do_post_batch(self, request, save_local=False):
+	def do_post_batch(self, handler, save_local=False):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
 		if DEBUG: print "PRE-PROCESSING POST_BATCH FILES FIRST"
 		
 		"""
 		we have to pre-prepare some of the files as they come in. so...
 		"""
-		for file in request.files.keys():
+		for file in handler.request.files.keys():
 			for rx in [rx for rx in self.local_file_rx if re.match(re.compile(rx), file)]:
-				return super(InformaFrontend, self).do_post_batch(request, 
+				return super(InformaFrontend, self).do_post_batch(handler, 
 					save_local=True, save_to=INFORMA_CONF_ROOT)
 
-		return super(InformaFrontend, self).do_post_batch(request, save_local)
+		return super(InformaFrontend, self).do_post_batch(handler, save_local)
 
 if __name__ == "__main__":
 	informa_frontend = InformaFrontend()

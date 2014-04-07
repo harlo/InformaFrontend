@@ -2,6 +2,23 @@ var InformaCamUser = Backbone.Model.extend({
 	constructor: function(username, password) {
 		if(username && password) {
 			this.doLogin(username, password);
+		} else {
+			doInnerAjax("get_status", "post", null, function(json) {
+				json = JSON.parse(json.responseText);
+				console.info(json);
+				if(json.result == 200) {
+					status = Number(json.data);
+				}
+			});
+		}
+	},
+	
+	loadUser: function() {
+		var user_data = JSON.parse(localStorage.getItem('informacam_user'));
+		if(!user_data) { return false; }
+		
+		for(var key in user_data) {
+			this.set(key, user_data[key]);
 		}
 	},
 	
@@ -45,7 +62,13 @@ var InformaCamUser = Backbone.Model.extend({
 	},
 	
 	doLogin: function(username, password) {
-		doInnerAjax("/login/", "post", 
+		if(!username && !password) {
+			// parse field for username and password
+			username = "";
+			password = "";
+		}
+		
+		doInnerAjax("login", "post", 
 			JSON.stringify({ username : username, password : password}),
 			function(json) {
 				json = JSON.parse(json.responseText);
@@ -59,15 +82,17 @@ var InformaCamUser = Backbone.Model.extend({
 	doLogout: function(with_password) {
 		var user_data = null;
 		if(with_password) {
-			// parse field for username and password
-			user_data = { username : "", password : "", user : this.render() };
+			// parse field for password
+			user_data = {
+				username : this.username , 
+				password : "", 
+				user : this.render()
+			};
 		}
 	
-		doInnerAjax("/logout/", "post", user_data, function(json) {
+		doInnerAjax("logout", "post", user_data, function(json) {
 			json = JSON.parse(json.responseText);
-			if(json.result == 200) {
-				informacam_user.unsetUser();
-			}
+			if(json.result == 200) { informacam_user.unsetUser(); }
 		});
 	}
 });

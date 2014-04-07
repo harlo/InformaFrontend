@@ -3,16 +3,34 @@ from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 
 from conf import DEBUG, INFORMA_CONF_ROOT, INFORMA_USER_ROOT
-from vars import USER_CREDENTIAL_PACK
+from vars import USER_CREDENTIAL_PACK, InformaCamCookie
 from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity
 
 class InformaAPI():
 	def __init__(self):
 		print "InformaAPI STARTED TOO!!!"
-	
-	def do_init_informacam(self, request):
+		
+	def do_get_status(self, handler):
+		try:
+			for cookie in handler.request.cookies:
+				if cookie == InformaCamCookie.PUBLIC: return 0
+		except KeyError as e: pass
+		
+		access = handler.get_secure_cookie(InformaCamCookie.USER)
+		if access is not None:
+			if handler.get_secure_cookie(InformaCamCookie.ADMIN) is not None:
+				return 3
+				
+			return 2
+
+		return 1
+		
+	def do_init_informacam(self, handler):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
 		if DEBUG: print "Initing INFORMA"
-		informacam_annex = parseRequestEntity(request.body)
+		informacam_annex = parseRequestEntity(handler.request.body)
 		if informacam_annex is None:  return None
 		
 		if DEBUG: print informacam_annex
@@ -100,10 +118,16 @@ class InformaAPI():
 			
 		return None
 	
-	def logout(self, request):
-		credentials = parseRequestEntity(request.body)
+	def do_logout(self, handler):
+		status = self.do_get_status(handler)
+		if status not in [2, 3]: return None
+				
+		credentials = parseRequestEntity(handler.request.body)
 		if credentials is None: return None
 		if DEBUG: print credentials
+		
+		handler.clear_cookie(InformaCamCookie.USER)
+		handler.clear_cookie(InformaCamCookie.ADMIN)
 		
 		try:
 			password = credentials['password']
@@ -131,8 +155,11 @@ class InformaAPI():
 		
 		return None
 	
-	def login(self, request):		
-		credentials = parseRequestEntity(request.body)
+	def do_login(self, handler):
+		status = self.do_get_status(handler)
+		if status != 1:	return None
+		
+		credentials = parseRequestEntity(handler.request.body)
 		if credentials is None: return None
 		if DEBUG: print credentials
 		
@@ -142,12 +169,10 @@ class InformaAPI():
 			if DEBUG: print e
 			return None
 		
-		if credentials['username'] is "" or credentials['password'] is "": return None	
-		as_admin = False
-		user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],
-			salt=USER_SALT)
-		
 		try:
+			user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],
+				salt=USER_SALT)
+
 			with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
 				user_data = self.decryptUserData(UD.read(), 
 					credentials['password'], p_salt=SALT)
@@ -155,11 +180,14 @@ class InformaAPI():
 				try:
 					if user_data['admin']: 
 						del user_data['admin']
-						as_admin = True
+						handler.set_secure_cookie(InformaCamCookie.ADMIN, 
+							"true", path="/", expires_days=1)
 				except KeyError as e: pass
 				
-				return (user_data, as_admin)
-		except IOError as e:
+				handler.set_secure_cookie(InformaCamCookie.USER, 
+					b64encode(json.dumps(user_data)), path="/", expires_days=1)
+				return user_data
+		except Exception as e:
 			if DEBUG: print e		
 		
 		return None
