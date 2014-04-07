@@ -23,3 +23,13 @@
 	float:left;
 	margin:0 0 0 0.6em;
 }
+
+#header #ic_header_popup {
+	position:relative;
+	clear:both;
+	top:0;
+	float:right;
+	border:1px solid #000;
+	width:47%;
+	min-height:10em;
+}

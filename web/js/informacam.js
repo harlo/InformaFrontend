@@ -4,22 +4,29 @@ function initUser() {
 	informacam_user = new InformaCamUser();
 }
 
+function loadHeaderPopup(view, onSuccess) {
+	if(!toggleElement($("#ic_header_popup"))) { toggleElement($("#ic_header_popup")); }
+	
+	insertTemplate((view + ".html"), null, $("#ic_header_popup_content"), 
+		onSuccess, "/web/layout/views/popup/");
+}
+
 (function($) {
 	var header_sammy = $.sammy("#header", function() {
 		this.get(/(.*)\#search/, function(context) {
-			alert("OMIGERD");
+			loadHeaderPopup("search", null);
 		});
 		
 		this.get(/(.*)\#me/, function(context) {
-			alert("USER STUFF");
+			loadHeaderPopup("me", null);
 		});
 		
 		this.get(/(.*)\#login/, function(context) {
-		
+			loadHeaderPopup("login", null);
 		});
 		
 		this.get(/(.*)\#logout/, function(context) {
-		
+			loadHeaderPopup("logout", null);
 		});
 	});
 	

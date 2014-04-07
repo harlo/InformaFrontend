@@ -11,21 +11,20 @@ var InformaCamUser = Backbone.Model.extend({
 					
 					var nav_ul = $("#ic_navigation").children('ul')[0];
 					var nav_child = document.createElement('li');
-					if(status == 1) { 
-						insertTemplate("nav_login.html", null, nav_child, 
-							function() { $(nav_ul).append(nav_child);}
-						);
-						
-					} else if(status == 2 || status == 3) {
+					var tmpl = "nav_login.html";
+					var data = null;
+					
+					if(status == 2 || status == 3) {
 						if(!informacam_user.loadUser()) { return; }
-						insertTemplate(
-							"nav_logout.html",
-							{ username: informacam_user.username },
-							nav_child,
-							function() { $(nav_ul).append(nav_child); }
-						);
-					}
 						
+						tmpl = "nav_logout.html";
+						data = { username: informacam_user.username };
+					}
+					
+					insertTemplate(
+						tmpl, data, nav_child,
+						function() { $(nav_ul).append(nav_child); }
+					);	
 				}
 			});
 		}
@@ -86,17 +85,45 @@ var InformaCamUser = Backbone.Model.extend({
 			// parse field for username and password
 			username = "";
 			password = "";
+			
+			var values = $("#ic_header_popup_content").find("input");
+			if(values.length == 0) { return false; }
+			
+			for(var i=0; i<values.length; i++) {
+				var item = values[i];
+				
+				$($(item).siblings(".uv_error_msg")[0]).css('visibility', 'hidden');
+				if($(item).hasClass('uv_invalid')) {
+					$(item).removeClass('uv_invalid');
+				}
+				
+				if(!(validateFormField($(item), $("#ic_header_popup_content")))) { 
+					return false; 
+				}
+				
+				if($(item).attr('name') == "informacam.config.user.username") {
+					username = $(item).val();
+				} else if($(item).attr('name') == "informacam.config.user.password") {
+					password = $(item).val();
+				}
+			}
 		}
+		
+		if(username == "" || password == "") { return false; }
 		
 		doInnerAjax("login", "post", 
 			JSON.stringify({ username : username, password : password}),
 			function(json) {
 				json = JSON.parse(json.responseText);
-				if(json.result == 200) {
+				if(json.result == 200 && json.data) {
 					informacam_user.setUser(json.data);
+				} else {
+					// throw error...
 				}
 			}
 		);
+		
+		return true;
 	},
 	
 	doLogout: function(with_password) {
