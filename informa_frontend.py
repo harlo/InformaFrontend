@@ -21,6 +21,13 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
 		])
+		self.on_loads.update({
+			'submissions' : ['/web/js/modules/ic_submissions.js'],
+			'submission' : [
+				'/web/js/modules/ic_submission.js',
+				'/web/js/models/ic_submission.js'],
+			'sources' : ['/web/js/modules/ic_sources.js']
+		})
 		
 		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
 		ictd_rx = r"informacam\.ictd"
