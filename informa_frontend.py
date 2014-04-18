@@ -4,7 +4,6 @@ from time import sleep
 
 from api import InformaAPI
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
-from lib.Frontend.lib.Core.Utils.uv_result import Result
 
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE
 from vars import INFORMA_SYNC_TYPES, InformaCamCookie

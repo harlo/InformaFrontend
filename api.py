@@ -147,7 +147,7 @@ class InformaAPI():
 			if user_data is None: return None
 			
 			new_data = copy.deepcopy(user_data)
-			new_data['saved_searches'] = credentials['user']['saved_searches']
+			new_data['saved_searches'] = credentials['save_data']['saved_searches']
 		
 		with open(os.path.join(INFORMA_USER_ROOT, user_root), 'wb+') as UD:
 			UD.write(self.encrypt(new_data, password, iv=IV, p_salt=SALT))

@@ -2,5 +2,13 @@
 	<a onclick="toggleElement('#ic_logout_with_data_holder');">Save my data?</a> or <a onclick="informacam_user.doLogout();">just log out?</a>
 </p>
 <div id="ic_logout_with_data_holder" style="display:none;">
-	<p>Password: <input type="password" name="informacam.config.user.password" /> <a onclick="informacam_user.doLogout(true);">Go!</a></p>
+	<p>
+		Password: 
+		<input 
+			name="informacam.config.user.password" 
+			type="password" class="uv_mandatory"
+			uv_error_msg="Password cannot be blank!" />
+		<span class="uv_error_msg"></span>
+	</p>
+	<a onclick="informacam_user.doLogout(true);">Go!</a>
 </div>

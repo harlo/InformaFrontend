@@ -4,10 +4,6 @@ var InformaCamAnnex = Backbone.Model.extend({
 	},
 	buildDefaults: function() {
 		console.info("build defaults");
-		/*
-		if(!annex.parseFields()) { return false; }
-		return true;
-		*/
 		return annex.parseFields();
 	},
 	buildExtras: function() {
@@ -33,7 +29,8 @@ var InformaCamAnnex = Backbone.Model.extend({
 				}
 			}
 		);
-		return false;
+		
+		return true;
 	},
 	setRepository: function(repository) {
 		if(!this.repository) { this.repository = {}; }

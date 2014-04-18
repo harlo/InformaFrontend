@@ -1,8 +1,9 @@
 OLD_DIR=`pwd`
 ANNEX_DIR=$1
 CONF_DIR=$OLD_DIR/conf
+REMOTE=user@host:/root
 
-# write any p12s or jsons to secrets.json and delete them, or mv forms to annex
+# write any p12s or jsons to secrets.json and delete them, or scp forms to annex
 for f in $CONF_DIR/*
 do
 	echo $f
@@ -13,13 +14,9 @@ do
 	
 	if echo "$f" | grep '^informacam.form*' > /dev/null
 	then
-		mv $CONF_DIR/$f $ANNEX_DIR/
+		scp $CONF_DIR/$f $REMOTE/forms
 	fi
 done
-
-# save ictd, gpg public key to local_remote
-mv $CONF_DIR/informacam.ictd.yaml $ANNEX_DIR/
-mv $CONF_DIR/informacam.gpg.pub_key.file $ANNEX_DIR/
 
 # delete private key; we don't need/want it on server and it's already in keyring
 #rm $GPG_PRIV_KEY

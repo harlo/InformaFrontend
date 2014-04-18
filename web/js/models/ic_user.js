@@ -43,6 +43,7 @@ var InformaCamUser = Backbone.Model.extend({
 	
 	setUser: function(user_data) {
 		localStorage.setItem('informacam_user', JSON.stringify(user_data));
+		window.history.back();
 		window.location.reload();
 	},
 	
@@ -128,12 +129,36 @@ var InformaCamUser = Backbone.Model.extend({
 	
 	doLogout: function(with_password) {
 		var user_data = null;
+		var password = "";
+		
 		if(with_password) {
 			// parse field for password
+			var values = $("#ic_header_popup_content").find("input");
+			if(values.length == 0) { return false; }
+			
+			for(var i=0; i<values.length; i++) {
+				var item = values[i];
+				
+				$($(item).siblings(".uv_error_msg")[0]).css('visibility', 'hidden');
+				if($(item).hasClass('uv_invalid')) {
+					$(item).removeClass('uv_invalid');
+				}
+				
+				if(!(validateFormField($(item), $("#ic_header_popup_content")))) { 
+					return false; 
+				}
+				
+				if($(item).attr('name') == "informacam.config.user.password") {
+					password = $(item).val();
+					break;
+				}
+			}
+			
+			
 			user_data = {
 				username : this.username , 
-				password : "", 
-				user : this.render()
+				password : password, 
+				save_data : this.render()
 			};
 		}
 	
