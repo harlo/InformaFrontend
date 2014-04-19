@@ -191,7 +191,7 @@ class InformaAPI():
 			if DEBUG: print e		
 		
 		return None
-	
+		
 	def encryptUserData(self, plaintext, password, iv=None, p_salt=None):
 		if p_salt is not None:
 			password = password + p_salt
