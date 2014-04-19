@@ -45,7 +45,8 @@ function initSubmission() {
 									submission.set({ j3m : j3m.data });
 									insertTemplate("submission_extended.html",
 										submission.toJSON(), 
-										"#ic_submission_extended", null
+										"#ic_submission_extended",
+										function() { submission.buildJ3M(); }
 									);
 								}
 							}

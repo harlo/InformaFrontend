@@ -2,13 +2,13 @@
 	<div class="ic_header"><span>Info</span></div>
 	<div id="ic_info_holder">
 		<div class="ic_pod">
-			<p>Date Created: {{ date_added }}</p>
+			<p>Date Created: <span class="uv_translate uv_date">{{ j3m.genealogy.dateCreated }}</p>
 		</div>
 		<div class="ic_pod">
-			<p>Device Type: </p>
+			<p>Device Type: {{ j3m.data.exif.make }} {{ j3m.data.exif.model }}</p>
 		</div>
 		<div class="ic_pod">
-			<p>Original Size: </p>
+			<p>Original Size: {{ j3m.data.exif.width }} x {{ j3m.data.exif.height }}</p>
 		</div>
 		<div class="ic_pod">
 			<p>Temperature: </p>
@@ -17,13 +17,13 @@
 			<p>Altitude: </p>
 		</div>
 		<div class="ic_pod">
-			<p>Location: </p>
+			<p>Location: {{ j3m.data.exif.location }}</p>
 		</div>
 		<div class="ic_pod">
 			<p>Bearing: </p>
 		</div>
 		<div class="ic_pod">
-			<p>Captured by: </p>
+			<p>Captured by: {{ j3m.intent.alias }} ({{ j3m.intent.pgpKeyFingerprint }})</p>
 		</div>
 	</div>
 </div>

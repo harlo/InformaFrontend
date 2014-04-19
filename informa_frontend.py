@@ -24,6 +24,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		self.on_loads.update({
 			'submissions' : ['/web/js/modules/ic_submissions.js'],
 			'submission' : [
+				'/web/js/lib/crossfilter.min.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/js/models/ic_submission.js'],
 			'sources' : ['/web/js/modules/ic_sources.js']
