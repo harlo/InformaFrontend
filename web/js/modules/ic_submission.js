@@ -2,15 +2,15 @@ var submission = null;
 
 (function($) {
 	var sub_sammy = $.sammy("#content", function() {
-		this.get(/(.*)\#j3m/, function(context) {
+		this.get(/.*\#j3m/, function(context) {
 			console.info("J3M");
 		});
 		
-		this.get(/(.*)\#view/, function(context) {
+		this.get(/.*\#view/, function(context) {
 			console.info("VIEW");
 		});
 		
-		this.get(/(.*)\#original/, function(context) {
+		this.get(/.*\#original/, function(context) {
 			console.info("DOWNLOAD ORIGINAL");
 		});
 		
@@ -25,6 +25,55 @@ var submission = null;
 		initSubmission();
 	});
 })(jQuery);
+
+function setJ3MInfo(item) {
+	console.info(item);
+	var info_holder = $(document.createElement("div"));
+	insertTemplate("j3m_info.html", item, info_holder, function() {
+		$($(info_holder).find(".ic_j3m_info_vizualization")[0]).attr({
+			'id' : item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase()
+		});
+		$("#ic_j3m_info_holder").append(info_holder);
+		buildChart(item);
+	});
+}
+
+function buildChart(obj) {
+	var id = ("#" + obj.label.replace(/ /g, "").replace(/,/g, "").toLowerCase());
+
+	var w = $(window).width();
+	var h = $(window).height() * 0.33;
+	var pl = 0;
+	var pt = h * 0.85;
+	
+	var x = d3.scale.ordinal().rangeRoundBands([0, w], .1);
+	var x_axis = d3.svg.axis().scale(x).orient("bottom");
+	
+	var y = d3.scale.linear().rangeRound([h, 0]);
+	var y_axis = d3.svg.axis().scale(y).orient("left");
+	
+	var viz = d3.select(id);
+	var svg = viz.append("svg:svg").attr({
+			'width' : w,
+			'height' : h,
+			'class' : 'ic_viz'
+	});
+	
+	svg.append("svg:g")
+		.attr({
+			'transform' : "translate(" + pl + "," + pt + ")",
+			'class' : 'x_axis',
+		})
+		.call(x_axis);
+			
+	svg.append("svg:g")
+		.attr({
+			'transform' : "translate(" + (pl + 40) + "," + 0 + ")",
+			'class' : 'y_axis'
+		})
+		.call(y_axis);
+	
+}
 
 function initSubmission() {	
 	_id = location.search.split('_id=')[1];
@@ -46,7 +95,10 @@ function initSubmission() {
 									insertTemplate("submission_extended.html",
 										submission.toJSON(), 
 										"#ic_submission_extended",
-										function() { submission.buildJ3M(); }
+										function() {
+											submission.buildJ3M();
+											_.each(submission.j3m_info, setJ3MInfo);
+										}
 									);
 								}
 							}

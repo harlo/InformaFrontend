@@ -2,7 +2,8 @@ import json, copy
 from time import time, sleep
 
 from lib.Frontend.lib.Core.Utils.funcs import generateMD5Hash
-from vars import FILE_SALT, MIME_TYPES, MIME_TYPE_MAP
+from vars import MIME_TYPES, MIME_TYPE_MAP
+from conf import DOC_SALT
 
 class InformaCamSyncClient(object):
 	def __init__(self, log_path, mode):
@@ -20,7 +21,7 @@ class InformaCamSyncClient(object):
 		self.usable = True
 	
 	def getFileNameHash(self, name_base):
-		return generateMD5Hash(content=name_base, salt=FILE_SALT)
+		return generateMD5Hash(content=name_base, salt=DOC_SALT)
 	
 	def updateLog(self, log_path, num_tires=0):
 		if num_tries >= 10: return

@@ -11,16 +11,16 @@
 			<p>Original Size: {{ j3m.data.exif.width }} x {{ j3m.data.exif.height }}</p>
 		</div>
 		<div class="ic_pod">
-			<p>Temperature: </p>
+			<p>Temperature: <span id="j3m_temperature"></span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Altitude: </p>
+			<p>Altitude: <span id="j3m_altitude"></span></p>
 		</div>
 		<div class="ic_pod">
 			<p>Location: {{ j3m.data.exif.location }}</p>
 		</div>
 		<div class="ic_pod">
-			<p>Bearing: </p>
+			<p>Bearing: <span id="j3m_bearing"></span></p>
 		</div>
 		<div class="ic_pod">
 			<p>Captured by: {{ j3m.intent.alias }} ({{ j3m.intent.pgpKeyFingerprint }})</p>
@@ -28,8 +28,8 @@
 	</div>
 </div>
 <div>
+	<div id="ic_j3m_info_holder"></div>
 	<div class="ic_toggle ic_header"><a href="#j3m">J3M</a></div>
-	<div id="ic_j3m_holder"></div>
 </div>
 <div>
 	<div class="ic_header"><span>Export J3M as...</span></div>
