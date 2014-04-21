@@ -34,7 +34,7 @@ function setJ3MInfo(item) {
 			'id' : item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase()
 		});
 		$("#ic_j3m_info_holder").append(info_holder);
-		buildChart(item);
+		item.build();
 	});
 }
 
@@ -46,7 +46,7 @@ function buildChart(obj) {
 	var pl = 0;
 	var pt = h * 0.85;
 	
-	var x = d3.scale.ordinal().rangeRoundBands([0, w], .1);
+	var x = d3.scale.linear().rangeRound([0, w]);
 	var x_axis = d3.svg.axis().scale(x).orient("bottom");
 	
 	var y = d3.scale.linear().rangeRound([h, 0]);
@@ -73,6 +73,7 @@ function buildChart(obj) {
 		})
 		.call(y_axis);
 	
+	return svg;
 }
 
 function initSubmission() {	

@@ -31,7 +31,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend: [],
 			filter: d.filter(function(se) {
 				return parseSensorEventKeys(["gps_coords"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 		
 		this.j3m_info.pitchRollAzimuth = {
@@ -40,7 +44,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			filter: d.filter(function(se) {
 				return parseSensorEventKeys(["pitch", "pitchCorrected", "roll",
 					"rollCorrected", "azimuth", "azimuthCorrected"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 		
 		this.j3m_info.accelerometer = {
@@ -48,7 +56,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend : [],
 			filter: d.filter(function(se) {
 				return parseSensorEventKeys(["acc_x", "acc_y", "acc_z"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 		
 		this.j3m_info.lightMeterValue = {
@@ -56,7 +68,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend: [],
 			filter: d.filter(function(se) {
 				return parseSensorEventKeys(["lightMeterValue"], se);;
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 		
 		this.j3m_info.visibleCellTowers = {
@@ -64,7 +80,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend : [],
 			fitler : d.filter(function(se) {
 				return parseSensorEventKeys(["cellTowerId", "MCC", "LAC"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 		
 		this.j3m_info.visibleBluetoothDevices = {
@@ -72,7 +92,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend : [],
 			filter : d.filter(function(se) {
 				return parseSensorEventKeys(["bluetoothDeviceAddress"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		}
 		
 		this.j3m_info.visibleWifiNetworks = {
@@ -80,7 +104,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			legend : [],
 			filter : d.filter(function(se) {
 				return parseSensorEventKeys(["visibleWifiNetworks"], se);
-			})
+			}),
+			build: function() {
+				var svg = buildChart(this);
+				console.info(svg);
+			}
 		};
 	}
 });
