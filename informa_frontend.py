@@ -28,7 +28,11 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				'/web/js/lib/d3.min.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/js/models/ic_submission.js'],
-			'sources' : ['/web/js/modules/ic_sources.js']
+			'sources' : ['/web/js/modules/ic_sources.js'],
+			'main' : [
+				'/web/js/lib/d3.min.js',
+				'/web/js/models/unveillance_cluster.js',
+				'/web/js/modules/ic_main_cluster.js']
 		})
 		
 		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
