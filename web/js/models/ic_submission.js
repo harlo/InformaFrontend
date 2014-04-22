@@ -19,6 +19,18 @@ var InformaCamSubmission = Backbone.Model.extend({
 		this.idAttribute = "_id";
 	},
 	
+	getAssetsByTagName: function(tag) {
+		var tagged_assets = [];
+		_.each(this.get("assets"), function(a) {
+			console.info(a);
+			if(a.tags && a.tags.indexOf(tag) != -1) {
+				tagged_assets.push(a);
+			}
+		});
+		
+		return tagged_assets;
+	},
+	
 	buildJ3M: function() {
 		console.info("loading j3m into view");
 		
@@ -34,7 +46,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 		
@@ -47,7 +58,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 		
@@ -59,7 +69,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 		
@@ -71,7 +80,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 		
@@ -83,7 +91,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 		
@@ -95,7 +102,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		}
 		
@@ -107,7 +113,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {
 				var svg = buildChart(this);
-				console.info(svg);
 			}
 		};
 	}

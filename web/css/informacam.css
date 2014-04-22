@@ -33,3 +33,13 @@
 	width:47%;
 	min-height:10em;
 }
+
+#ic_media_holder {
+	width:90%;
+	height:40em;
+}
+
+#ic_media_holder img {
+	height:inherit;
+	width:auto;
+}

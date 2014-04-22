@@ -26,6 +26,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			'submission' : [
 				'/web/js/lib/crossfilter.min.js',
 				'/web/js/lib/d3.min.js',
+				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/js/models/ic_submission.js'],
 			'sources' : ['/web/js/modules/ic_sources.js'],
