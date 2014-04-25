@@ -22,7 +22,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 	getAssetsByTagName: function(tag) {
 		var tagged_assets = [];
 		_.each(this.get("assets"), function(a) {
-			console.info(a);
 			if(a.tags && a.tags.indexOf(tag) != -1) {
 				tagged_assets.push(a);
 			}
@@ -38,81 +37,107 @@ var InformaCamSubmission = Backbone.Model.extend({
 		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture)
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
 		
+		/*
 		this.j3m_info.gpsTrace = {
 			label : "Movement",
 			legend: [],
 			filter: d.filter(function(se) {
 				return parseSensorEventKeys(["gps_coords"], se);
 			}),
-			build: function() {
-				var svg = buildChart(this);
-			}
+			build: function() {}
 		};
+		*/
 		
 		this.j3m_info.pitchRollAzimuth = {
-			label : "Pitch, Roll, Azimuth",
-			legend : [{ key : "pitch" }, { key : "roll" }, { key : "azimuth" }],
-			filter: d.filter(function(se) {
-				return parseSensorEventKeys(["pitch", "pitchCorrected", "roll",
-					"rollCorrected", "azimuth", "azimuthCorrected"], se);
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			label: "Pitch, Roll, Azimuth",
+			build: function(id) {
+				return new InformaCamTimeseriesGraph({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["pitch", "pitchCorrected", "roll",
+							"rollCorrected", "azimuth", "azimuthCorrected"], se);
+					}),
+					root_el : id,
+					legend : [
+						{ key : "pitchCorrected", label : "Pitch" }, 
+						{ key : "rollCorrected", label : "Roll" }, 
+						{ key : "azimuthCorrected", label : "Azimuth" }
+					]
+				});
 			}
 		};
 		
 		this.j3m_info.accelerometer = {
 			label : "Accelerometer",
-			legend : [],
-			filter: d.filter(function(se) {
-				return parseSensorEventKeys(["acc_x", "acc_y", "acc_z"], se);
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			build: function(id) {
+				return new InformaCamTimeseriesGraph({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["acc_x", "acc_y", "acc_z"], se);
+					}),
+					root_el : id,
+					legend : [
+						{ key : "acc_x", label : "X" }, 
+						{ key : "acc_y", label : "Y" }, 
+						{ key : "acc_z", label : "Z" }
+					]
+				});
 			}
 		};
 		
 		this.j3m_info.lightMeterValue = {
 			label : "Light Meter",
-			legend: [],
-			filter: d.filter(function(se) {
-				return parseSensorEventKeys(["lightMeterValue"], se);;
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			build: function(id) {
+				return new InformaCamTimeseriesGraph({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["lightMeterValue"], se);
+					}),
+					root_el : id,
+					legend : [{ key : "lightMeterValue", label : "Light Meter" }]
+				});
 			}
 		};
 		
 		this.j3m_info.visibleCellTowers = {
 			label : "Nearby Cell Towers",
-			legend : [],
-			fitler : d.filter(function(se) {
-				return parseSensorEventKeys(["cellTowerId", "MCC", "LAC"], se);
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			build: function(id) {
+				return new InformaCamTimeseriesChart({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["cellTowerId", "MCC", "LAC"], se);
+					}),
+					root_el : id,
+					legend : [{ key : "cellTowerId", label : "Cell Tower ID" }]
+				});
 			}
 		};
 		
 		this.j3m_info.visibleBluetoothDevices = {
 			label : "Visible Bluetooth Devices",
-			legend : [],
-			filter : d.filter(function(se) {
-				return parseSensorEventKeys(["bluetoothDeviceAddress"], se);
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			build: function(id) {
+				return new InformaCamTimeseriesChart({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["bluetoothDeviceAddress"], se);
+					}),
+					root_el : id,
+					legend : [{
+						key : "bluetoothDeviceAddress", 
+						label : "Bluetooth Device (hashed)" 
+					}]
+				});
 			}
-		}
+		};
 		
 		this.j3m_info.visibleWifiNetworks = {
 			label : "Visible Wifi Networks",
-			legend : [],
-			filter : d.filter(function(se) {
-				return parseSensorEventKeys(["visibleWifiNetworks"], se);
-			}),
-			build: function() {
-				var svg = buildChart(this);
+			build: function(id) {
+				return new InformaCamTimeseriesChart({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["visibleWifiNetworks"], se);
+					}),
+					root_el : id,
+					legend : [{
+						key : "visibleWifiNetworks.bssid", 
+						label : "Wifi Network" 
+					}]
+				});
 			}
 		};
 	}

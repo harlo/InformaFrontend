@@ -1,4 +1,4 @@
-var submission = null;
+var submission;
 
 (function($) {
 	var sub_sammy = $.sammy("#content", function() {
@@ -21,7 +21,7 @@ var submission = null;
 function showJ3M() {
 	var el = "#ic_j3m_readout_holder";
 	if(toggleElement(el) && $(el).children().length == 0) {
-		j3m_view = new UVIndentedTree({
+		new UVIndentedTree({
 			data : {
 				'data' : submission.toJSON().j3m.data,
 				'intent' : submission.toJSON().j3m.intent,
@@ -52,54 +52,20 @@ function loadView() {
 function setJ3MInfo(item) {
 	var info_holder = $(document.createElement("div"));
 	insertTemplate("j3m_info.html", item, info_holder, function() {
-		$($(info_holder).find(".ic_j3m_info_vizualization")[0]).attr({
-			'id' : item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase()
-		});
+		var id = item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase();
+		
+		$($(info_holder).find(".ic_j3m_info_vizualization")[0])
+			.attr({
+				'id' : id
+			});
 		$("#ic_j3m_info_holder").append(info_holder);
-		item.build();
+		
+		item.viz = item.build("#" + id);
 	});
-}
-
-function buildChart(obj) {
-	var id = ("#" + obj.label.replace(/ /g, "").replace(/,/g, "").toLowerCase());
-
-	var w = $(window).width();
-	var h = $(window).height() * 0.33;
-	var pl = 0;
-	var pt = h * 0.85;
-	
-	var x = d3.scale.linear().rangeRound([0, w]);
-	var x_axis = d3.svg.axis().scale(x).orient("bottom");
-	
-	var y = d3.scale.linear().rangeRound([h, 0]);
-	var y_axis = d3.svg.axis().scale(y).orient("left");
-	
-	var viz = d3.select(id);
-	var svg = viz.append("svg:svg").attr({
-			'width' : w,
-			'height' : h,
-			'class' : 'ic_viz'
-	});
-	
-	svg.append("svg:g")
-		.attr({
-			'transform' : "translate(" + pl + "," + pt + ")",
-			'class' : 'x_axis',
-		})
-		.call(x_axis);
-			
-	svg.append("svg:g")
-		.attr({
-			'transform' : "translate(" + (pl + 40) + "," + 0 + ")",
-			'class' : 'y_axis'
-		})
-		.call(y_axis);
-	
-	return svg;
 }
 
 function initSubmission() {	
-	_id = location.search.split('_id=')[1];
+	var _id = location.search.split('_id=')[1];
 	doInnerAjax("documents", "post", { _id : _id }, function(json) {
 		json = JSON.parse(json.responseText);
 		

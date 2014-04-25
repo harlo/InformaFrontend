@@ -43,3 +43,26 @@
 	height:inherit;
 	width:auto;
 }
+
+#ic_main_cluster_holder {
+	width:80%;
+	height:500px;
+}
+
+.ic_pod img.ic_icon {
+	height:1em;
+	width:auto;
+}
+
+#ic_j3m_info_holder {
+	margin:2em 0;
+}
+
+#ic_j3m_info_holder div .ic_j3m_info_vizualization {
+	height: 14em;
+	width: 100%;
+}
+
+.uv_viz .ic_x_axis path, .ic_viz .ic_y_axis path {
+	color: #ccc;
+}

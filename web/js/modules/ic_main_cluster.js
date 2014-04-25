@@ -6,9 +6,10 @@ var cluster;
 			function(json) {
 				json = JSON.parse(json.responseText);
 				if(json.result == 200) {
-					cluster = new UnveillanceCluster(json.data);
-					cluster.build("#ic_main_cluster_holder");
-					
+					var c = json.data;
+					c.root_el = "#ic_main_cluster_holder";
+
+					cluster = new UnveillanceCluster(c);
 				}
 			}
 		);

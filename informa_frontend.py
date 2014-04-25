@@ -26,12 +26,17 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			'submission' : [
 				'/web/js/lib/crossfilter.min.js',
 				'/web/js/lib/d3.min.js',
+				'/web/js/viz/uv_viz.js',
 				'/web/js/viz/uv_indented_tree.js',
+				'/web/js/viz/ic_timeseries_graph.js',
+				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/js/models/ic_submission.js'],
 			'sources' : ['/web/js/modules/ic_sources.js'],
 			'main' : [
 				'/web/js/lib/d3.min.js',
+				'/web/js/viz/uv_viz.js',
+				'/web/js/viz/uv_colored_cluster.js',
 				'/web/js/models/unveillance_cluster.js',
 				'/web/js/modules/ic_main_cluster.js']
 		})
