@@ -63,6 +63,8 @@
 	width: 100%;
 }
 
-.uv_viz .ic_x_axis path, .ic_viz .ic_y_axis path {
-	color: #ccc;
+.uv_viz .ic_x_axis path, .uv_viz .ic_y_axis path {
+	stroke: #ccc;
+	fill: none;
+	shape-rendering: crispEdges;
 }

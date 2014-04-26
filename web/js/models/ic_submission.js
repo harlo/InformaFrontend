@@ -36,6 +36,7 @@ var InformaCamSubmission = Backbone.Model.extend({
 		this.j3m_info = {};
 		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture)
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
+		var ts = { f : d[0].timestamp, l : d[d.length - 1].timestamp };
 		
 		/*
 		this.j3m_info.gpsTrace = {
@@ -57,10 +58,12 @@ var InformaCamSubmission = Backbone.Model.extend({
 							"rollCorrected", "azimuth", "azimuthCorrected"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [
-						{ key : "pitchCorrected", label : "Pitch" }, 
-						{ key : "rollCorrected", label : "Roll" }, 
-						{ key : "azimuthCorrected", label : "Azimuth" }
+						{ key : "pitch", label : "Pitch" }, 
+						{ key : "roll", label : "Roll" }, 
+						{ key : "azimuth", label : "Azimuth" }
 					]
 				});
 			}
@@ -74,6 +77,8 @@ var InformaCamSubmission = Backbone.Model.extend({
 						return parseSensorEventKeys(["acc_x", "acc_y", "acc_z"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [
 						{ key : "acc_x", label : "X" }, 
 						{ key : "acc_y", label : "Y" }, 
@@ -91,6 +96,8 @@ var InformaCamSubmission = Backbone.Model.extend({
 						return parseSensorEventKeys(["lightMeterValue"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [{ key : "lightMeterValue", label : "Light Meter" }]
 				});
 			}
@@ -104,6 +111,8 @@ var InformaCamSubmission = Backbone.Model.extend({
 						return parseSensorEventKeys(["cellTowerId", "MCC", "LAC"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [{ key : "cellTowerId", label : "Cell Tower ID" }]
 				});
 			}
@@ -117,6 +126,8 @@ var InformaCamSubmission = Backbone.Model.extend({
 						return parseSensorEventKeys(["bluetoothDeviceAddress"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [{
 						key : "bluetoothDeviceAddress", 
 						label : "Bluetooth Device (hashed)" 
@@ -133,6 +144,8 @@ var InformaCamSubmission = Backbone.Model.extend({
 						return parseSensorEventKeys(["visibleWifiNetworks"], se);
 					}),
 					root_el : id,
+					first_timestamp: ts.f,
+					last_timestamp: ts.l,
 					legend : [{
 						key : "visibleWifiNetworks.bssid", 
 						label : "Wifi Network" 

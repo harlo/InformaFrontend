@@ -9,24 +9,25 @@ var InformaCamTimeseriesChart = UnveillanceViz.extend({
 			right: 180,
 			bottom: 20
 		};
-		
-		var first_timestamp = this.get('data')[0].timestamp;
-		var last_timestamp = this.get('data')[this.get('data').length - 1].timestamp;
-		
+						
 		this.set('data', crossfilter(this.get('data')));
 		this.entities = this.getUniqueEntities();
 		this.dims.axis = { 
-			x: [first_timestamp, last_timestamp], 
+			x: [this.get('first_timestamp'), this.get('last_timestamp')], 
 			y: [0, this.entities.length]
 		};
 		
-		var x = d3.scale.linear().rangeRound(
-			[0, this.dims.width - (this.dims.padding.left + this.dims.padding.right)]);
-		var x_axis = d3.svg.axis().scale(x).orient("bottom");
+		this.scale = {}
+		var x_range = [0, 
+			this.dims.width - (this.dims.padding.left + this.dims.padding.right)];
+		this.scale.x = d3.scale.linear().domain(this.dims.axis.x).range(x_range);
+		var x_axis = d3.svg.axis().scale(this.scale.x).orient("bottom").ticks(10)
+			.tickFormat(function(d) { return moment(Number(d)).format("HH:mm:ss"); });
 		
-		var y = d3.scale.linear().rangeRound(
-			[this.dims.height - this.dims.padding.bottom, this.dims.padding.bottom]);
-		var y_axis = d3.svg.axis().scale(y).orient("left");
+		var y_range = [this.dims.height - this.dims.padding.bottom,
+			this.dims.padding.bottom];
+		this.scale.y = d3.scale.linear().domain(this.dims.axis.y).range(y_range);
+		var y_axis = d3.svg.axis().scale(this.scale.y).orient("left");
 		
 		this.svg.append("svg:g")
 			.attr({
@@ -44,7 +45,14 @@ var InformaCamTimeseriesChart = UnveillanceViz.extend({
 			})
 			.call(y_axis);
 		
-		this.buildLegend(_.map(this.entities, function(e) { return { label : e }; }));	
+		this.entities = _.map(this.entities, function(e) {
+			return {
+				label : e,
+				color: getRandomColor()
+			}; 
+		});
+		this.buildLegend(this.entities);
+		this.buildData();	
 	},
 	getUniqueEntities: function() {
 		var entities = [];
@@ -65,7 +73,41 @@ var InformaCamTimeseriesChart = UnveillanceViz.extend({
 		
 		return _.uniq(entities);
 	},
-	buildDataTree: function(data) {
+	buildData: function() {
+		var cf = this.get('data');
+		var entities = this.entities;
+		var dims = this.dims;
+		var ctx = this.svg;
+		var offs = this.dims.padding.left
+		var scale = this.scale;
 		
+		_.each(this.get('legend'), function(l) {
+			console.info(l);			
+			
+			_.each(entities, function(e, i) {
+				console.info(e);
+				var d = cf.dimension(function(se) {
+					var value = drillToKey(se.sensorPlayback, l.key)[0];
+					console.info(value);
+					return value == e.label;
+				});
+				
+				var c_name = e.label.replace(/\W+/g, "_");
+				
+				ctx.selectAll("rect.ic_rect_" + c_name)
+					.data(d.top(Infinity)).enter()
+					.append("svg:rect").style('fill', e.color).attr({
+						"width" : 40,
+						"height" : (dims.height/entities.length) * 0.6,
+						"x" : function(point) {
+							return scale.x(point.timestamp) + offs;
+						},
+						"y" : function(point) {
+							return scale.y(i) - dims.padding.bottom;
+						}
+					});
+				
+			});
+		});
 	}
 });
