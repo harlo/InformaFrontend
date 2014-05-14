@@ -31,6 +31,16 @@ def getSecrets(password=None, key=None):
 		if DEBUG: print "could not find %s in config" % key
 		return None
 
+def saveSecret(key, secret, password=None):
+	secrets = getSecrets(password=password)
+	if secrets is None: secrets = {}
+	
+	secrets['key'].update(secret)
+		
+	try:
+		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.secrets.json"), 'wb+') as C:
+			C.write(secrets)
+
 def getSyncTypes():
 	try:
 		return getSecrets(key="informacam.sync").keys()

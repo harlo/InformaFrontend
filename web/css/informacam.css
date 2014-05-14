@@ -34,9 +34,14 @@
 	min-height:10em;
 }
 
+#ic_searchbar_holder {
+	height:auto;
+}
+
 #ic_media_holder {
 	width:90%;
 	height:40em;
+	display:inline-table;
 }
 
 #ic_media_holder img {

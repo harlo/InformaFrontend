@@ -4,6 +4,7 @@ from time import sleep
 
 from api import InformaAPI
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
+from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity
 
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE
 from vars import INFORMA_SYNC_TYPES, InformaCamCookie
@@ -13,10 +14,22 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		UnveillanceFrontend.__init__(self)
 		InformaAPI.__init__(self)
 		
-		self.reserved_routes.extend(["ictd"])
-		self.routes.extend([(r"/ictd/", self.ICTDHandler)])
+		self.reserved_routes.extend(["ictd", "auth"])
+		self.routes.extend([
+			(r"/ictd/", self.ICTDHandler),
+			(r"/auth/(drive|globaleaks)", self.AuthHandler)])
 		
-		self.default_on_loads = ['/web/js/lib/sammy.js', '/web/js/informacam.js', '/web/js/models/ic_user.js']
+		self.default_on_loads = [
+			'/web/js/lib/sammy.js',
+			'/web/js/lib/visualsearch.js',
+			'/web/js/lib/jquery.ui.core.js',
+			'/web/js/lib/jquery.ui.position.js',
+			'/web/js/lib/jquery.ui.widget.js',
+			'/web/js/lib/jquery.ui.menu.js',
+			'/web/js/lib/jquery.ui.autocomplete.js',
+			'/web/js/informacam.js', 
+			'/web/js/models/ic_user.js'
+		]
 		self.on_loads['setup'].extend([
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
@@ -54,6 +67,42 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		self.MODULE_FOOTER = self.INDEX_FOOTER
 
 		self.WEB_TITLE = WEB_TITLE
+	
+	class AuthHandler(tornado.web.RequestHandler):
+		def initialize(self, auth_type):
+			self.auth_type = auth_type
+			
+		@tornado.web.asynchronous
+		def get(self, auth_type):
+			from conf import getSecrets, saveSecret
+			endpoint = "/"
+			
+			if auth_type == "drive":
+				SYNC_CONF = getSecrets(key="informacam.sync")
+				
+				try:
+					if DEBUG: print parseRequestEntity(self.request.query)
+					auth_code = parseRequestEntity(self.request.query)['code']
+				except KeyError as e:
+					print "no auth code. do step 1\n%s" e
+					
+					from oauth2client.client import OAuth2WebServerFlow
+					
+					GD = SYNC_CONF['google_drive']
+					flow = OAuth2WebServerFlow(GD['client_id'], GD['client_secret'],
+						GD['scopes'], GD['redirect_uri'])
+					self.redirect(flow.step1_get_authorize_url())
+					return
+				
+				SYNC_CONF['google_drive'].update({
+					'auth_code' : auth_code,
+					'account_type' : "user"
+				})
+				
+				if DEBUG: print SYNC_CONF
+				saveSecret("informacam.sync", SYNC_CONF)
+
+			self.redirect(endpoint)			
 	
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous

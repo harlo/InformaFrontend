@@ -16,37 +16,51 @@ class DriveClient(InformaCamSyncClient):
 		
 		InformaCamSyncClient.__init__(self, self.log, mode=mode)
 		
-		scopes = [
-			'https://www.googleapis.com/auth/drive',
-			'https://www.googleapis.com/auth/drive.file']
+		credentials = None
 
-		try:
-			with open(GOOGLE_DRIVE_CONF['p12'], 'rb') as key:
-				with open(GOOGLE_DRIVE_CONF['client_secrets'], 'rb') as secrets:
-					secrets = json.loads(secrets.read())
+		if GOOGLE_DRIVE_CONF['account_type'] == "service":
+			try:
+				with open(GOOGLE_DRIVE_CONF['p12'], 'rb') as key:
+					with open(GOOGLE_DRIVE_CONF['client_secrets'], 'rb') as secrets:
+						secrets = json.loads(secrets.read())
 				
-					credentials = SignedJwtAssertionCredentials(
-						secrets['web']['client_email'], key.read(), scopes)
+						credentials = SignedJwtAssertionCredentials(
+							secrets['web']['client_email'], key.read(), 
+							GOOGLE_DRIVE_CONF['scopes'])
 
-					http = credentials.authorize(httplib2.Http())
-					self.service = build('drive', 'v2', http=http)
-				
-					self.mime_types['folder'] = "application/vnd.google-apps.folder"
-					self.mime_types['file'] = "application/vnd.google-apps.file"
-				
-					files = self.service.children().list(
-						folderId=GOOGLE_DRIVE_CONF['asset_root']).execute()
+			except KeyError as e:
+				print e
+				print "cannot authenticate with service account."
+			
+		elif GOOGLE_DRIVE_CONF['account_type'] == "user":
+			try:
+				flow = OAuth2WebServerFlow(
+					GOOGLE_DRIVE_CONF['client_id'], GOOGLE_DRIVE_CONF['client_secret'],
+					GOOGLE_DRIVE_CONF['scopes'], GOOGLE_DRIVE_CONF['redirect_uri'])
+					
+				credentials = flow.setp2_exchange(GOOGLE_DRIVE_CONF['auth_code'])
+			except KeyError as e:
+				print e
+				print "cannot authenticate with user account (no flow auth code)"
 
-					self.files_manifest = [self.getFile(f['id']) for f in files['items']]
-					if DEBUG: 
-						print "OUR FILES:\ncount: %d\n%s" % (len(self.files_manifest),
-							[f['title'] for f in self.files_manifest])
-		
-		except Exception as e:
-			print e
+		if credentials is None:
 			self.usable = False
-			return		
+			return
 		
+		http = credentials.authorize(httplib2.Http())
+		self.service = build('drive', 'v2', http=http)
+	
+		self.mime_types['folder'] = "application/vnd.google-apps.folder"
+		self.mime_types['file'] = "application/vnd.google-apps.file"
+	
+		files = self.service.children().list(
+			folderId=GOOGLE_DRIVE_CONF['asset_root']).execute()
+
+		self.files_manifest = [self.getFile(f['id']) for f in files['items']]
+		if DEBUG: 
+			print "OUR FILES:\ncount: %d\n%s" % (len(self.files_manifest),
+				[f['title'] for f in self.files_manifest])
+				
 		self.files_manifest = []
 	
 	def getAssetMimeType(self, fileId):		
