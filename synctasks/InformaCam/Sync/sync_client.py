@@ -23,7 +23,7 @@ class InformaCamSyncClient(object):
 	def getFileNameHash(self, name_base):
 		return generateMD5Hash(content=name_base, salt=DOC_SALT)
 	
-	def updateLog(self, log_path, num_tires=0):
+	def updateLog(self, log_path, num_tries=0):
 		if num_tries >= 10: return
 		
 		self.absorbed_log[self.mode] = self.last_update_for_mode

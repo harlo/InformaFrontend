@@ -16,11 +16,14 @@ def getSecrets(password=None, key=None):
 				config = json.loads(C.read())
 			except TypeError as e:
 				if password is None: return None
+			except ValueError as e:
+				if DEBUG: print "NO SECRETS YET (VALUE ERROR?)\n%s" % e
+				return None
 				
 				# decrypt with password
 			
 	except IOError as e:
-		if DEBUG: print "NO SECRETS YET"
+		if DEBUG: print "NO SECRETS YET (IO ERROR?)\n%s" % e
 		return None
 	
 	if key is None: return config
@@ -35,11 +38,19 @@ def saveSecret(key, secret, password=None):
 	secrets = getSecrets(password=password)
 	if secrets is None: secrets = {}
 	
-	secrets['key'].update(secret)
-		
+	try:
+		secrets[key].update(secret)
+	except Exception as e:
+		return False
+	
 	try:
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.secrets.json"), 'wb+') as C:
-			C.write(secrets)
+			C.write(json.dumps(secrets))
+			return True
+	except Exception as e:
+		if DEBUG: print "Cannot save secret: %s" % e
+	
+	return False
 
 def getSyncTypes():
 	try:

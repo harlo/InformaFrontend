@@ -2,7 +2,7 @@ import httplib2, json, datetime
 from time import sleep, strptime, mktime, time
 
 from oauth2client.client import SignedJwtAssertionCredentials
-from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.file import Storage
 from apiclient import errors
 from apiclient.discovery import build
 
@@ -34,11 +34,7 @@ class DriveClient(InformaCamSyncClient):
 			
 		elif GOOGLE_DRIVE_CONF['account_type'] == "user":
 			try:
-				flow = OAuth2WebServerFlow(
-					GOOGLE_DRIVE_CONF['client_id'], GOOGLE_DRIVE_CONF['client_secret'],
-					GOOGLE_DRIVE_CONF['scopes'], GOOGLE_DRIVE_CONF['redirect_uri'])
-					
-				credentials = flow.setp2_exchange(GOOGLE_DRIVE_CONF['auth_code'])
+				credentials = Storage(GOOGLE_DRIVE_CONF['auth_storage']).get()
 			except KeyError as e:
 				print e
 				print "cannot authenticate with user account (no flow auth code)"
@@ -94,7 +90,7 @@ class DriveClient(InformaCamSyncClient):
 		new_time = 0
 		files = None
 		
-		q = { 'q' : 'sharedWithMe and not trashed' }
+		q = { 'q' : 'sharedWithMe' }
 		try:
 			files = self.service.files().list(**q).execute()
 		except errors.HttpError as e:
@@ -115,14 +111,6 @@ class DriveClient(InformaCamSyncClient):
 				if DEBUG: print clone
 				
 				assets.append(clone['id'])
-				sleep(2)
-			except errors.HttpError as e:
-				print e
-				continue
-			
-			try:
-				del_result = self.service.files().delete(fileId=f['id']).execute()
-				if DEBUG: print del_result
 				sleep(2)
 			except errors.HttpError as e:
 				print e

@@ -68,13 +68,12 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 
 		self.WEB_TITLE = WEB_TITLE
 	
-	class AuthHandler(tornado.web.RequestHandler):
-		def initialize(self, auth_type):
-			self.auth_type = auth_type
-			
+	class AuthHandler(tornado.web.RequestHandler):			
 		@tornado.web.asynchronous
 		def get(self, auth_type):
-			from conf import getSecrets, saveSecret
+			if DEBUG: print "AUTH TYPE: %s" % auth_type
+			
+			from conf import getSecrets, saveSecret, INFORMA_CONF_ROOT
 			endpoint = "/"
 			
 			if auth_type == "drive":
@@ -82,25 +81,38 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				
 				try:
 					if DEBUG: print parseRequestEntity(self.request.query)
+					
 					auth_code = parseRequestEntity(self.request.query)['code']
+					auth_storage = os.path.join(INFORMA_CONF_ROOT, "drive.secrets.json")
+
+					credentials = self.application.flow.step2_exchange(auth_code)
+					
+					from oauth2client.file import Storage
+					Storage(auth_storage).put(credentials)
+					
+					SYNC_CONF['google_drive'].update({
+						'auth_storage' : auth_storage,
+						'account_type' : "user"
+					})
+				
+					if DEBUG: print SYNC_CONF
+					saveSecret("informacam.sync", SYNC_CONF)
+					del self.application.flow
+					
 				except KeyError as e:
-					print "no auth code. do step 1\n%s" e
+					print "no auth code. do step 1\n%s" % e
 					
 					from oauth2client.client import OAuth2WebServerFlow
+					from oauth2client.file import Storage
+					from conf import API_PORT
 					
 					GD = SYNC_CONF['google_drive']
-					flow = OAuth2WebServerFlow(GD['client_id'], GD['client_secret'],
-						GD['scopes'], GD['redirect_uri'])
-					self.redirect(flow.step1_get_authorize_url())
-					return
-				
-				SYNC_CONF['google_drive'].update({
-					'auth_code' : auth_code,
-					'account_type' : "user"
-				})
-				
-				if DEBUG: print SYNC_CONF
-				saveSecret("informacam.sync", SYNC_CONF)
+					self.application.flow = OAuth2WebServerFlow(
+						GD['client_id'], GD['client_secret'],
+						GD['scopes'], 
+						"http://localhost:%d%s" % (API_PORT, GD['redirect_uri']))
+					
+					endpoint = self.application.flow.step1_get_authorize_url()				
 
 			self.redirect(endpoint)			
 	
