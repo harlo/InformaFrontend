@@ -57,12 +57,11 @@ class InformaAPI():
 				with open(conf_path, "ab") as informa_conf:
 					informa_conf.write("%s: %s\n" % (conf_info[0], v))
 			elif re.match(sec_rx, k):
-				with open(sec_path, "wb+") as sec: sec.write(json.dumps({ k : v }))
-		
-		try:
-			with open(sec_path, 'rb') as sec: pass
-		except IOError as e: return None
-
+				with open(sec_path, "rb") as sec_conf:
+					sec = json.loads(sec_conf.read())
+					sec.update({ k : v })
+				with open(sec_path, "wb+") as sec_conf:
+					sec_conf.write(json.dumps(sec))
 		"""
 			1. init keys and write fingerprint
 		"""

@@ -1,27 +1,22 @@
 #! /bin/bash
 OLD_DIR=`pwd`
-LOCAL_CONFIG=$OLD_DIR/conf/informa.config.yaml
 
 echo "**************************************************"
 echo "************** INFORMACAM SETUP **************"
-mkdir .users
 
-#cd lib/Server
-#./setup.sh
-#cd $OLD_DIR
+mkdir .users
+mkdir conf/.gpg
+
+cp conf/informacam.secrets.json.example conf/informacam.secrets.json
 
 cd lib/Frontend
-./setup.sh $OLD_DIR
+./setup.sh $OLD_DIR ~/.ssh "ec2-54-83-176-172.compute-1.amazonaws.com" 8888 false
 cd web
 ln -s ../../../web/ extras
-cd $OLD_DIR
 
-cd lib/python-gnupg
+cd $OLD_DIR/lib/python-gnupg
 make install
+
 cd $OLD_DIR
-
 pip install --upgrade -r requirements.txt
-
-echo "**************************************************"
-echo "Launching frontend..."
 python informa_frontend.py -firstuse

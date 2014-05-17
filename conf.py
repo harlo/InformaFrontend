@@ -61,8 +61,11 @@ def getSyncTypes():
 	return None
 
 try:
-	with open(os.path.join(INFORMA_CONF_ROOT, "informacam.config.yaml"), 'rb') as C:
-		config = yaml.load(C.read())
+	with open(os.path.join(INFORMA_CONF_ROOT, "informacam.secrets.json"), 'rb') as C:
+		config = json.loads(C.read())
+
+		try: UNVEILLANCE_LM_VARS = config['unveillance.local_remote']
+		except KeyError as e: pass
 		
 		try: ADMIN_USERNAME = config['admin.username']
 		except KeyError as e: pass

@@ -14,6 +14,9 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		UnveillanceFrontend.__init__(self)
 		InformaAPI.__init__(self)
 		
+		from conf import UNVEILLANCE_LM_VARS
+		self.UNVEILLANCE_LM_VARS.update(UNVEILLANCE_LM_VARS)
+		
 		self.reserved_routes.extend(["ictd", "auth"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
@@ -54,6 +57,9 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				'/web/js/modules/ic_main_cluster.js']
 		})
 		
+		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
+			self.init_vars = json.loads(IV.read())['web']
+		
 		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
 		ictd_rx = r"informacam\.ictd"
 		forms_rx = r"informacam\.form"
@@ -68,58 +74,47 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 
 		self.WEB_TITLE = WEB_TITLE
 	
-	class AuthHandler(tornado.web.RequestHandler):			
-		@tornado.web.asynchronous
-		def get(self, auth_type):
-			if DEBUG: print "AUTH TYPE: %s" % auth_type
-			
-			from conf import getSecrets, saveSecret, INFORMA_CONF_ROOT
-			endpoint = "/"
-			
-			if auth_type == "drive":
-				SYNC_CONF = getSecrets(key="informacam.sync")
-				
-				try:
-					if DEBUG: print parseRequestEntity(self.request.query)
-					
-					auth_code = parseRequestEntity(self.request.query)['code']
-					auth_storage = os.path.join(INFORMA_CONF_ROOT, "drive.secrets.json")
-
-					credentials = self.application.flow.step2_exchange(auth_code)
-					
-					from oauth2client.file import Storage
-					Storage(auth_storage).put(credentials)
-					
-					SYNC_CONF['google_drive'].update({
-						'auth_storage' : auth_storage,
-						'account_type' : "user"
-					})
-				
-					if DEBUG: print SYNC_CONF
-					saveSecret("informacam.sync", SYNC_CONF)
-					del self.application.flow
-					
-				except KeyError as e:
-					print "no auth code. do step 1\n%s" % e
-					
-					from oauth2client.client import OAuth2WebServerFlow
-					from oauth2client.file import Storage
-					from conf import API_PORT
-					
-					GD = SYNC_CONF['google_drive']
-					self.application.flow = OAuth2WebServerFlow(
-						GD['client_id'], GD['client_secret'],
-						GD['scopes'], 
-						"http://localhost:%d%s" % (API_PORT, GD['redirect_uri']))
-					
-					endpoint = self.application.flow.step1_get_authorize_url()				
-
-			self.redirect(endpoint)			
-	
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
 		def get(self):
 			self.finish("ICTD GOES HERE")
+	
+	class AuthHandler(tornado.web.RequestHandler):
+		@tornado.web.asynchronous
+		def get(self, auth_type):
+			endpoint = "/"
+			
+			if auth_type == "drive":
+				try:
+					if self.application.drive_client.authenticate(
+						parseRequestEntity(self.request.query)['code']):
+							self.application.do_send_public_key(self)
+				except KeyError as e:
+					if DEBUG: print "no auth code. do step 1\n%s" % e
+					endpoint = self.application.drive_client.authenticate()
+					
+			self.redirect(endpoint)
+	
+	"""
+		Overrides
+	"""
+	def do_send_public_key(self, handler):
+		super(CompassFrontend, self).do_send_public_key(handler)
+		
+		upload = self.drive_client.upload(getConfig('unveillance.local_remote.pub_key'), 
+			{'title' : "my_public_key.pub"})	
+		try:
+			return self.drive_client.share(upload['id'])
+		except KeyError as e:
+			if DEBUG: print e
+		
+		return None
+	
+	def do_link_annex(self, handler):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
+		return super(CompassFrontend, self).do_link_annex(handler)
 	
 	def do_init_synctask(self, handler):
 		status = self.do_get_status(handler)
@@ -131,13 +126,14 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		status = self.do_get_status(handler)
 		if status == 0: return None
 		
-		credentials, password = super(InformaFrontend, self).do_init_annex(handler)
+		credentials, result = super(InformaFrontend, self).do_init_annex(handler)
+		if DEBUG: print credentials
 		
 		"""
 			1. create new informacam admin user
 		"""
-		from conf import ADMIN_USERNAME
-		return self.createNewUser(ADMIN_USERNAME, password, as_admin=True)
+		return self.createNewUser(credentials['informacam.config.admin.username'],
+			credentials['unveillance.local_remote.password'], as_admin=True)
 		
 	def do_post_batch(self, handler, save_local=False):
 		status = self.do_get_status(handler)

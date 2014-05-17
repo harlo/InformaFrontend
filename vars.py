@@ -26,5 +26,9 @@ informacam_mime_type_map = {
 	'informacam/log' : "j3mlog"
 }
 
+FILE_NON_OVERWRITES.extend(["informacam.form"])
+
+print FILE_NON_OVERWRITES
+
 MIME_TYPES.update(informacam_mime_types)
 MIME_TYPE_MAP.update(informacam_mime_type_map)
