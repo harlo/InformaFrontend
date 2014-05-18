@@ -1,13 +1,12 @@
-import httplib2, json
+import httplib2, json, os
 
 from oauth2client.file import Storage
 from apiclient import errors
 from apiclient.discovery import build
-from apiclient.http import MediaFileUpload
 
-from conf import DEBUG, API_PORT, saveSecret, INFORMACAM_CONF_ROOT, getSecrets
+from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, getSecrets
 
-class CompassDriveClient(object):
+class InformaCamDriveClient(object):
 	def __init__(self):
 		self.config = getSecrets(key="informacam.sync")['google_drive']
 		
@@ -45,19 +44,36 @@ class CompassDriveClient(object):
 		
 		return None
 		
-	def upload(self, data, as_binary=False, **metadata):
+	def upload(self, data, mime_type=None, as_binary=False, **body):
 		if not hasattr(self, "service"): return None
+		
 		if not as_binary:
 			try:
-				with open(data, 'rb') as d: body = d.read()
+				with open(data, 'rb') as d: data = d.read()
 			except IOError as e:
 				if DEBUG: print e
 				return False
-		else: body = data
+		
+		import io, sys
+		from apiclient.http import MediaIoBaseUpload
+		
+		if mime_type is None:
+			mime_type = "application/octet-stream"
+			
+		chunk_size = 1024*1024	# unless data is tiny. check first
+		data = io.BytesIO(data)
+
+		if sys.getsizeof(data) < chunk_size:
+			chunk_size = -1
+		
+		media_body = MediaIoBaseUpload(data, mimetype=mime_type,
+			chunksize=chunk_size, resumable=True)
 		
 		try:
-			return self.service.files().insert(
-				body=body, media_body=metadata).execute() 
+			upload = self.service.files().insert(
+				body=body, media_body=media_body).execute()
+			
+			return upload
 		except errors.HttpError as e:
 			if DEBUG: print e
 		
@@ -98,11 +114,12 @@ class CompassDriveClient(object):
 				self.config['client_id'], self.config['client_secret'],
 				self.config['scopes'], 
 				"http://localhost:%d%s" % (API_PORT, self.config['redirect_uri']))
+
 			return self.flow.step1_get_authorize_url()
 		else:
 			credentials = self.flow.step2_exchange(auth_token)
 
-			auth_storage = os.path.join(COMPASS_CONF_ROOT, "drive.secrets.json")
+			auth_storage = os.path.join(INFORMA_CONF_ROOT, "drive.secrets.json")
 			Storage(auth_storage).put(credentials)
 			self.config['auth_storage'] = auth_storage
 			

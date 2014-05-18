@@ -92,6 +92,13 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				except KeyError as e:
 					if DEBUG: print "no auth code. do step 1\n%s" % e
 					endpoint = self.application.drive_client.authenticate()
+				except AttributeError as e:
+					self.application.initDriveClient()
+
+					from conf import getSecrets
+					endpoint = getSecrets(
+						key="informacam.sync")['google_drive']['redirect_uri']
+					
 					
 			self.redirect(endpoint)
 	
@@ -99,10 +106,12 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		Overrides
 	"""
 	def do_send_public_key(self, handler):
-		super(CompassFrontend, self).do_send_public_key(handler)
+		super(InformaFrontend, self).do_send_public_key(handler)
 		
-		upload = self.drive_client.upload(getConfig('unveillance.local_remote.pub_key'), 
-			{'title' : "my_public_key.pub"})	
+		from conf import getConfig
+		upload = self.drive_client.upload(getConfig('unveillance.local_remote.pub_key'),
+			title="unveillance.local_remote.pub_key")
+		
 		try:
 			return self.drive_client.share(upload['id'])
 		except KeyError as e:

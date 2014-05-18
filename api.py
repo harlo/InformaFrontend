@@ -5,11 +5,12 @@ from Crypto.Cipher import AES
 from conf import DEBUG, INFORMA_CONF_ROOT, INFORMA_USER_ROOT
 from vars import USER_CREDENTIAL_PACK, InformaCamCookie
 from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity
+from Models.ic_drive_client import InformaCamDriveClient
 
 class InformaAPI():
 	def __init__(self):
 		print "InformaAPI STARTED TOO!!!"
-		
+				
 	def do_get_status(self, handler):
 		try:
 			for cookie in handler.request.cookies:
@@ -190,6 +191,10 @@ class InformaAPI():
 			if DEBUG: print e		
 		
 		return None
+	
+	def initDriveClient(self):
+		self.drive_client = InformaCamDriveClient()
+		
 		
 	def encryptUserData(self, plaintext, password, iv=None, p_salt=None):
 		if p_salt is not None:
