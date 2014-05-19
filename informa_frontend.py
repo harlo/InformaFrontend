@@ -350,7 +350,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	def do_init_synctask(self, handler):
 		status = self.do_get_status(handler)
 		if status == 0: return None
-		# TODO: actually, it should be 2 or 3 ONLY.
+		# TODO: actually, it should be 3 ONLY.
 		
 		return super(InformaFrontend, self).do_init_synctask(handler)
 	

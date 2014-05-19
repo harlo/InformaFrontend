@@ -264,9 +264,12 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 			auth_storage = os.path.join(INFORMA_CONF_ROOT, "drive.secrets.json")
 			
 			from oauth2client.file import Storage
-			Storage(auth_storage).put(credentials
-			)
-			self.config['auth_storage'] = auth_storage
+			Storage(auth_storage).put(credentials)
+			
+			self.config.update({
+				'auth_storage' : auth_storage,
+				'account_type' : "user"
+			})
 			
 			sync_config = getSecrets(key="informacam.sync")
 			sync_config['google_drive'].update(self.config)
