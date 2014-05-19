@@ -11,8 +11,12 @@ cp conf/informacam.secrets.json.example conf/informacam.secrets.json
 
 cd lib/Frontend
 ./setup.sh $OLD_DIR ~/.ssh "ec2-54-83-176-172.compute-1.amazonaws.com" 8888 false
+
 cd web
-ln -s ../../../web/ extras
+ln -s $OLD_DIR/web/ extras
+
+cd ../SyncTasks
+ln -s $OLD_DIR/SyncTasks/* .
 
 cd $OLD_DIR/lib/python-gnupg
 make install

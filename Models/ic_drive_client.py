@@ -1,31 +1,144 @@
-import httplib2, json, os
+import httplib2, json, os, re
+from subprocess import Popen
 
-from oauth2client.file import Storage
 from apiclient import errors
 from apiclient.discovery import build
 
-from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, getSecrets
+from lib.Frontend.Models.uv_annex_client import UnveillanceAnnexClient
+from Models.ic_sync_client import InformaCamSyncClient
 
-class InformaCamDriveClient(object):
-	def __init__(self):
-		self.config = getSecrets(key="informacam.sync")['google_drive']
+from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, ANNEX_DIR, getSecrets
+
+class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
+	def __init__(self, mode=None):
+		InformaCamDriveClient.__init__(self)
+		
+		credentials = None
 		
 		try:
-			from oauth2client.file import Storage
+			self.config = getSecrets(key="informacam.sync")['google_drive']
 			
-			credentials = Storage(self.config['auth_storage']).get()
-			http = httplib2.Http()
-			http = credentials.authorize(http)
-			
-			self.service = build('drive', 'v2', http=http)
-			self.setInfo()
+			if self.config['account_type'] == "service":
+				from oauth2client.client import SignedJwtAssertionCredentials
+				
+				try:
+					with open(self.config['p12'], 'rb') as key:
+						with open(self.config['client_secrets'], 'rb') as secrets:
+							secrets = json.loads(secrets.read())
+				
+							credentials = SignedJwtAssertionCredentials(
+								secrets['web']['client_email'], key.read(), 
+								self.config['scopes'])
+
+				except KeyError as e:
+					print e
+					print "cannot authenticate with service account."
+			elif self.config['account_type'] == "user":
+				from oauth2client.file import Storage	
+				credentials = Storage(self.config['auth_storage']).get()
 			
 		except KeyError as e:
-			print "NO AUTH YET!"
+			if DEBUG: print "NO AUTH YET!"
+		
+		if credentials is None:
+			self.usable = False
 			return
-	
+				
+		http = httplib2.Http()
+		http = credentials.authorize(http)
+		
+		self.service = build('drive', 'v2', http=http)
+		self.setInfo()
+		
+		if mode is not None:
+			self.log_path = os.path.join(MONITOR_ROOT, "drive.intake.log")
+			InformaCamSyncClient.__init__(self, mode)
+			
+			self.mime_types['folder'] = "application/vnd.google-apps.folder"
+			self.mime_types['file'] = "application/vnd.google-apps.file"
+			
+			try:
+				files = self.service.children().list(
+					folderId=self.config['asset_root']).execute()
+				
+				self.files_manifest = [self.getFile(f['id']) for f in files['items']]
+		
+			except errors.HttpError as e:
+				if DEBUG: print e
+			
 	def setInfo(self):
 		print "setting user info"
+	
+	def getAssetMimeType(self, fileId):
+		return self.getFile(fileId)['mimeType']
+	
+	def lockFile(self, file):
+		if type(file) is str or type(file) is unicode:
+			return self.lockFile(self.getFile(file))
+		
+		pass
+	
+	def listAssets(self, omit_absorbed=False):
+		assets = []
+		files = None
+		q = { 'q' : 'sharedWithMe' }
+		
+		try:
+			files = self.service.files().list(**q).execute()
+		except errors.HttpError as e:
+			if DEBUG: print e
+			return False
+		
+		for f in files['items']:
+			if f['mimeType'] not in self.mime_types.itervalues() or f['mimeType'] == self.mime_types['folder']: continue
+			
+			if omit_absorbed and self.isAbsorbed(f['id'], f['mimeType']): continue
+			
+			if DEBUG: print "INTAKE: %s (mime type: %s)" % (f['id'], f['mimeType'])
+			
+			try:
+				clone = self.service.files().copy(
+					fileId=f['id'], body={'title':f['id']}).execute()
+				if DEBUG: print clone
+				
+				assets.append(clone['id'])
+				sleep(2)
+			except errors.HttpError as e:
+				print e
+				continue
+		
+		self.last_update_for_mode = time() * 1000
+		return assets
+	
+	def isAbsorbed(self, file_name, mime_type):
+		if self.mode == "sources":
+			if mime_type != self.mime_types['zip']: return True
+		elif self.mode == "submissions":
+			if mime_type == self.mime_types['zip']: return True
+		
+		for f in self.files_manifest:
+			if f['title'] == file_name: return True
+		
+		return False
+	
+	def absorb(self, file):
+		if type(file) is str or type(file) is unicode:
+			return self.absorb(self.getFile(file))
+		
+		self.files_manifest.append(file)
+	
+	def getFileName(self, file):
+		if type(file) is str or type(file) is unicode:
+			return self.getFileName(self.getFile(file))
+					
+		return str(file['title'])
+	
+	def getFileNameHash(self, file):
+		if type(file) is str or type(file) is unicode:
+			return self.getFileName(self.getFile(file))
+		
+		name_base = file['id']
+		return super(InformaCamDriveClient, self).getFileNameHash(name_base)
 	
 	def share(self, fileId, email=None):
 		if not hasattr(self, "service"): return None
@@ -80,6 +193,8 @@ class InformaCamDriveClient(object):
 		return None
 	
 	def getFile(self, fileId):
+		if not hasattr(self, "service"): return None
+		
 		try:
 			return self.service.files().get(fileId=fileId).execute()
 		except errors.HttpError as e:
@@ -87,25 +202,52 @@ class InformaCamDriveClient(object):
 		
 		return None
 	
-	def dowload(self, file):
+	def dowload(self, file, save_as=None, save=True, return_content=False):
+		# don't waste my time.
+		if not hasattr(self, "service"): return None
+		if not save and not return_content: return None
+		
 		if type(file) is str or type(file) is unicode:
 			return self.download(self.getFile(file))
 		
 		url = file.get('downloadUrl')
 		if url:
-			response, content = self.service._http.request(url)
-			if response.status == 200: return content
+			content = None
+			destination_path = None
+			
+			if save:
+				if save_as is None:
+					save_as = self.getFileName(file)
+				
+				# fuck you. (path traversal)
+				if len(re.findall(r'\.\.', save_as)) > 0:
+					return None
+				
+				destination_path = os.path.join(ANNEX_DIR, save_as)
+				
+				p = Popen(["wget", "-O", destination_path, url])
+				p.wait()
+			else:
+				response, content = self.service._http.request(url)
+				if response.status != 200:
+					return None
+				
+				return_content = True
+		
+			if return_content:
+				if content is None and destination_path is not None:
+					try:
+						with open(destination_path, 'rb') as C:
+							content = C.read()
+					except IOError as e:
+						if DEBUG: print e
+					
+					return content
+			else:
+				return destination_path
 		
 		return None
-	
-	def listAssets(self):
-		try:
-			return self.service.files().list().execute()
-		except errors.HttpError as e:
-			if DEBUG: print e
 		
-		return None
-	
 	def authenticate(self, auth_token=None):
 		if auth_token is None:
 			from oauth2client.client import OAuth2WebServerFlow
@@ -120,7 +262,10 @@ class InformaCamDriveClient(object):
 			credentials = self.flow.step2_exchange(auth_token)
 
 			auth_storage = os.path.join(INFORMA_CONF_ROOT, "drive.secrets.json")
-			Storage(auth_storage).put(credentials)
+			
+			from oauth2client.file import Storage
+			Storage(auth_storage).put(credentials
+			)
 			self.config['auth_storage'] = auth_storage
 			
 			sync_config = getSecrets(key="informacam.sync")

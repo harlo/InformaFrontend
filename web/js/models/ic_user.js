@@ -117,7 +117,16 @@ var InformaCamUser = Backbone.Model.extend({
 			function(json) {
 				json = JSON.parse(json.responseText);
 				if(json.result == 200 && json.data) {
+					if(json.data.auth_redir) {
+						var auth_redir = json.data.auth_redir;
+						delete json.data.auth_redir;
+					}
+					
 					informacam_user.setUser(json.data);
+					
+					if(auth_redir) {
+						window.location = auth_redir;
+					}
 				} else {
 					// throw error...
 				}
