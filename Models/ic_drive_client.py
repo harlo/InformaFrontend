@@ -7,12 +7,13 @@ from apiclient.discovery import build
 from lib.Frontend.Models.uv_annex_client import UnveillanceAnnexClient
 from Models.ic_sync_client import InformaCamSyncClient
 
-from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, ANNEX_DIR, getSecrets
+from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, getSecrets
 
 class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 	def __init__(self, mode=None):
-		InformaCamDriveClient.__init__(self)
+		from conf import ANNEX_DIR
 		
+		UnveillanceAnnexClient.__init__(self)
 		credentials = None
 		
 		try:
@@ -227,6 +228,8 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 				
 				p = Popen(["wget", "-O", destination_path, url])
 				p.wait()
+				
+				super(InformaCamDriveClient, self).download()
 			else:
 				response, content = self.service._http.request(url)
 				if response.status != 200:

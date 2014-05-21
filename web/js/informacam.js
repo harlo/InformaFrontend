@@ -2,7 +2,20 @@ var informacam_user = null;
 var visual_search;
 
 function initUser() {
-	informacam_user = new InformaCamUser();
+	doInnerAjax("get_user_status", "post", null, function(json) {
+		json = JSON.parse(json.responseText);
+		if(json.result == 200) {
+			status = Number(json.data);
+			if(status == 0) { return; }
+			
+			if(status != 4) {
+				informacam_user = new InformaCamUser();
+			} else {
+				window.location = "/setup/#step-1";
+			}
+		}
+	});
+	
 }
 
 function loadHeaderPopup(view, onSuccess) {

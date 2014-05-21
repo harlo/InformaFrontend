@@ -3,11 +3,11 @@ var InformaCamUser = Backbone.Model.extend({
 		if(username && password) {
 			this.doLogin(username, password);
 		} else {
-			doInnerAjax("get_status", "post", null, function(json) {
+			doInnerAjax("get_user_status", "post", null, function(json) {
 				json = JSON.parse(json.responseText);
 				if(json.result == 200) {
 					status = Number(json.data);
-					if(status == 0) { return; }
+					if(status == 0 || status == 4) { return; }					
 					
 					var nav_ul = $("#ic_navigation").children('ul')[0];
 					var nav_child = document.createElement('li');

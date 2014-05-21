@@ -19,10 +19,11 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		from conf import UNVEILLANCE_LM_VARS
 		self.UNVEILLANCE_LM_VARS.update(UNVEILLANCE_LM_VARS)
 		
-		self.reserved_routes.extend(["ictd", "auth"])
+		self.reserved_routes.extend(["ictd", "auth", "commit"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
-			(r"/auth/(drive|globaleaks)", self.AuthHandler)])
+			(r"/auth/(drive|globaleaks)", self.AuthHandler),
+			(r"/commit/", self.GDOpenHandler)])
 		
 		self.default_on_loads = [
 			'/web/js/lib/sammy.js',
@@ -76,6 +77,9 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 
 		self.WEB_TITLE = WEB_TITLE
 	
+	"""
+		Custom handlers
+	"""
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
 		def get(self):
@@ -87,10 +91,15 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			endpoint = "/"
 			
 			if auth_type == "drive":
+				if self.application.do_get_status(self) != 3:
+					self.redirect(endpoint)
+					return
+
 				try:
 					if self.application.drive_client.authenticate(
 						parseRequestEntity(self.request.query)['code']):
-							self.application.do_send_public_key(self)
+							if self.application.initDriveClient(restart=True):
+								self.application.do_send_public_key(self)
 				except KeyError as e:
 					if DEBUG: print "no auth code. do step 1\n%s" % e
 					endpoint = self.application.drive_client.authenticate()
@@ -112,19 +121,70 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		def post(self, auth_type):
 			res = Result()
 			
-			if auth_type == "drive":
+			if auth_type == "drive" and self.do_get_status in [3,4]:
 				status_check = "get_drive_status"
+			elif auth_type == "user":
+				status_check = "get_user_status"
 			
 			if status_check is not None:
 				res = self.application.routeRequest(res, status_check, self)
 			
+			if DEBUG: print res.emit()
+			
 			self.set_status(res.result)
 			self.finish(res.emit())
 	
+	class GDOpenHandler(tornado.web.RequestHandler):
+		def get(self):
+			res = self.application.routeRequest(Result(), "open_drive_file", self)
+			
+			if DEBUG: print res.emit()
+			
+			self.set_status(res.result)
+			self.finish(res.emit())
 	
 	"""
 		Frontend-accessible methods
 	"""
+	def do_open_drive_file(self, handler):
+		if self.do_get_status(handler) == 0: return None
+		# TODO: actually, if not 3
+		
+		if DEBUG: print "opening this drive file in informacam annex"
+		
+		if self.initDriveClient(restart=True):
+			committed_files = None
+			
+			for _id in parseRequestEntity(handler.request.query)['_ids']:
+				if DEBUG: print _id
+				
+				download = self.drive_client.download(_id)
+				if download is not None and self.drive_client.sendToAnnex(download):
+					if committed_files is None: committed_files = []
+					committed_files.append(download)
+
+			return committed_files
+			
+		return None
+	
+	# /Users/LvH/Proj/InformaCam2/glsp_remote_test
+	def do_get_admin_party_status(self, handler):
+		status = self.do_get_status(handler)
+		if status == 0: return None
+		
+		from conf import INFORMA_USER_ROOT
+		for _, _, files in os.walk(INFORMA_USER_ROOT):
+			for f in files: return False
+		
+		return True
+	
+	def do_get_user_status(self, handler):
+		status = self.do_get_status(handler)
+
+		if status == 0: return None		
+		if self.do_get_admin_party_status(handler): return 4
+		
+		return status
 		
 	def do_get_status(self, handler):
 		try:
@@ -143,8 +203,8 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	
 	def do_get_drive_status(self, handler=None):
 		if handler is not None:
-			if self.do_get_status(handler) == 0: return False
-			# TODO: actually, not 3
+			if self.do_get_status(handler) == 0: return None
+			# TODO: actually, if not 3
 
 		if hasattr(self, "drive_client"):
 			if hasattr(self.drive_client, "service"):
@@ -153,8 +213,8 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		return False
 		
 	def do_init_informacam(self, handler):
-		status = self.do_get_status(handler)
-		if status == 0: return None
+		status = self.do_get_user_status(handler)
+		if status != 4: return None
 		
 		if DEBUG: print "Initing INFORMA"
 		informacam_annex = parseRequestEntity(handler.request.body)
@@ -167,9 +227,14 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		sec_rx = r"informacam\.gpg\.(\S+)"
 		sec_path = os.path.join(INFORMA_CONF_ROOT, "informacam.secrets.json")
 		
-		conf_rx = r"informacam\.conf\.(\S+)"
+		conf_rx = r"informacam\.config\.(\S+)"
 		conf_path = os.path.join(INFORMA_CONF_ROOT, "informacam.config.yaml")
+		
+		pwd_rx = "unveillance.local_remote.password"
 
+		new_username = None
+		new_password = None
+		
 		for k, v in informacam_annex.iteritems():
 			if DEBUG: print k, v
 			if v == "null": continue
@@ -183,15 +248,49 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			elif len(conf_info) == 1:
 				with open(conf_path, "ab") as informa_conf:
 					informa_conf.write("%s: %s\n" % (conf_info[0], v))
+					if conf_info[0] == "admin.username": new_username = v
 			elif re.match(sec_rx, k):
 				with open(sec_path, "rb") as sec_conf:
 					sec = json.loads(sec_conf.read())
 					sec.update({ k : v })
+					
 				with open(sec_path, "wb+") as sec_conf:
 					sec_conf.write(json.dumps(sec))
+			elif k == pwd_rx:
+				new_password = v
 		"""
-			1. init keys and write fingerprint
+			1. init encryption config etc.
 		"""
+		from lib.Frontend.lib.Core.Utils.funcs import generateSecureRandom, generateNonce
+		with open(conf_path, 'ab') as informa_conf:
+			informa_conf.write("encryption.iv: %s\n" % generateSecureRandom())
+			informa_conf.write("encryption.salt: %s\n" % generateSecureRandom())
+			informa_conf.write("encryption.doc_salt: \"%s\"\n" % generateNonce())
+			informa_conf.write("encryption.user_salt: \"%s\"\n" % generateNonce())
+		
+		
+		"""
+			2. create new informacam admin user
+		"""
+		if new_username is None or new_password is None: 
+			if DEBUG: print "NO USERNAME or PASSWORD?"
+			return None
+		
+		from conf import getSecrets
+		try:
+			if self.createNewUser(new_username, new_password, as_admin=True):
+				return self.loginUser(new_username, new_password, handler)
+				
+		except Exception as e:
+			if DEBUG: print e
+		
+		return None
+			
+		"""
+			3. init keys and write fingerprint
+		"""
+		
+		'''
 		import gnupg
 		
 		pk_path = os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.priv_key.file")
@@ -221,28 +320,12 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				pub_path = os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.pub_key.file")
 				with open(pub_path, 'wb+') as public_key:
 					public_key.write(gpg.export_keys([k_id])[0])
+					return True
 				
 		except IOError as e:
 			print e
-			return None
-		"""
-			2. init encryption config etc.
-		"""
-		from lib.Frontend.lib.Core.Utils.funcs import generateSecureRandom, generateNonce
-		with open(conf_path, 'ab') as informa_conf:
-			informa_conf.write("encryption.iv: %s\n" % generateSecureRandom())
-			informa_conf.write("encryption.salt: %s\n" % generateSecureRandom())
-			informa_conf.write("encryption.doc_salt: %s\n" % generateNonce())
-			informa_conf.write("encryption.user_salt: %s\n" % generateNonce())		
+		'''
 		
-		"""
-			3. run init_informacam.sh to cleanup
-		"""
-		from conf import ANNEX_DIR
-		p = Popen([os.path.join("init_informacam.sh"), ANNEX_DIR])
-		p.wait()
-			
-		return None
 	
 	def do_logout(self, handler):
 		status = self.do_get_status(handler)
@@ -288,46 +371,16 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		credentials = parseRequestEntity(handler.request.body)
 		if credentials is None: return None
 		if DEBUG: print credentials
-		
-		try:
-			from conf import SALT, USER_SALT
-		except ImportError as e:
-			if DEBUG: print e
-			return None
-		
-		try:
-			user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],
-				salt=USER_SALT)
-
-			with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
-				user_data = self.decryptUserData(UD.read(), 
-					credentials['password'], p_salt=SALT)
-				if user_data is None: return None
-				try:
-					if user_data['admin']: 
-						del user_data['admin']
-						handler.set_secure_cookie(InformaCamCookie.ADMIN, 
-							"true", path="/", expires_days=1)
-							
-						if not self.do_get_drive_status():
-							if not self.initDriveClient():
-								from conf import getSecrets
-								user_data['auth_redir'] = getSecrets(										key="informacam.sync")['google_drive']['redirect_uri']
-
-				except KeyError as e: pass
 				
-				handler.set_secure_cookie(InformaCamCookie.USER, 
-					b64encode(json.dumps(user_data)), path="/", expires_days=1)
-				return user_data
-		except Exception as e:
-			if DEBUG: print e		
-		
-		return None
+		return self.loginUser(credentials['username'], credentials['password'], handler)
 	
 	"""
 		Overrides
 	"""
 	def do_send_public_key(self, handler):
+		status = self.do_get_user_status(handler)
+		if status != 4: return None
+		
 		super(InformaFrontend, self).do_send_public_key(handler)
 		
 		from conf import getConfig
@@ -343,33 +396,33 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 	
 	def do_link_annex(self, handler):
 		status = self.do_get_status(handler)
-		if status == 0: return None
+		if status != 3: return None
 		
 		return super(CompassFrontend, self).do_link_annex(handler)
 	
 	def do_init_synctask(self, handler):
 		status = self.do_get_status(handler)
-		if status == 0: return None
-		# TODO: actually, it should be 3 ONLY.
+		if status != 3: return None
 		
 		return super(InformaFrontend, self).do_init_synctask(handler)
 	
 	def do_init_annex(self, handler):
-		status = self.do_get_status(handler)
-		if status == 0: return None
+		status = self.do_get_user_status(handler)
+		if status != 4: return None
 		
 		credentials, result = super(InformaFrontend, self).do_init_annex(handler)
 		if DEBUG: print credentials
+
+		try:
+			return { 'credentials' : credentials, 'task_result' : result }
+		except Exception as e:
+			if DEBUG: print e
 		
-		"""
-			1. create new informacam admin user
-		"""
-		return self.createNewUser(credentials['informacam.config.admin.username'],
-			credentials['unveillance.local_remote.password'], as_admin=True)
+		return None
 		
 	def do_post_batch(self, handler, save_local=False):
-		status = self.do_get_status(handler)
-		if status == 0: return None
+		status = self.do_get_user_status(handler)
+		if status not in [3, 4]: return None
 		
 		if DEBUG: print "PRE-PROCESSING POST_BATCH FILES FIRST"
 		

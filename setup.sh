@@ -18,9 +18,9 @@ ln -s $OLD_DIR/web/ extras
 cd ../SyncTasks
 ln -s $OLD_DIR/SyncTasks/* .
 
-cd $OLD_DIR/lib/python-gnupg
-make install
+#cd $OLD_DIR/lib/python-gnupg
+#make install
 
 cd $OLD_DIR
-pip install --upgrade -r requirements.txt
+#pip install --upgrade -r requirements.txt
 python informa_frontend.py -firstuse

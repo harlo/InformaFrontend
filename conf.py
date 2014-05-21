@@ -66,6 +66,14 @@ try:
 
 		try: UNVEILLANCE_LM_VARS = config['unveillance.local_remote']
 		except KeyError as e: pass
+
+except IOError as e:
+	if DEBUG: print "NO SECRETS YET"
+		
+try:
+	with open(os.path.join(INFORMA_CONF_ROOT, "informacam.config.yaml"), 'rb') as C:
+		config = yaml.load(C.read())
+		print config
 		
 		try: ADMIN_USERNAME = config['admin.username']
 		except KeyError as e: pass

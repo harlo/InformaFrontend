@@ -19,6 +19,8 @@ var InformaCamAnnex = Backbone.Model.extend({
 			}
 		}
 		
+		informaCamAnnex.annex_bundle['unveillance.local_remote.password'] = annex.annex_bundle['unveillance.local_remote.password'];
+		
 		// send off informa stuff
 		doInnerAjax("init_informacam", "post",
 			JSON.stringify(informaCamAnnex.annex_bundle),

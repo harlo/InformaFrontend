@@ -3,9 +3,10 @@ from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 
 from Models.ic_drive_client import InformaCamDriveClient
+from lib.Frontend.lib.Core.Utils.funcs import generateMD5Hash
 
 from conf import DEBUG, INFORMA_USER_ROOT
-from vars import USER_CREDENTIAL_PACK
+from vars import USER_CREDENTIAL_PACK, InformaCamCookie
 
 class InformaAPI():
 	def __init__(self):
@@ -25,9 +26,10 @@ class InformaAPI():
 		aes = AES.new(generateMD5Hash(content=password), AES.MODE_CBC, iv)
 		ciphertext = {
 			'iv' : iv.encode('hex'), 
-			'data' : aes.encrypt(self.pad(json.dumps(plaintext)).encode('hex'))
+			'data' : aes.encrypt(self.pad(json.dumps(plaintext))).encode('hex')
 		}
 		
+		print ciphertext
 		return b64encode(json.dumps(ciphertext))
 	
 	def decyptUserData(self, ciphertext, password, iv=None, p_salt=None):
@@ -93,8 +95,10 @@ class InformaAPI():
 				if DEBUG: print "user already exists NOPE!"
 				return False
 			
+			print user_data
+			
 			with open(user_root, 'wb+') as user:
-				user.write(self.encrypt(user_data, password, p_salt=SALT, iv=IV))
+				user.write(self.encryptUserData(user_data, password, p_salt=SALT, iv=IV))
 				try:
 					if user_data['admin']: del user_data['admin']
 				except KeyError as e: pass
@@ -103,3 +107,39 @@ class InformaAPI():
 
 		except Exception as e: print e		
 		return False
+	
+	def loginUser(self, username, password, handler):
+		try:
+			from conf import SALT, USER_SALT
+		except ImportError as e:
+			if DEBUG: print e
+			return None
+		
+		try:
+			user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],
+				salt=USER_SALT)
+
+			with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
+				user_data = self.decryptUserData(UD.read(), 
+					credentials['password'], p_salt=SALT)
+				if user_data is None: return None
+				try:
+					if user_data['admin']: 
+						del user_data['admin']
+						handler.set_secure_cookie(InformaCamCookie.ADMIN, 
+							"true", path="/", expires_days=1)
+							
+						if not self.do_get_drive_status():
+							if not self.initDriveClient():
+								from conf import getSecrets
+								user_data['auth_redir'] = getSecrets(										key="informacam.sync")['google_drive']['redirect_uri']
+
+				except KeyError as e: pass
+				
+				handler.set_secure_cookie(InformaCamCookie.USER, 
+					b64encode(json.dumps(user_data)), path="/", expires_days=1)
+				return user_data
+		except Exception as e:
+			if DEBUG: print e		
+		
+		return None
