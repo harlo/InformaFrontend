@@ -1,4 +1,9 @@
 .DS_Store
-api.pyc conf.pyc vars.pyc
-*.exe
-.synctasks/local/
+*.pyc
+
+.users/
+.gpg/
+
+conf/*.config.yaml
+conf/informacam.*
+conf/*.secrets.json
