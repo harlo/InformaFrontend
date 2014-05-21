@@ -1,4 +1,5 @@
 import json, re, os, copy
+from time import sleep
 from base64 import b64encode, b64decode
 from Crypto.Cipher import AES
 
@@ -12,8 +13,12 @@ class InformaAPI():
 	def __init__(self):
 		print "InformaAPI STARTED TOO!!!"
 
-	def initDriveClient(self):
-		self.drive_client = InformaCamDriveClient()
+	def initDriveClient(self, restart=False):
+		if DEBUG: print "INITING DRIVE CLIENT"		
+		if not hasattr(self, "drive_client") or restart:
+			self.drive_client = InformaCamDriveClient()
+			sleep(2)
+	
 		return self.do_get_drive_status()
 		
 	def encryptUserData(self, plaintext, password, iv=None, p_salt=None):

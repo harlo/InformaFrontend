@@ -11,7 +11,7 @@ function initUser() {
 			if(status != 4) {
 				informacam_user = new InformaCamUser();
 			} else {
-				window.location = "/setup/#step-1";
+				//window.location = "/setup/#step-1";
 			}
 		}
 	});

@@ -1,13 +1,13 @@
-import os, json, re, tornado.web, requests
+import os, json, re, tornado.web, requests, urllib
 from sys import exit, argv
 from time import sleep
 
 from api import InformaAPI
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
-from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity, generateMD5Hash
+from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity, generateMD5Hash, asTrueValue
 
-from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, INFORMA_USER_ROOT, DEBUG, WEB_TITLE
+from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, INFORMA_USER_ROOT, DEBUG, WEB_TITLE, buildServerURL
 from vars import INFORMA_SYNC_TYPES, InformaCamCookie
 
 class InformaFrontend(UnveillanceFrontend, InformaAPI):
@@ -22,7 +22,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		self.reserved_routes.extend(["ictd", "auth", "commit"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
-			(r"/auth/(drive|globaleaks)", self.AuthHandler),
+			(r"/auth/(drive|globaleaks|annex)", self.AuthHandler),
 			(r"/commit/", self.GDOpenHandler)])
 		
 		self.default_on_loads = [
@@ -114,6 +114,10 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 							key="informacam.sync")['google_drive']['redirect_uri']
 					else:
 						if DEBUG: print "client has been authenticated already."
+			elif auth_type == "annex":
+				if self.application.do_get_status(self) == 3:
+					from lib.Frontend.Utils.fab_api import linkLocalRemote
+					endpoint = "/#linked_remote_%s" % linkLocalRemote()
 					
 			self.redirect(endpoint)
 		
@@ -147,25 +151,40 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		Frontend-accessible methods
 	"""
 	def do_open_drive_file(self, handler):
-		if self.do_get_status(handler) == 0: return None
-		# TODO: actually, if not 3
-		
 		if DEBUG: print "opening this drive file in informacam annex"
-		
-		if self.initDriveClient(restart=True):
-			committed_files = None
-			
-			for _id in parseRequestEntity(handler.request.query)['_ids']:
-				if DEBUG: print _id
-				
-				download = self.drive_client.download(_id)
-				if download is not None and self.drive_client.sendToAnnex(download):
-					if committed_files is None: committed_files = []
-					committed_files.append(download)
 
-			return committed_files
+		status = self.do_get_status(handler)
+		committed_files = None
+
+		for _id in parseRequestEntity(handler.request.query)['_ids']:
+			_id = urllib.unquote(_id).replace("'", "")[1:]
+			url = "%s/documents/?file_name=%s" % (buildServerURL(), _id)
+			entry = None
 			
-		return None
+			if DEBUG: print url
+			
+			# look up the file in annex. (annex/documents/?query=file_name=file)
+			# if this file exists in annex, return its _id for opening in-app
+			try:
+				entry = json.loads(requests.get(url).content)['data']['documents'][0]
+			except Exception as e:
+				if DEBUG: print "COULD NOT GET ENTRY:\n%s" % e
+				
+			if entry is not None: return entry['_id']
+			
+			# if the entry is not in annex, and logged in as admin, commit it.
+			if status != 3: continue
+			if not self.initDriveClient(restart=True): continue
+			
+			download = self.drive_client.download(_id)
+			if DEBUG: print download
+			
+			from lib.Frontend.Utils.fab_api import autoSync
+			if download is not None and autoSync():
+				if committed_files is None: committed_files = []
+				committed_files.append(download)
+
+		return committed_files
 	
 	# /Users/LvH/Proj/InformaCam2/glsp_remote_test
 	def do_get_admin_party_status(self, handler):
@@ -199,7 +218,8 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				
 			return 2
 
-		return 1
+		#return 1
+		return 3
 	
 	def do_get_drive_status(self, handler=None):
 		if handler is not None:
@@ -325,8 +345,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		except IOError as e:
 			print e
 		'''
-		
-	
+
 	def do_logout(self, handler):
 		status = self.do_get_status(handler)
 		if status not in [2, 3]: return None

@@ -5,6 +5,7 @@ from apiclient import errors
 from apiclient.discovery import build
 
 from lib.Frontend.Models.uv_annex_client import UnveillanceAnnexClient
+from lib.Frontend.Utils.fab_api import netcat, autoSync
 from Models.ic_sync_client import InformaCamSyncClient
 
 from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, getSecrets
@@ -203,8 +204,10 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 		
 		return None
 	
-	def dowload(self, file, save_as=None, save=True, return_content=False):
+	def download(self, file, save_as=None, save=True, return_content=False):
 		# don't waste my time.
+		if DEBUG: print "HAAAAAAAY DOWNLOAD FIRST!"
+		
 		if not hasattr(self, "service"): return None
 		if not save and not return_content: return None
 		
@@ -224,12 +227,16 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 				if len(re.findall(r'\.\.', save_as)) > 0:
 					return None
 				
+				from conf import ANNEX_DIR
 				destination_path = os.path.join(ANNEX_DIR, save_as)
 				
 				p = Popen(["wget", "-O", destination_path, url])
 				p.wait()
 				
-				super(InformaCamDriveClient, self).download()
+				if os.path.exists(destination_path):
+					autoSync()
+				else:
+					destination_path = None
 			else:
 				response, content = self.service._http.request(url)
 				if response.status != 200:
