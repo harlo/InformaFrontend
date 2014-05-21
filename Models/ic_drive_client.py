@@ -219,42 +219,25 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 			content = None
 			destination_path = None
 			
-			if save:
-				if save_as is None:
-					save_as = self.getFileName(file)
-				
-				# fuck you. (path traversal)
-				if len(re.findall(r'\.\.', save_as)) > 0:
-					return None
-				
-				from conf import ANNEX_DIR
-				destination_path = os.path.join(ANNEX_DIR, save_as)
-				
-				p = Popen(["wget", "-O", destination_path, url])
-				p.wait()
-				
-				if os.path.exists(destination_path):
-					autoSync()
-				else:
-					destination_path = None
-			else:
-				response, content = self.service._http.request(url)
-				if response.status != 200:
-					return None
-				
-				return_content = True
+			if save_as is None:
+				save_as = self.getFileName(file)
+			
+			# fuck you. (path traversal)
+			if len(re.findall(r'\.\.', save_as)) > 0:
+				return None
+			
+			from conf import ANNEX_DIR
+			destination_path = os.path.join(ANNEX_DIR, save_as)
+			
+			response, content = self.service._http.request(url)
+			if response.status != 200: return None
+			
+			with open(destination_path, 'wb+') as C:
+				C.write(content)
+				autoSync()				
 		
-			if return_content:
-				if content is None and destination_path is not None:
-					try:
-						with open(destination_path, 'rb') as C:
-							content = C.read()
-					except IOError as e:
-						if DEBUG: print e
-					
-					return content
-			else:
-				return destination_path
+			if return_content: return content
+			else: return destination_path
 		
 		return None
 		
