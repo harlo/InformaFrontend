@@ -232,9 +232,13 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 			response, content = self.service._http.request(url)
 			if response.status != 200: return None
 			
-			with open(destination_path, 'wb+') as C:
-				C.write(content)
-				autoSync()				
+			try:
+				with open(destination_path, 'wb+') as C: C.write(content)
+			except IOError as e:
+				if DEBUG: print e
+				return None
+			
+			autoSync()
 		
 			if return_content: return content
 			else: return destination_path

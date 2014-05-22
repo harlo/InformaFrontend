@@ -7,3 +7,5 @@
 conf/*.config.yaml
 conf/informacam.*
 conf/*.secrets.json
+
+test.*
