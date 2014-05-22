@@ -116,8 +116,16 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 						if DEBUG: print "client has been authenticated already."
 			elif auth_type == "annex":
 				if self.application.do_get_status(self) == 3:
+					from lib.Frontend.Models.uv_fabric_process import UnveillanceFabricProcess
 					from lib.Frontend.Utils.fab_api import linkLocalRemote
-					endpoint = "/#linked_remote_%s" % linkLocalRemote()
+					
+					p = UnveillanceFabricProcess(linkLocalRemote)
+					p.join()
+					
+					try:
+						endpoint = "/#linked_remote_%s" % p.output
+					except AttributeError as e:
+						if DEBUG: print e
 					
 			self.redirect(endpoint)
 		
@@ -179,8 +187,16 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			download = self.drive_client.download(_id)
 			if DEBUG: print download
 			
-			from lib.Frontend.Utils.fab_api import autoSync
-			if download is not None and autoSync():
+			if download is not None:
+				from lib.Frontend.Models.uv_fabric_process import UnveillanceFabricProcess
+				from lib.Frontend.Utils.fab_api import autoSync
+				from conf import ANNEX_DIR
+				
+				p = UnveillanceFabricProcess(autoSync, op_dir=ANNEX_DIR)
+				p.join()
+				
+				if DEBUG: print p.output
+				
 				if committed_files is None: committed_files = []
 				committed_files.append(download)
 

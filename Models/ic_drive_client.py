@@ -5,7 +5,6 @@ from apiclient import errors
 from apiclient.discovery import build
 
 from lib.Frontend.Models.uv_annex_client import UnveillanceAnnexClient
-from lib.Frontend.Utils.fab_api import netcat, autoSync
 from Models.ic_sync_client import InformaCamSyncClient
 
 from conf import DEBUG, API_PORT, saveSecret, INFORMA_CONF_ROOT, getSecrets
@@ -237,9 +236,7 @@ class InformaCamDriveClient(UnveillanceAnnexClient, InformaCamSyncClient):
 			except IOError as e:
 				if DEBUG: print e
 				return None
-			
-			autoSync()
-		
+					
 			if return_content: return content
 			else: return destination_path
 		
