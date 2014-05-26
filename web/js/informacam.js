@@ -25,37 +25,8 @@ function loadHeaderPopup(view, onSuccess) {
 		onSuccess, "/web/layout/views/popup/");
 }
 
-function informaSearch(query, search_collection) {
-
-}
-
-function informaFacetMatches(callback) {
-	var main_facets = _.map(["hash", "location", "date range", "annotations"], 
-		function(f) {
-			return { category : "Info", label : f };
-		}
-	);
-	
-	var device_facets = _.map(["make", "model"], function(f) {
-		return { category : "Device", label : f };
-	});
-	
-	var user_facets = _.map(["PGP fingerprint", "alias"], function(f) {
-		return { category : "User", label : f };
-	});
-	
-	var signal_facets = _.map(
-		["cell tower", "wifi BSSID", "bluetooth hash"], 
-		function(f) {
-			return { category : "Signal", label : f };
-		}
-	);
-	
-	callback(_.union(user_facets, device_facets, signal_facets, main_facets));
-}
-
-function informaValueMatches(facet, search_term, callback) {
-
+function initVisualSearch() {
+	visual_search = new InformaCamVisualSearch();
 }
 
 (function($) {
@@ -87,17 +58,11 @@ function informaValueMatches(facet, search_term, callback) {
 			document.getElementsByTagName("head")[0].appendChild(css.get(0));
 		});
 		
-		visual_search = VS.init({
-			container : $("#ic_searchbar_holder"),
-			query : '',
-			callbacks: {
-				search: informaSearch,
-				facetMatches: informaFacetMatches,
-				valueMatches: informaValueMatches
-			}
-		});
-		
 		initUser();
 		header_sammy.run();
+		
+		window.setTimeout(function() {
+			initVisualSearch();
+		}, 2000);
 	})
 })(jQuery);
