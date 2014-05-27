@@ -1,18 +1,3 @@
-function parseSensorEventKeys(keep_keys, sensorEvent) {
-	var keys_found = 0;
-	for(key in sensorEvent.sensorPlayback) {
-		if(keep_keys.indexOf(key) != -1) { keys_found++; }
-	}
-	
-	return keys_found == keep_keys.length;
-}
-
-function CFSort(dimension) {
-	return dimension.top(Infinity).sort(function(a, b) {
-		return a.timestamp < b.timestamp ? -1 : 1;
-	});
-}
-
 var InformaCamSubmission = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
@@ -28,17 +13,17 @@ var InformaCamSubmission = Backbone.Model.extend({
 		});
 		
 		return tagged_assets;
-	},
-	
+	}
+	/*
 	buildJ3M: function() {
+		
 		console.info("loading j3m into view");
 		
 		this.j3m_info = {};
-		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture)
+		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture);
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
 		var ts = { f : d[0].timestamp, l : d[d.length - 1].timestamp };
 		
-		/*
 		this.j3m_info.gpsTrace = {
 			label : "Movement",
 			legend: [],
@@ -47,7 +32,6 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {}
 		};
-		*/
 		
 		this.j3m_info.pitchRollAzimuth = {
 			label: "Pitch, Roll, Azimuth",
@@ -153,5 +137,9 @@ var InformaCamSubmission = Backbone.Model.extend({
 				});
 			}
 		};
+		
+		
+		
 	}
+	*/
 });

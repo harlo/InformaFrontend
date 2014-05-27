@@ -80,13 +80,16 @@ function initSubmission() {
 							function(j3m) {
 								j3m = JSON.parse(j3m.responseText);
 								if(j3m.result == 200) {
-									submission.set({ j3m : j3m.data });
+									submission.set({ j3m : new InformaCamJ3M(j3m.data) });
 									insertTemplate("submission_extended.html",
 										submission.toJSON(), 
 										"#ic_submission_extended",
 										function() {
-											submission.buildJ3M();
-											_.each(submission.j3m_info, setJ3MInfo);
+											submission.get('j3m').build();
+											_.each(
+												submission.get('j3m').j3m_info,
+												setJ3MInfo
+											);
 										}
 									);
 								}

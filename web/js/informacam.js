@@ -1,6 +1,19 @@
 var informacam_user = null;
 var visual_search;
 
+var onConfLoaded = function() {
+	console.info("HELLO");
+	
+	var map_id = "harlo.ibn0kk8l";
+	var key = "23c00ae936704081ab019253c36a55b3";
+	UV.CM_API = {
+		//AUTH_STR : "http://{s}.tile.cloudmade.com/" + key + "/110483/256/{z}/{x}/{y}.png",
+		AUTH_STR : "http://{s}.tiles.mapbox.com/v3/" + map_id + "/{z}/{x}/{y}.png",
+		MAX_ZOOM: 18,
+		ATTRIBUTION: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	};
+}
+
 function initUser() {
 	doInnerAjax("get_user_status", "post", null, function(json) {
 		json = JSON.parse(json.responseText);
@@ -58,6 +71,11 @@ function initVisualSearch() {
 			document.getElementsByTagName("head")[0].appendChild(css.get(0));
 		});
 		
+		css = $(css_stub).clone();
+		css.attr('href', "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css");
+		document.getElementsByTagName("head")[0].appendChild(css.get(0));
+		
+		onConfLoaded();
 		initUser();
 		header_sammy.run();
 		

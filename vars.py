@@ -26,9 +26,15 @@ informacam_mime_type_map = {
 	'informacam/log' : "j3mlog"
 }
 
+informacam_asset_tags = {
+	'J3M' : "j3m",
+	'PGP_KEY' : "pgp_key"
+}
+
 FILE_NON_OVERWRITES.extend(["informacam.form"])
 
 print FILE_NON_OVERWRITES
 
 MIME_TYPES.update(informacam_mime_types)
 MIME_TYPE_MAP.update(informacam_mime_type_map)
+ASSET_TAGS.update(informacam_asset_tags)

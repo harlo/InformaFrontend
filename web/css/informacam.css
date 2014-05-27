@@ -104,9 +104,27 @@ div.ic_module {
 #ic_asset_panel {
 	width:30%;
 	height:100%;
-	border-right:1px solid #000;
 }
 
 #ic_asset_browser_holder li.ic_in_annex_false {
 	background-color:#ccc;
+}
+
+#ic_viewer_panel {
+	width:70%;
+	height:100%;
+	float:right;
+	right:0;
+	top:2em;
+	border-left:1px solid #000;
+}
+
+#ic_viewer_panel, #ic_document_panel {
+	position:absolute;
+}
+
+#ic_document_main_ctrl li {
+	float:left;
+	padding:0.1em 0.35em;
+	margin:0.1em 0.35em;
 }

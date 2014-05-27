@@ -26,6 +26,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			(r"/commit/", self.DriveHandler)])
 		
 		self.default_on_loads = [
+			'http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js',
 			'/web/js/lib/sammy.js',
 			'/web/js/lib/crossfilter.min.js',
 			'/web/js/lib/d3.min.js',
@@ -46,12 +47,10 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		])
 		self.on_loads.update({
 			'submission' : [
-				'/web/js/lib/crossfilter.min.js',
-				'/web/js/lib/d3.min.js',
-				'/web/js/viz/uv_viz.js',
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
+				'/web/js/viz/ic_map.js',
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js'],
@@ -59,6 +58,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
+				'/web/js/viz/ic_map.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_collection.js',
