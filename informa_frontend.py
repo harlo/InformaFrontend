@@ -419,7 +419,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		super(InformaFrontend, self).do_send_public_key(handler)
 		
 		from conf import getConfig
-		upload = self.drive_client.upload(getConfig('unveillance.local_remote.pub_key'),
+		upload = self.drive_client.upload("%.pub" % getConfig('unveillance.local_remote.pub_key'),
 			title="unveillance.local_remote.pub_key")
 		
 		try:
