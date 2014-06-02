@@ -82,13 +82,11 @@ var InformaCamTimeseriesChart = UnveillanceViz.extend({
 		var scale = this.scale;
 		
 		_.each(this.get('legend'), function(l) {
-			console.info(l);			
 			
 			_.each(entities, function(e, i) {
 				console.info(e);
 				var d = cf.dimension(function(se) {
 					var value = drillToKey(se.sensorPlayback, l.key)[0];
-					console.info(value);
 					return value == e.label;
 				});
 				

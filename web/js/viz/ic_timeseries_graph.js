@@ -23,9 +23,13 @@ var InformaCamTimeseriesGraph = UnveillanceViz.extend({
 		
 		var x_range = [0, 
 			this.dims.width - (this.dims.padding.left + this.dims.padding.right)];
+		console.info(x_range);
+		
 		this.scale.x = d3.scale.linear().domain(this.dims.axis.x).range(x_range);
 		var x_axis = d3.svg.axis().scale(this.scale.x).orient("bottom").ticks(10)
-			.tickFormat(function(d) { return moment(Number(d)).format("HH:mm:ss"); });
+			.tickFormat(function(d) { 
+				return moment(Number(d)).format("MM-DD-YYYY HH:mm:ss"); 
+			});
 		
 		var y_range = [(this.dims.height - this.dims.padding.bottom),
 			 this.dims.padding.bottom];
@@ -39,7 +43,9 @@ var InformaCamTimeseriesGraph = UnveillanceViz.extend({
 					(this.dims.height - this.dims.padding.bottom) + ")",
 				"class" : "ic_x_axis"
 			})
-			.call(x_axis);
+			.call(x_axis)
+			.selectAll("text")
+			.attr("transform", "rotate(-75)");
 		
 		this.svg.append("svg:g")
 			.attr({
@@ -50,9 +56,8 @@ var InformaCamTimeseriesGraph = UnveillanceViz.extend({
 		
 		this.buildLegend();
 		this.buildData();
-	},
-	XTVals: function() {
-		return [1,2,5,7,9];
+		
+		g_scale = this.scale;
 	},
 	getMinAndMax: function() {
 		var min, max;
@@ -101,7 +106,7 @@ var InformaCamTimeseriesGraph = UnveillanceViz.extend({
 				.data(d.top(Infinity)).enter()
 				.append("svg:circle").style('fill', l.color).attr({
 					"r" : r,
-					"cx" : function(point) {
+					"cx" : function(point) {	
 						return scale.x(point.timestamp) + offs;
 					},
 					"cy" : function(point) {

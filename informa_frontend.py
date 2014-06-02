@@ -23,45 +23,52 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
 			(r"/auth/(drive|globaleaks|annex)", self.AuthHandler),
-			(r"/commit/", self.GDOpenHandler)])
+			(r"/commit/", self.DriveHandler)])
 		
 		self.default_on_loads = [
+			'http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js',
 			'/web/js/lib/sammy.js',
+			'/web/js/lib/crossfilter.min.js',
+			'/web/js/lib/d3.min.js',
 			'/web/js/lib/visualsearch.js',
 			'/web/js/lib/jquery.ui.core.js',
 			'/web/js/lib/jquery.ui.position.js',
 			'/web/js/lib/jquery.ui.widget.js',
 			'/web/js/lib/jquery.ui.menu.js',
 			'/web/js/lib/jquery.ui.autocomplete.js',
+			'/web/js/viz/uv_viz.js',
+			'/web/js/models/ic_user.js',
+			'/web/js/models/ic_visual_search.js',
 			'/web/js/informacam.js', 
-			'/web/js/models/ic_user.js'
 		]
 		self.on_loads['setup'].extend([
 			'/web/js/models/ic_annex.js',
 			'/web/js/modules/ic_setup.js'
 		])
 		self.on_loads.update({
-			'submissions' : ['/web/js/modules/ic_submissions.js'],
 			'submission' : [
-				'/web/js/lib/crossfilter.min.js',
-				'/web/js/lib/d3.min.js',
-				'/web/js/viz/uv_viz.js',
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
-				'/web/js/modules/ic_submission.js',
-				'/web/js/models/ic_submission.js'],
-			'sources' : ['/web/js/modules/ic_sources.js'],
+				'/web/js/viz/ic_map.js',
+				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_submission.js',
+				'/web/js/modules/ic_submission.js'],
 			'main' : [
-				'/web/js/lib/d3.min.js',
-				'/web/js/viz/uv_viz.js',
-				'/web/js/viz/uv_colored_cluster.js',
-				'/web/js/models/unveillance_cluster.js',
-				'/web/js/modules/ic_main_cluster.js']
+				'/web/js/viz/uv_indented_tree.js',
+				'/web/js/viz/ic_timeseries_graph.js',
+				'/web/js/viz/ic_timeseries_chart.js',
+				'/web/js/viz/ic_map.js',
+				'/web/js/models/ic_document_browser.js',
+				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_collection.js',
+				'/web/js/models/ic_source.js',
+				'/web/js/models/ic_submission.js',
+				'/web/js/modules/main.js']
 		})
 		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
-			self.init_vars = json.loads(IV.read())['web']
+			self.init_vars.update(json.loads(IV.read())['web'])
 		
 		repo_data_rx = r"informacam\.repository\.(?:(%s))\.[\S]+" % "|".join(INFORMA_SYNC_TYPES)
 		ictd_rx = r"informacam\.ictd"
@@ -146,61 +153,81 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			self.set_status(res.result)
 			self.finish(res.emit())
 	
-	class GDOpenHandler(tornado.web.RequestHandler):
+	class DriveHandler(tornado.web.RequestHandler):
 		def get(self):
+			endpoint = "/"			
 			res = self.application.routeRequest(Result(), "open_drive_file", self)
 			
 			if DEBUG: print res.emit()
 			
-			self.set_status(res.result)
-			self.finish(res.emit())
+			if res.result == 200 and hasattr(res, "data"):
+				endpoint += "#collection=%s" % json.dumps(res.data)
+			
+			self.redirect(endpoint)
 	
 	"""
 		Frontend-accessible methods
 	"""
 	def do_open_drive_file(self, handler):
 		if DEBUG: print "opening this drive file in informacam annex"
-
 		status = self.do_get_status(handler)
-		committed_files = None
-
+		if status not in [2,3]: 
+			if DEBUG: print "NO-ACCESS TO THIS METHOD (\"do_open_drive_file\")"
+			return None
+		
+		files = None
+			
 		for _id in parseRequestEntity(handler.request.query)['_ids']:
 			_id = urllib.unquote(_id).replace("'", "")[1:]
-			url = "%s/documents/?file_name=%s" % (buildServerURL(), _id)
+			file_name = self.drive_client.getFileName(_id)
+
+			if file_name is None: return None
+			url = "%s/documents/?file_name=%s" % (buildServerURL(), file_name)
+
 			entry = None
-			
+			handled_file = None
+		
 			if DEBUG: print url
 			
-			# look up the file in annex. (annex/documents/?query=file_name=file)
+			# look up the file in annex. (annex/documents/?file_name=file)
 			# if this file exists in annex, return its _id for opening in-app
 			try:
-				entry = json.loads(requests.get(url).content)['data']['documents'][0]
+				entry = json.loads(requests.get(
+					url, verify=False).content)['data']['documents'][0]
 			except Exception as e:
 				if DEBUG: print "COULD NOT GET ENTRY:\n%s" % e
-				
-			if entry is not None: return entry['_id']
 			
-			# if the entry is not in annex, and logged in as admin, commit it.
-			if status != 3: continue
-			if not self.initDriveClient(restart=True): continue
+			if entry is not None:
+				print type(entry['_id'])
+				handled_file = { '_id' : entry['_id'] }
+			else:
+				if status != 3:
+					if DEBUG:
+						print "** at this point, we would process file if you were admin"
+						print "** but you are not admin."
+					
+					return None
+						
+				entry = self.drive_client.download(_id, save=False)
+				if entry is not None:						
+					p = UnveillanceFabricProcess(netcat, {
+						'file' : entry[0],
+						'save_as' : entry[1],
+						'password' : getSecrets(key="unveillance.local_remote")['pwd']
+					})
+					p.join()
 			
-			download = self.drive_client.download(_id)
-			if DEBUG: print download
+					if p.output is not None:
+						if DEBUG: print p.output
+						handled_file = { 'file_name' : entry[1] }
+					
+					if DEBUG and p.error is not None: print p.error
 			
-			if download is not None:
-				from lib.Frontend.Models.uv_fabric_process import UnveillanceFabricProcess
-				from lib.Frontend.Utils.fab_api import autoSync
-				from conf import ANNEX_DIR
-				
-				p = UnveillanceFabricProcess(autoSync, op_dir=ANNEX_DIR)
-				p.join()
-				
-				if DEBUG: print p.output
-				
-				if committed_files is None: committed_files = []
-				committed_files.append(download)
-
-		return committed_files
+			if handled_file is not None:
+				if files is None: files = []
+				files.append(handled_file)
+		
+		return files
 	
 	# /Users/LvH/Proj/InformaCam2/glsp_remote_test
 	def do_get_admin_party_status(self, handler):

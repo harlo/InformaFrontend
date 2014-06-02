@@ -1,29 +1,45 @@
-var InformaCamSubmission = Backbone.Model.extend({
+function parseSensorEventKeys(keep_keys, sensorEvent) {
+	var keys_found = 0;
+	for(key in sensorEvent.sensorPlayback) {
+		if(keep_keys.indexOf(key) != -1) { keys_found++; }
+	}
+	
+	return keys_found == keep_keys.length;
+}
+
+function CFSort(dimension) {
+	return dimension.top(Infinity).sort(function(a, b) {
+		return a.timestamp < b.timestamp ? -1 : 1;
+	});
+}
+
+var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
-		this.idAttribute = "_id";
 	},
-	
-	getAssetsByTagName: function(tag) {
-		var tagged_assets = [];
-		_.each(this.get("assets"), function(a) {
-			if(a.tags && a.tags.indexOf(tag) != -1) {
-				tagged_assets.push(a);
-			}
+	setJ3MInfo: function(item) {
+		var info_holder = $(document.createElement('div'));
+		insertTemplate("j3m_info.html", item, info_holder, function() {
+			var id = item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase();
+		
+			$($(info_holder).find(".ic_j3m_info_vizualization")[0])
+				.attr({
+					'id' : id
+				});
+			$("#ic_j3m_info_holder").append(info_holder);
+		
+			item.viz = item.build("#" + id);
 		});
-		
-		return tagged_assets;
-	}
-	/*
-	buildJ3M: function() {
-		
+	},
+	build: function() {
 		console.info("loading j3m into view");
 		
 		this.j3m_info = {};
-		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture);
+		var sensorEvents = crossfilter(this.get("data").sensorCapture);
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
 		var ts = { f : d[0].timestamp, l : d[d.length - 1].timestamp };
 		
+		/*
 		this.j3m_info.gpsTrace = {
 			label : "Movement",
 			legend: [],
@@ -32,10 +48,11 @@ var InformaCamSubmission = Backbone.Model.extend({
 			}),
 			build: function() {}
 		};
+		*/
 		
 		this.j3m_info.pitchRollAzimuth = {
 			label: "Pitch, Roll, Azimuth",
-			build: function(id) {
+			build: function(id) {				
 				return new InformaCamTimeseriesGraph({
 					data : d.filter(function(se) {
 						return parseSensorEventKeys(["pitch", "pitchCorrected", "roll",
@@ -137,9 +154,5 @@ var InformaCamSubmission = Backbone.Model.extend({
 				});
 			}
 		};
-		
-		
-		
 	}
-	*/
 });
