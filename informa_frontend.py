@@ -121,6 +121,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 							key="informacam.sync")['google_drive']['redirect_uri']
 					else:
 						if DEBUG: print "client has been authenticated already."
+			
 			elif auth_type == "annex":
 				if self.application.do_get_status(self) == 3:
 					from lib.Frontend.Models.uv_fabric_process import UnveillanceFabricProcess
@@ -291,7 +292,7 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		sec_path = os.path.join(INFORMA_CONF_ROOT, "informacam.secrets.json")
 		
 		conf_rx = r"informacam\.config\.(\S+)"
-		conf_path = os.path.join(INFORMA_CONF_ROOT, "informacam.config.yaml")
+		conf_path = os.path.join(CONF_ROOT, "local.config.yaml")
 		
 		pwd_rx = "unveillance.local_remote.password"
 
@@ -339,7 +340,6 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			if DEBUG: print "NO USERNAME or PASSWORD?"
 			return None
 		
-		from conf import getSecrets
 		try:
 			if self.createNewUser(new_username, new_password, as_admin=True):
 				return self.loginUser(new_username, new_password, handler)
@@ -348,46 +348,6 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 			if DEBUG: print e
 		
 		return None
-			
-		"""
-			3. init keys and write fingerprint
-		"""
-		
-		'''
-		import gnupg
-		
-		pk_path = os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.priv_key.file")
-		gpg_homedir = os.path.join(INFORMA_CONF_ROOT, ".gpg")
-		if not os.path.exists(gpg_homedir): os.mkdir(gpg_homedir)
-		
-		gpg = gnupg.GPG(homedir=gpg_homedir)		
-		
-		try:
-			with open(pk_path, 'rb') as pk:
-				private_key = pk.read()
-				gpg.import_keys(private_key)
-				
-				packet_res = gpg.list_packets(private_key).data.split("\n")
-				for line in packet_res:
-					if DEBUG: print line
-					if re.match(r"^:signature packet:", line):
-						k_id = line[-16:]
-						break
-				
-				key_res = [key for key in gpg.list_keys() if key['keyid'] == k_id]
-				if len(key_res) != 1: return None
-				
-				with open(ictd_path, 'ab') as ictd:
-					ictd.write("organizationFingerprint: %s\n") % key_res[0]['fingerprint']
-				
-				pub_path = os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.pub_key.file")
-				with open(pub_path, 'wb+') as public_key:
-					public_key.write(gpg.export_keys([k_id])[0])
-					return True
-				
-		except IOError as e:
-			print e
-		'''
 
 	def do_logout(self, handler):
 		status = self.do_get_status(handler)
@@ -445,16 +405,35 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		
 		super(InformaFrontend, self).do_send_public_key(handler)
 		
-		from conf import getConfig
-		upload = self.drive_client.upload("%.pub" % getConfig('unveillance.local_remote.pub_key'),
-			title="unveillance.local_remote.pub_key")
+		from conf import getConfig, getSecrets, CONF_ROOT
 		
-		try:
-			return self.drive_client.share(upload['id'])
-		except KeyError as e:
-			if DEBUG: print e
+		uploaded = []
+		uploads = [
+			("%.pub" % getConfig('unveillance.local_remote.pub_key'),
+				"unveillance.local_remote.pub_key"),
+			(os.path.join(CONF_ROOT, "informacam.gpg.priv_key.file"),
+				"informacam.gpg.priv_key.file"),
+			(os.path.join(CONF_ROOT, "informacam.gpg.priv_key.password"),
+				"informacam.gpg.priv_key.password")]
+
+		with open(uploads[2][0], 'wb+') as P:
+			P.write(getSecrets(key='informacam.gpg.priv_key.password'))
+				
+		for _, _, files in os.walk(CONF_ROOT):
+			for file in files:
+				if re.match(r'informacam.form.(?:.*\.xml)', file):
+					uploads.append((os.path.join(CONF_ROOT, file), file))
+			
+		for u in uploads:
+			upload = self.drive_client.upload(u[0], title=u[1])
 		
-		return None
+			try:
+				uploaded.append(self.drive_client.share(upload['id']))
+			except KeyError as e:
+				if DEBUG: print e
+		
+		if len(uploaded) == 0 : return None
+		return uploaded
 	
 	def do_link_annex(self, handler):
 		status = self.do_get_status(handler)

@@ -1,7 +1,6 @@
 import os, yaml, json
 
 from lib.Frontend.conf import *
-#from lib.Server.conf import *
 
 INFORMA_BASE_DIR = os.path.abspath(os.path.join(__file__, os.pardir))
 INFORMA_CONF_ROOT = os.path.join(INFORMA_BASE_DIR, "conf")
@@ -70,27 +69,19 @@ try:
 except IOError as e:
 	if DEBUG: print "NO SECRETS YET"
 		
-try:
-	with open(os.path.join(INFORMA_CONF_ROOT, "informacam.config.yaml"), 'rb') as C:
-		config = yaml.load(C.read())
-		print config
-		
-		try: ADMIN_USERNAME = config['admin.username']
-		except KeyError as e: pass
-		
-		try: IV = config['encryption.iv']
-		except KeyError as e: pass
-		
-		try: SALT = config['encryption.salt']
-		except KeyError as e: pass
-		
-		try: USER_SALT = config['encryption.user_salt']
-		except KeyError as e: pass
-		
-		try: DOC_SALT = config['encryption.doc_salt']
-		except KeyError as e: pass
-			
-except IOError as e:
-	if DEBUG: print "NO INFORMA CONF YET"
+try: ADMIN_USERNAME = getConfig('admin.username')
+except KeyError as e: pass
+
+try: IV = getConfig('encryption.iv')
+except KeyError as e: pass
+
+try: SALT = getConfig('encryption.salt')
+except KeyError as e: pass
+
+try: USER_SALT = getConfig('encryption.user_salt')
+except KeyError as e: pass
+
+try: DOC_SALT = getConfig('encryption.doc_salt')
+except KeyError as e: pass
 
 SYNC_TYPES = getSyncTypes()
