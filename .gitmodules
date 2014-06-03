@@ -1,9 +1,3 @@
-[submodule "lib/Server"]
-	path = lib/Server
-	url = git@github.com:harlo/UnveillanceServer.git
 [submodule "lib/Frontend"]
 	path = lib/Frontend
 	url = git@github.com:harlo/UnveillanceInterface.git
-[submodule "lib/python-gnupg"]
-	path = lib/python-gnupg
-	url = git@github.com:isislovecruft/python-gnupg.git
