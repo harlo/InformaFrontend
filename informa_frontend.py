@@ -351,50 +351,32 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 
 	def do_logout(self, handler):
 		status = self.do_get_status(handler)
-		if status not in [2, 3]: return None
+		if status not in [2, 3]:
+			if DEBUG: print "CANNOT LOG IN USER, DON'T EVEN TRY (status %d)" % status
+			return None
 				
 		credentials = parseRequestEntity(handler.request.body)
 		if credentials is None: return None
 		if DEBUG: print credentials
 		
-		handler.clear_cookie(InformaCamCookie.USER)
-		handler.clear_cookie(InformaCamCookie.ADMIN)
-		
-		try:
-			password = credentials['password']
-		except KeyError as e: return True
-		
-		try:
-			from conf import IV, SALT, USER_SALT
-		except ImportError as e:
-			if DEBUG: print e
-			return None
-		
-		user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],salt=USER_SALT)
-		
-		with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
-			user_data = self.decrypt(UD.read, password, p_salt=SALT)
-			
-			if user_data is None: return None
-			
-			new_data = copy.deepcopy(user_data)
-			new_data['saved_searches'] = credentials['save_data']['saved_searches']
-		
-		with open(os.path.join(INFORMA_USER_ROOT, user_root), 'wb+') as UD:
-			UD.write(self.encrypt(new_data, password, iv=IV, p_salt=SALT))
-			return True
-		
-		return None
+		return self.logoutUser(self, credentials, handler)
 	
 	def do_login(self, handler):
 		status = self.do_get_status(handler)
-		if status != 1:	return None
+		if status != 1:
+			if DEBUG: print "CANNOT LOG IN USER, DON'T EVEN TRY (status %d)" % status
+			return None
 		
 		credentials = parseRequestEntity(handler.request.body)
 		if credentials is None: return None
 		if DEBUG: print credentials
-				
-		return self.loginUser(credentials['username'], credentials['password'], handler)
+		
+		try:	
+			return self.loginUser(credentials['username'], 
+				credentials['password'], handler)
+		except KeyError as e:
+			if DEBUG: print "CANNOT LOG IN USER: %s missing" % e
+			return None
 	
 	"""
 		Overrides
@@ -405,30 +387,31 @@ class InformaFrontend(UnveillanceFrontend, InformaAPI):
 		
 		super(InformaFrontend, self).do_send_public_key(handler)
 		
-		from conf import getConfig, getSecrets, CONF_ROOT
+		from conf import getConfig, getSecrets, INFORMA_CONF_ROOT
 		
 		uploaded = []
 		uploads = [
 			("%.pub" % getConfig('unveillance.local_remote.pub_key'),
-				"unveillance.local_remote.pub_key"),
-			(os.path.join(CONF_ROOT, "informacam.gpg.priv_key.file"),
-				"informacam.gpg.priv_key.file"),
-			(os.path.join(CONF_ROOT, "informacam.gpg.priv_key.password"),
-				"informacam.gpg.priv_key.password")]
+				"unveillance.local_remote.pub_key", False),
+			(os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.priv_key.file"),
+				"informacam.gpg.priv_key.file", True),
+			(os.path.join(INFORMA_CONF_ROOT, "informacam.gpg.priv_key.password"),
+				"informacam.gpg.priv_key.password", True)]
 
 		with open(uploads[2][0], 'wb+') as P:
 			P.write(getSecrets(key='informacam.gpg.priv_key.password'))
 				
-		for _, _, files in os.walk(CONF_ROOT):
+		for _, _, files in os.walk(INFORMA_CONF_ROOT):
 			for file in files:
 				if re.match(r'informacam.form.(?:.*\.xml)', file):
-					uploads.append((os.path.join(CONF_ROOT, file), file))
+					uploads.append((os.path.join(INFORMA_CONF_ROOT, file), file, True))
 			
 		for u in uploads:
 			upload = self.drive_client.upload(u[0], title=u[1])
 		
 			try:
 				uploaded.append(self.drive_client.share(upload['id']))
+				if u[2]: os.remove(u[0])
 			except KeyError as e:
 				if DEBUG: print e
 		

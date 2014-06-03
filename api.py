@@ -113,6 +113,39 @@ class InformaAPI():
 		except Exception as e: print e		
 		return False
 	
+	def logoutUser(self, credentials, handler):
+		handler.clear_cokie(InformaCamCookie.USER)
+		handler.clear_cookie(InformaCamCookie.ADMIN)
+		
+		try:
+			password = credentials['password']
+		except KeyError as e: return True
+		
+		try:
+			username = credentials['username']
+		except KeyError as e: return None
+		
+		try:
+			from conf import IV, SALT, USER_SALT
+		except ImportError as e:
+			if DEBUG: print e
+			return None
+				
+		user_root = "%s.txt" % generateMD5Hash(content=username,salt=USER_SALT)
+		with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
+			user_data = self.decrypt(UD.read, password, p_salt=SALT)
+			
+			if user_data is None: return None
+			
+			new_data = copy.deepcopy(user_data)
+			new_data['saved_searches'] = credentials['save_data']['saved_searches']
+		
+		with open(os.path.join(INFORMA_USER_ROOT, user_root), 'wb+') as UD:
+			UD.write(self.encrypt(new_data, password, iv=IV, p_salt=SALT))
+			return True
+		
+		return None
+	
 	def loginUser(self, username, password, handler):
 		try:
 			from conf import SALT, USER_SALT
@@ -121,13 +154,11 @@ class InformaAPI():
 			return None
 		
 		try:
-			user_root = "%s.txt" % generateMD5Hash(content=credentials['username'],
-				salt=USER_SALT)
-
+			user_root = "%s.txt" % generateMD5Hash(content=username, salt=USER_SALT)
 			with open(os.path.join(INFORMA_USER_ROOT, user_root), 'rb') as UD:
-				user_data = self.decryptUserData(UD.read(), 
-					credentials['password'], p_salt=SALT)
+				user_data = self.decryptUserData(UD.read(), password, p_salt=SALT)
 				if user_data is None: return None
+				
 				try:
 					if user_data['admin']: 
 						del user_data['admin']
@@ -143,7 +174,9 @@ class InformaAPI():
 				
 				handler.set_secure_cookie(InformaCamCookie.USER, 
 					b64encode(json.dumps(user_data)), path="/", expires_days=1)
+				
 				return user_data
+		
 		except Exception as e:
 			if DEBUG: print e		
 		
