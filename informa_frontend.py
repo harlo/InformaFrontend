@@ -6,16 +6,12 @@ from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
 from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity, generateMD5Hash, asTrueValue
 
-from conf import INFORMA_BASE_DIR, DEBUG, WEB_TITLE, buildServerURL
+from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE, buildServerURL
 
 class InformaFrontend(UnveillanceFrontend):
 	def __init__(self):
 		UnveillanceFrontend.__init__(self)
-		
-		# sketchy...
-		from conf import UNVEILLANCE_LM_VARS
-		self.UNVEILLANCE_LM_VARS.update(UNVEILLANCE_LM_VARS)
-		
+				
 		self.reserved_routes.extend(["ictd", "commit"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
