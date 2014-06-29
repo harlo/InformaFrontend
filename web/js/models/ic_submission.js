@@ -1,18 +1,57 @@
-var InformaCamSubmission = Backbone.Model.extend({
+var InformaCamSubmission = UnveillanceDocument.extend({
 	constructor: function(inflate) {
-		Backbone.Model.apply(this, arguments);
-		this.idAttribute = "_id";
+		UnveillanceDocument.prototype.constructor.apply(this, arguments);
 	},
 	
-	getAssetsByTagName: function(tag) {
-		var tagged_assets = [];
-		_.each(this.get("assets"), function(a) {
-			if(a.tags && a.tags.indexOf(tag) != -1) {
-				tagged_assets.push(a);
+	updateInfo: function() {
+		var updated_info = _.findWhere(
+			document_browser.get('data'), { _id : this.get('_id') });
+		
+		if(updated_info) {
+			this.set(updated_info);
+			onViewerModeChanged("asset", force_reload=true);
+		}
+	},
+	
+	initViewer: function() {
+		if(!this.has('available_views')) {
+			this.set('available_views', []);
+		}
+	},
+	setInPanel: function(asset) {
+		var callback = null;
+		var ctx = this;
+		
+		switch(asset) {
+			case "info":
+				break;
+			case "options":
+				break;
+			case "viewer":
+				var mt = "image";
+				switch(this.get('mime_type')) {
+					case "informacam/log":
+						mt = "log";
+						break;
+					case "video/x-matroska":
+						mt = "video";
+						break;
+				}
+				asset += ("_" + mt);
+				break;
+		}
+		
+		insertTemplate(
+			asset + ".html", this.toJSON(),
+			"#ic_asset_view_panel", callback, "/web/layout/views/document/");
+		
+		$.each($("#ic_asset_main_ctrl").children('li'), function() {
+			if($(this).attr('id') == 'ic_d_' + asset) {
+				$(this).addClass("ic_active");
+			} else {
+				$(this).removeClass("ic_active");
 			}
 		});
-		
-		return tagged_assets;
 	}
 	/*
 	buildJ3M: function() {

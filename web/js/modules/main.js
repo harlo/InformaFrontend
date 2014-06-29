@@ -14,9 +14,6 @@ function initAssetBrowser() {
 								case "application/pgp":
 									asset_type = "source";
 									break;
-								case "informacam/log":
-									asset_type = "collection";
-									break;
 								default:
 									asset_type = "submission";
 									break;
@@ -145,12 +142,11 @@ function loadModule(module_name) {
 }
 
 function loadAsset(asset_type, _id) {
+	console.info(arguments);
 	if(asset_type == "submission") {
 		current_asset = new InformaCamSubmission({ _id : _id });
 	} else if(asset_type == "source") {
 		current_asset = new InformaCamSource({ _id : _id });
-	} else if(asset_type == "collection") {
-		current_asset = new InformaCamCollection({ _id : _id });
 	}
 	
 	try {
@@ -226,15 +222,6 @@ function onViewerModeChanged(mode, force_reload) {
 		
 		this.get('/#(submission|source)/:_id', function() {
 			loadAsset(this.params['_id'], this.params.splat[0]);
-		});
-		
-		this.get('/#collection/:_id', function() {
-			console.info(this.params['_id']);
-			var collection = _.findWhere(document_browser.get('data'), { _id : this.params['_id']})
-			console.info(collection);
-			buildDocumentCollection({
-				collection : [collection.j3m_id]
-			});
 		});
 	});
 	
