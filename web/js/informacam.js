@@ -1,13 +1,10 @@
 var informacam_user = null;
 var visual_search;
 
-var onConfLoaded = function() {
-	console.info("HELLO");
-	
+var onConfLoaded = function() {	
 	var map_id = "harlo.ibn0kk8l";
 	var key = "23c00ae936704081ab019253c36a55b3";
 	UV.CM_API = {
-		//AUTH_STR : "http://{s}.tile.cloudmade.com/" + key + "/110483/256/{z}/{x}/{y}.png",
 		AUTH_STR : "http://{s}.tiles.mapbox.com/v3/" + map_id + "/{z}/{x}/{y}.png",
 		MAX_ZOOM: 18,
 		ATTRIBUTION: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
@@ -23,8 +20,6 @@ function initUser() {
 			
 			if(status != 4) {
 				informacam_user = new InformaCamUser();
-			} else {
-				//window.location = "/setup/#step-1";
 			}
 		}
 	});

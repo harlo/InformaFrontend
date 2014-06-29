@@ -2,14 +2,28 @@ var document_browser, current_collection, current_asset, current_mode;
 
 function initAssetBrowser() {
 	doInnerAjax("documents", "post", 
-		{ mime_type : "image/jpeg, video/x-matroska, application/pgp" }, 
+		{ mime_type : "application/pgp" }, 
 		function(json) {
 			try {
 				json = JSON.parse(json.responseText);
 				if(json.result == 200) {
 					document_browser = new InformaCamDocumentBrowser({
 						root_el: "#ic_asset_browser_holder",
-						data: json.data.documents
+						data: _.map(json.data.documents, function(doc) {
+							switch(doc.mime_type) {
+								case "application/pgp":
+									asset_type = "source";
+									break;
+								case "informacam/log":
+									asset_type = "collection";
+									break;
+								default:
+									asset_type = "submission";
+									break;
+							}
+							
+							return _.extend(doc, { asset_type : asset_type });
+						})
 					});
 				}
 			
