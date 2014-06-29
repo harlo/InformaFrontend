@@ -2,7 +2,7 @@ var document_browser, current_collection, current_asset, current_mode;
 
 function initAssetBrowser() {
 	doInnerAjax("documents", "post", 
-		{ mime_type : "application/pgp" }, 
+		{ mime_type : "[application/pgp,image/jpeg,video/x-matroska,informacam/log]" },
 		function(json) {
 			try {
 				json = JSON.parse(json.responseText);
@@ -149,6 +149,8 @@ function loadAsset(asset_type, _id) {
 		current_asset = new InformaCamSubmission({ _id : _id });
 	} else if(asset_type == "source") {
 		current_asset = new InformaCamSource({ _id : _id });
+	} else if(asset_type == "collection") {
+		current_asset = new InformaCamCollection({ _id : _id });
 	}
 	
 	try {
@@ -222,8 +224,17 @@ function onViewerModeChanged(mode, force_reload) {
 			}
 		});
 		
-		this.get('#(submission|source)/:_id', function() {
-			loadAsset(this.params.splat[0], this.this.params['_id']);
+		this.get('/#(submission|source)/:_id', function() {
+			loadAsset(this.params['_id'], this.params.splat[0]);
+		});
+		
+		this.get('/#collection/:_id', function() {
+			console.info(this.params['_id']);
+			var collection = _.findWhere(document_browser.get('data'), { _id : this.params['_id']})
+			console.info(collection);
+			buildDocumentCollection({
+				collection : [collection.j3m_id]
+			});
 		});
 	});
 	

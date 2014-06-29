@@ -118,7 +118,6 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		
 		var ctx = this;
 		_.each(dir, function(doc) {
-			console.info(doc);
 			var dir_name = "root";
 			var path_segments = doc.file_name.split("/");
 			
