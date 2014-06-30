@@ -8,6 +8,10 @@ var InformaCamSource = UnveillanceDocument.extend({
 		
 		if(updated_info) {
 			this.set(updated_info);
+			if(this.get('fingerprint')) {
+				this.set({ fingerprint : this.get('fingerprint').toLowerCase() });
+			}
+		
 			onViewerModeChanged("asset", force_reload=true);
 		}
 	},
