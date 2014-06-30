@@ -66,13 +66,9 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			j3m = JSON.parse(j3m.responseText);
 			if(j3m.result == 200) {
 				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
-				insertTemplate("submission_extended.html", ctx.get('j3m').toJSON(), 
-					el, function() {
-						ctx.get('j3m').build();
-						_.each(ctx.get('j3m').j3m_info, ctx.get('j3m').setInfo);
-						console.info(ctx.get('j3m').toJSON());
-					}
-				);
+				insertTemplate("j3m_stub.html", ctx.get('j3m').toJSON(), el, function() {
+					$("#ic_j3m_output").html(JSON.stringify(ctx.get('j3m').toJSON()));
+				});
 			}
 		});
 	}
