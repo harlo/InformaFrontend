@@ -1,6 +1,5 @@
 var informacam_user = null;
-var visual_search;
-var advanced_search;
+var visual_search, advanced_search;
 
 var onConfLoaded = function() {	
 	var map_id = "harlo.ibn0kk8l";
