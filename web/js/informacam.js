@@ -63,15 +63,14 @@ function initVisualSearch() {
 			} else {
 				var values = this.params;
 				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
-				console.info(params);
 				
 				advanced_search = new InformaCamAdvancedSearch({
 					params : _.map(params, function(p) {
 						return { key : p, value : values[p] };
 					})
 				});
-				onViewerModeChanged("search");
 				
+				onViewerModeChanged("search");
 			}
 		});
 	});

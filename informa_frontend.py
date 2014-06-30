@@ -31,7 +31,8 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/viz/uv_viz.js',
 			'/web/js/models/ic_user.js',
 			'/web/js/models/ic_visual_search.js',
-			'/web/js/informacam.js', 
+			'/web/js/models/ic_search.js',
+			'/web/js/informacam.js',
 		]
 		
 		self.on_loads.update({

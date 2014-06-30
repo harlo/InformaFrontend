@@ -198,6 +198,11 @@ function onViewerModeChanged(mode, force_reload) {
 				console.warn(err);
 			}
 		}
+	} else if(current_mode == "search" && advanced_search) {
+		data = advanced_search.toJSON();
+		callback = function(res) {
+			advanced_search.perform();
+		}
 	}
 	
 	insertTemplate(mode + "_status.html", data, 
