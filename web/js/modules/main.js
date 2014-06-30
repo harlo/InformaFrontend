@@ -142,7 +142,6 @@ function loadModule(module_name) {
 }
 
 function loadAsset(asset_type, _id) {
-	console.info(arguments);
 	if(asset_type == "submission") {
 		current_asset = new InformaCamSubmission({ _id : _id });
 	} else if(asset_type == "source") {
@@ -169,10 +168,12 @@ function buildDocumentCollection(collection) {
 }
 
 function onViewerModeChanged(mode, force_reload) {
+	console.info("CHANGING VIEWING MODE? " + mode);
+	
 	if(!force_reload && mode == current_mode) { return; }
 	
 	current_mode = mode;	
-	var data = null;
+	var data = {};
 	var callback = null;
 	
 	if(current_mode == "collection" && current_collection) {

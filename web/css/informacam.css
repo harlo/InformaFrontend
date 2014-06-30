@@ -28,10 +28,12 @@
 	position:relative;
 	clear:both;
 	top:0;
-	float:right;
 	border:1px solid #000;
-	width:47%;
+	width:96%;
+	left:2%;
 	min-height:10em;
+	z-index:1;
+	background-color:#fff;
 }
 
 #ic_media_holder {

@@ -1,5 +1,6 @@
 var informacam_user = null;
 var visual_search;
+var advanced_search;
 
 var onConfLoaded = function() {	
 	var map_id = "harlo.ibn0kk8l";
@@ -33,6 +34,11 @@ function loadHeaderPopup(view, onSuccess) {
 		onSuccess, "/web/layout/views/popup/");
 }
 
+function closeHeaderPopup() {
+	toggleElement('#ic_header_popup');
+	window.back();
+}
+
 function initVisualSearch() {
 	visual_search = new InformaCamVisualSearch();
 }
@@ -49,6 +55,24 @@ function initVisualSearch() {
 		
 		this.get(/(.*)\#logout/, function(context) {
 			loadHeaderPopup("logout", null);
+		});
+		
+		this.get(/(.*)\#advanced_search/, function(context) {
+			if(this.params.keys().length <= 10) {
+				loadHeaderPopup("search", null);
+			} else {
+				var values = this.params;
+				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
+				console.info(params);
+				
+				advanced_search = new InformaCamAdvancedSearch({
+					params : _.map(params, function(p) {
+						return { key : p, value : values[p] };
+					})
+				});
+				onViewerModeChanged("search");
+				
+			}
 		});
 	});
 	

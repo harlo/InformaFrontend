@@ -67,7 +67,10 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 			$(cb).unbind();
 		});
 		
-		onViewerModeChanged("asset");
+		if(current_mode != "search") {
+			onViewerModeChanged("asset");
+		}
+		
 		$("#ic_asset_collection_toggle").prop('checked', false);
 	},
 	
@@ -90,7 +93,10 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		});
 		
 		if(is_real_collection) {
-			onViewerModeChanged("collection");
+			console.info("CURRENT MODE: " + current_mode);
+			if(current_mode != "search") {
+				onViewerModeChanged("collection");
+			}
 			
 			$("#ic_asset_collection_toggle").prop('checked', true);
 			$($(this.root_el).find("input:checkbox")).change(function() {
