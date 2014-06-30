@@ -49,6 +49,8 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 					$(item).html(translate(item));
 				});
 				
+				$("#ic_av_status_holder").html("<p>" + json.data.documents.length + " result(s) found.</p>");
+				
 			} else {
 				$("#ic_av_status_holder").html("<p>There are no results matching your query.</p>");
 			}

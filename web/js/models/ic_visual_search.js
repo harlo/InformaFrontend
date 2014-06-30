@@ -35,10 +35,13 @@ var InformaCamVisualSearch = Backbone.Model.extend({
 						break;
 					case "With Asset":
 						filter_func = function(doc) {
-							console.info(_.flatten(_.pluck(doc.assets, "tags")));
-							console.info(value);
 							return _.contains(
 								_.flatten(_.pluck(doc.assets, "tags")), value);
+						}
+						break;
+					case "Alias":
+						filter_func = function(doc) {
+							return doc.alias == value;
 						}
 						break;
 				}
@@ -49,7 +52,6 @@ var InformaCamVisualSearch = Backbone.Model.extend({
 				filter_result = _.filter(filter_result, filter_func);
 			});
 				
-			console.info(filter_result);
 		} catch(err) {
 			console.warn("COULD NOT PERFORM SEARCH ON DOC BROWSER");
 			console.warn(err);

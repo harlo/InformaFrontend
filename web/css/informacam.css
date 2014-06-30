@@ -105,7 +105,8 @@ div.ic_module {
 
 #ic_asset_panel {
 	width:30%;
-	height:100%;
+	height:auto;
+	border-right:1px solid #000;
 }
 
 #ic_asset_browser_holder li.ic_in_annex_false {
@@ -117,8 +118,7 @@ div.ic_module {
 	height:100%;
 	float:right;
 	right:0;
-	top:2em;
-	border-left:1px solid #000;
+	top:3em;
 }
 
 #ic_viewer_panel, #ic_document_panel {

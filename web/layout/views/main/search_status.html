@@ -1,7 +1,10 @@
-<p>Search Results for: <span id="ic_av_search_query">
+<p>Search Results for:</p>
+<ul id="ic_av_search_query">
 	{{ # params }}
-		<span class="ic_search_term">{{ key }}</span>: {{ value }}
+		<li>
+			<span class="ic_search_term">{{ key }}</span>: {{ value }}
+		</li>
 	{{ / params }}
-</span></p>
+</ul>
 <div id="ic_av_status_holder"></div>
 <ul id="ic_av_results"></ul>
