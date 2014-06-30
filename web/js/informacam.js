@@ -9,6 +9,10 @@ var onConfLoaded = function() {
 		MAX_ZOOM: 18,
 		ATTRIBUTION: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	};
+	UV.SEARCH_TYPES = {
+		J3M : ["genealogy.createdOnDevice"],
+		SOURCE : ["fingerprint", "alias", "email"]
+	};
 }
 
 function initUser() {

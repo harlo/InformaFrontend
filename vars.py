@@ -13,14 +13,14 @@ USER_CREDENTIAL_PACK = {
 from lib.Frontend.vars import *
 
 informacam_mime_types = {
-	'j3m' : "text/plain",
+	'j3m' : "informacam/j3m",
 	'video' : "video/x-matroska",
 	'3gp' : "video/3gpp",
 	'log' : "informacam/log" 
 }
 
 informacam_mime_type_map = {
-	'text/plain' : "json",
+	'informacam/j3m' : "j3m",
 	'video/x-matroska': "mkv",
 	'video/3gpp' : "3gp",
 	'informacam/log' : "j3mlog"
