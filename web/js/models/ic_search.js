@@ -76,7 +76,7 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		
 		var clause_ui = $(document.createElement('li')).html(this.clause_tmpl);
 
-		var stub = "____________________________"
+		var stub = "____________________________";
 		var default_stub = $(document.createElement('option')).html(stub);
 		$($(clause_ui).find(".ic_clause_selector")[0]).append(default_stub);
 
