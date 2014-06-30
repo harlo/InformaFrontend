@@ -13,6 +13,37 @@ var onConfLoaded = function() {
 		J3M : ["genealogy.createdOnDevice"],
 		SOURCE : ["fingerprint", "alias", "email"]
 	};
+	
+	UV.SEARCH_CLAUSE_SELECTORS = {
+		j3m : [
+			{
+				label: "were created on or between...",
+				tmpl: "by_dateCreated.html"
+			},
+			{
+				label: "were taken near...",
+				tmpl: "by_location.html"
+			},
+			{
+				label: "were taken by...",
+				tmpl: "by_source_j3m.html"
+			},
+			{
+				label: "were taken in view of...",
+				tmpl: "by_broadcast.html"
+			}
+		],
+		source: [
+			{
+				label: "goes by alias...",
+				tmpl: "by_source_alias.html"
+			},
+			{
+				label: "with email address...",
+				tmpl: "by_source_email.html"
+			}
+		]
+	};
 }
 
 function initUser() {
@@ -62,7 +93,9 @@ function initVisualSearch() {
 		
 		this.get(/(.*)\#advanced_search/, function(context) {
 			if(this.params.keys().length <= 10) {
-				loadHeaderPopup("search", null);
+				loadHeaderPopup("search", function() {
+					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });
+				});
 			} else {
 				var values = this.params;
 				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);

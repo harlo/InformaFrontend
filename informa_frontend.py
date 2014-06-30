@@ -23,6 +23,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/lib/crossfilter.min.js',
 			'/web/js/lib/d3.min.js',
 			'/web/js/lib/visualsearch.js',
+			'/web/js/lib/jquery.ui.js',
 			'/web/js/lib/jquery.ui.core.js',
 			'/web/js/lib/jquery.ui.position.js',
 			'/web/js/lib/jquery.ui.widget.js',

@@ -1,1 +1,14 @@
-<h1>search...</h1>
+<h2>Advanced Search</h2>
+<div id="ic_av_search_root">
+	<span>Get</span>
+	<select id="ic_av_search_type" onchange="advanced_search.setSearchType();">
+		<option value="any">any media</option>
+		<option value="image/jpeg">images</option>
+		<option value="video/x-matroska">video</option>
+		<option value="informacam/log">logs</option>
+		<option value="source">submitter</option>
+	</select>
+	<span id="ic_av_add_clause" onclick="advanced_search.addClause();">that...</span>
+	<ul id="ic_av_search_clause_holder"></ul>
+	<a onclick="advanced_search.buildAndPerform();">Go</a>
+</div>

@@ -11,6 +11,21 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		}
 		
 		this.set('search_type', search_type);
+
+		if(this.has('as_stub') && this.get('as_stub')) {
+			getTemplate("advanced_search_clause_builder.html", function(html) {
+				this.clause_tmpl = html.responseText;
+			}, null, this);
+		}
+	},
+	setSearchType: function() {
+		var search_type = "j3m";
+		if($("#ic_av_search_type").val() == "source") {
+			search_type = "source";
+		}
+		
+		this.set('search_type', search_type);
+		$("#ic_av_search_clause_holder").empty();
 	},
 	perform: function() {
 		if(!this.has('params') || !this.has('search_type')) { return; }
@@ -55,5 +70,45 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				$("#ic_av_status_holder").html("<p>There are no results matching your query.</p>");
 			}
 		});
+	},
+	addClause: function() {
+		if(!this.clause_tmpl) { return; }
+		
+		var clause_ui = $(document.createElement('li')).html(this.clause_tmpl);
+
+		var stub = "____________________________"
+		var default_stub = $(document.createElement('option')).html(stub);
+		$($(clause_ui).find(".ic_clause_selector")[0]).append(default_stub);
+
+		_.each(UV.SEARCH_CLAUSE_SELECTORS[this.get('search_type')], function(cs) {
+			var el = $(document.createElement('option'))
+				.html(cs.label)
+				.attr({
+					value: cs.tmpl
+				});
+				
+			$($(clause_ui).find(".ic_clause_selector")[0]).append(el);
+		});
+		
+		$($(clause_ui).find(".ic_clause_selector")[0]).change(function() {
+			if(!$(this).val()) { return; }
+			
+			var ui_parent = $(this).parent();
+			var clause_holder = $($(ui_parent).find(".ic_clause_filter_holder")[0]);
+			var clause_selector = $($(ui_parent).find(".ic_clause_selector")[0]);
+					
+			insertTemplate($(this).val(), null, clause_holder, function() {
+				$(clause_selector).remove();
+			}, null);
+		});
+		
+		$("#ic_av_search_clause_holder").append(clause_ui);
+	},
+	removeClause: function(holder) {
+		var ui_parent = $($($(holder).parent()).parent()).parent();
+		$(ui_parent).remove();
+	},
+	buildAndPerform: function() {
+	
 	}
 });
