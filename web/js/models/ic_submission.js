@@ -28,11 +28,9 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			case "options":
 				break;
 			case "viewer":
-				if(!this.has('j3m')) {
-					var has_j3m = this.getAssetsByTagName("j3m").length > 0;
-					if(has_j3m) {
-						callback = this.loadJ3M();
-					}
+				var has_j3m = this.getAssetsByTagName("j3m").length > 0;
+				if(has_j3m) {
+					callback = this.loadJ3M();
 				}
 				
 				var mt = "image";
