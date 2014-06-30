@@ -17,7 +17,7 @@ var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
 	},
-	setJ3MInfo: function(item) {
+	setInfo: function(item) {
 		var info_holder = $(document.createElement('div'));
 		insertTemplate("j3m_info.html", item, info_holder, function() {
 			var id = item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase();

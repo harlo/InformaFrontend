@@ -28,6 +28,11 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			case "options":
 				break;
 			case "viewer":
+				var has_j3m = this.getAssetsByTagName("j3m").length > 0;
+				if(has_j3m) {
+					callback = this.loadJ3M();
+				}
+				
 				var mt = "image";
 				switch(this.get('mime_type')) {
 					case "informacam/log":
@@ -52,133 +57,23 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 				$(this).removeClass("ic_active");
 			}
 		});
+	},
+	loadJ3M: function(el) {
+		if(!el) { el = "#ic_j3m_holder"; }
+		
+		var ctx = this;
+		doInnerAjax("documents", "post", { _id : this.get("j3m_id") }, function(j3m) {
+			j3m = JSON.parse(j3m.responseText);
+			if(j3m.result == 200) {
+				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
+				insertTemplate("submission_extended.html", ctx.get('j3m').toJSON(), 
+					el, function() {
+						ctx.get('j3m').build();
+						_.each(ctx.get('j3m').j3m_info, ctx.get('j3m').setInfo);
+						console.info(ctx.get('j3m').toJSON());
+					}
+				);
+			}
+		});
 	}
-	/*
-	buildJ3M: function() {
-		
-		console.info("loading j3m into view");
-		
-		this.j3m_info = {};
-		var sensorEvents = crossfilter(this.get("j3m").data.sensorCapture);
-		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
-		var ts = { f : d[0].timestamp, l : d[d.length - 1].timestamp };
-		
-		this.j3m_info.gpsTrace = {
-			label : "Movement",
-			legend: [],
-			filter: d.filter(function(se) {
-				return parseSensorEventKeys(["gps_coords"], se);
-			}),
-			build: function() {}
-		};
-		
-		this.j3m_info.pitchRollAzimuth = {
-			label: "Pitch, Roll, Azimuth",
-			build: function(id) {
-				return new InformaCamTimeseriesGraph({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["pitch", "pitchCorrected", "roll",
-							"rollCorrected", "azimuth", "azimuthCorrected"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [
-						{ key : "pitch", label : "Pitch" }, 
-						{ key : "roll", label : "Roll" }, 
-						{ key : "azimuth", label : "Azimuth" }
-					]
-				});
-			}
-		};
-		
-		this.j3m_info.accelerometer = {
-			label : "Accelerometer",
-			build: function(id) {
-				return new InformaCamTimeseriesGraph({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["acc_x", "acc_y", "acc_z"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [
-						{ key : "acc_x", label : "X" }, 
-						{ key : "acc_y", label : "Y" }, 
-						{ key : "acc_z", label : "Z" }
-					]
-				});
-			}
-		};
-		
-		this.j3m_info.lightMeterValue = {
-			label : "Light Meter",
-			build: function(id) {
-				return new InformaCamTimeseriesGraph({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["lightMeterValue"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [{ key : "lightMeterValue", label : "Light Meter" }]
-				});
-			}
-		};
-		
-		this.j3m_info.visibleCellTowers = {
-			label : "Nearby Cell Towers",
-			build: function(id) {
-				return new InformaCamTimeseriesChart({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["cellTowerId", "MCC", "LAC"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [{ key : "cellTowerId", label : "Cell Tower ID" }]
-				});
-			}
-		};
-		
-		this.j3m_info.visibleBluetoothDevices = {
-			label : "Visible Bluetooth Devices",
-			build: function(id) {
-				return new InformaCamTimeseriesChart({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["bluetoothDeviceAddress"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [{
-						key : "bluetoothDeviceAddress", 
-						label : "Bluetooth Device (hashed)" 
-					}]
-				});
-			}
-		};
-		
-		this.j3m_info.visibleWifiNetworks = {
-			label : "Visible Wifi Networks",
-			build: function(id) {
-				return new InformaCamTimeseriesChart({
-					data : d.filter(function(se) {
-						return parseSensorEventKeys(["visibleWifiNetworks"], se);
-					}),
-					root_el : id,
-					first_timestamp: ts.f,
-					last_timestamp: ts.l,
-					legend : [{
-						key : "visibleWifiNetworks.bssid", 
-						label : "Wifi Network" 
-					}]
-				});
-			}
-		};
-		
-		
-		
-	}
-	*/
 });

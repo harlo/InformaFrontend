@@ -1,35 +1,34 @@
 <div>
-	<div class="ic_header"><span>Info</span></div>
 	<div id="ic_info_holder">
 		<div class="ic_pod">
-			<p>Date Created: <span class="uv_translate uv_date">{{ j3m.genealogy.dateCreated }}</span></p>
+			<p>Date Created: <span class="uv_translate uv_date">{{ genealogy.dateCreated }}</span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Device Type: {{ j3m.data.exif.make }} {{ j3m.data.exif.model }}</p>
+			<p>Device Type: <span class="uv_translate uv_none_if_null">{{ data.exif.make }}</span> <span class="uv_translate uv_none_if_null">{{ data.exif.model }}</span></p>
 		</div>
 		<div class="ic_pod">
 			<p>
-				<span>Media Verified: <img class="ic_icon" src="/web/images/ic_{{ media_verified }}.png" /></span>
-				<span>J3M Signature Verified: <img class="ic_icon" src="/web/images/ic_{{ j3m_verified }}.png" /></span>
+				<span>Media Verified: <img class="ic_icon uv_translate uv_false_if_null" src="/web/images/ic_{{ media_verified }}.png" repl="ic_" /></span>
+				<span>J3M Signature Verified: <img class="ic_icon uv_translate uv_false_if_null" src="/web/images/ic_{{ j3m_verified }}.png" repl="ic_" /></span>
 			</p>
 		</div>
 		<div class="ic_pod">
-			<p>Original Size: {{ j3m.data.exif.width }} x {{ j3m.data.exif.height }}</p>
+			<p>Original Size: <span class="uv_translate uv_none_if_null">{{ data.exif.width }}</span> x <span class="uv_translate uv_none_if_null">{{ data.exif.height }}</span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Temperature: <span id="j3m_temperature"></span></p>
+			<p>Temperature: <span id="j3m_temperature uv_translate uv_none_if_null"></span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Altitude: <span id="j3m_altitude"></span></p>
+			<p>Altitude: <span id="j3m_altitude uv_translate uv_none_if_null"></span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Location: {{ j3m.data.exif.location }}</p>
+			<p>Location: <span class="uv_translate uv_unknown_if_null">{{ data.exif.location }}</span></p>
 		</div>
 		<div class="ic_pod">
 			<p>Bearing: <span id="j3m_bearing"></span></p>
 		</div>
 		<div class="ic_pod">
-			<p>Captured by: {{ j3m.intent.alias }} ({{ j3m.intent.pgpKeyFingerprint }})</p>
+			<p>Captured by: <span class="uv_translate uv_unknown_if_null">{{ intent.alias }}</span> (<span class="uv_translate uv_none_if_null">{{ intent.pgpKeyFingerprint }}</span>)</p>
 		</div>
 	</div>
 </div>
@@ -42,10 +41,10 @@
 	<div class="ic_header"><span>Export J3M as...</span></div>
 	<div id="ic_export_holder">
 		<ul>
-			<li><a href="#json">json</a></li>
-			<li><a href="#csv">csv</a></li>
-			<li><a href="#tsv">tsv</a></li>
-			<li><a href="#html">html</a></li>
+			<li><a href="json/">json</a></li>
+			<li><a href="csv/">csv</a></li>
+			<li><a href="tsv/">tsv</a></li>
+			<li><a href="html/">html</a></li>
 		</ul>
 	</div>
 </div>
