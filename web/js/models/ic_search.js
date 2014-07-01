@@ -2,9 +2,9 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
 		
-		var search_type = "j3m";
+		var search_type = "submission";
 		if(this.has('params')) {
-			if(_.intersection(this.get('params'), UV.SEARCH_TYPES.SOURCE).length > 0) {
+			if(_.intersection(this.get('params'), UV.SEARCH_TYPES.source).length > 0) {
 				search_type = "source";
 			}
 			
@@ -19,7 +19,7 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		}
 	},
 	setSearchType: function() {
-		var search_type = "j3m";
+		var search_type = "submission";
 		if($("#ic_av_search_type").val() == "source") {
 			search_type = "source";
 		}
@@ -33,6 +33,10 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		var search_query = {};
 		var search_type = this.get('search_type');
 		
+		if(search_type == "submission") {
+			search_query['cast_as'] = "media_id";
+		}
+		
 		_.each(this.get('params'), function(p) {
 			_.extend(search_query, _.object([p.key], [p.value]));
 		});
@@ -44,10 +48,8 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 					var tmpl;
 					
 					switch(search_type) {
-						case "j3m":
-							if(doc.media_id) {
-								tmpl = '<a href="/#submission/<%= media_id %>"><%= media_id %></a> (<span class="uv_translate uv_date"><%= genealogy.dateCreated %></span>)';
-							}
+						case "submission":
+							tmpl = '<a href="/#submission/<%= _id %>"><%= _id %></a> (<span class="uv_translate uv_date"><%= date_added %></span>)';
 							break;
 						case "source":
 							tmpl = '<a href="/#source/<%= _id %>"><%= _id %></a>';
