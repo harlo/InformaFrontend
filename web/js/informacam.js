@@ -124,8 +124,17 @@ function initVisualSearch() {
 		css.attr('href', "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css");
 		document.getElementsByTagName("head")[0].appendChild(css.get(0));
 		
-		onConfLoaded();
-		initUser();
-		header_sammy.run();		
+		var conf = $(document.createElement('script'))
+			.attr({
+				'type' : "text/javascript",
+				'src' : "/web/js/conf.js?t=" + new Date().getTime()
+			})
+			.on("load", function() {
+				onConfLoaded();
+				initUser();
+				header_sammy.run();
+			});
+		document.getElementsByTagName("head")[0].appendChild(conf.get(0));
+			
 	})
 })(jQuery);

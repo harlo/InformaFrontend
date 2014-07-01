@@ -18,8 +18,7 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/commit/", self.DriveHandler),
 			(r"/submissions/", self.SubmissionShortcutHandler)])
 		
-		self.default_on_loads = [
-			'http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js',
+		self.default_on_loads.extend([
 			'/web/js/lib/sammy.js',
 			'/web/js/lib/crossfilter.min.js',
 			'/web/js/lib/d3.min.js',
@@ -35,7 +34,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/models/ic_visual_search.js',
 			'/web/js/models/ic_search.js',
 			'/web/js/informacam.js',
-		]
+		])
 		
 		self.on_loads.update({
 			'submission' : [
