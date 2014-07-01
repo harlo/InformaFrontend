@@ -82,12 +82,12 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 						// append j3m viewer to dom
 						insertTemplate("j3m_visualizer.html", merged_asset,
 							"#ic_j3m_holder", function() {
-								// setup the j3m
-								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
-
 								// extra magic logic...
 								$("#ic_j3m_readout_holder").html(
-									JSON.stringify(ctx.get('j3m').toJSON()));
+									JSON.stringify(merged_asset.j3m));
+								
+								// setup the j3m...
+								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
 
 								// translate all...
 								$.each(".uv_translate", function(idx, item) {

@@ -48,6 +48,22 @@ var InformaCamJ3M = Backbone.Model.extend({
 			});
 			
 		}
+		
+		if(!this.get('data').exif) {
+			this.get('data').exif = {};
+		}
+		
+		if(!this.get('data').exif.location) {
+			var sensorEvents = crossfilter(this.get("data").sensorCapture);
+			var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
+			var gps = d.filter(function(se) {
+				return parseSensorEventKeys(["gps_coords"], se);
+			})[0];
+			
+			if(gps) {
+				this.get('data').exif.location = gps.sensorPlayback.gps_coords;
+			}
+		}
 	},
 	setInfo: function(item) {
 		var info_holder = $(document.createElement('div'));
@@ -69,16 +85,17 @@ var InformaCamJ3M = Backbone.Model.extend({
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));
 		var ts = { f : d[0].timestamp, l : d[d.length - 1].timestamp };
 		
-		/*
 		this.j3m_info.gpsTrace = {
-			label : "Movement",
-			legend: [],
-			filter: d.filter(function(se) {
-				return parseSensorEventKeys(["gps_coords"], se);
-			}),
-			build: function() {}
+			label : "Location and Movement",
+			build: function(id) {
+				return new InformaCamTimeseriesMap({
+					data : d.filter(function(se) {
+						return parseSensorEventKeys(["gps_coords"], se);
+					}),
+					root_el : id
+				});
+			}
 		};
-		*/
 		
 		this.j3m_info.pitchRollAzimuth = {
 			label: "Pitch, Roll, Azimuth",
