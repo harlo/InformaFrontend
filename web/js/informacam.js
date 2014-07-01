@@ -1,5 +1,5 @@
 var informacam_user = null;
-var visual_search, advanced_search;
+var current_asset;
 
 var onConfLoaded = function() {	
 	var map_id = "harlo.ibn0kk8l";
@@ -61,6 +61,21 @@ function initUser() {
 	
 }
 
+function loadAsset(asset_type, _id) {
+	if(asset_type == "submission") {
+		current_asset = new InformaCamSubmission({ _id : _id });
+	} else if(asset_type == "source") {
+		current_asset = new InformaCamSource({ _id : _id });
+	}
+	
+	try {
+		current_asset.updateInfo();
+	} catch(err) {
+		console.warn("COULD NOT LOAD WHOLE ASSET AT THIS TIME");
+		console.warn(err);
+	}
+}
+
 function loadHeaderPopup(view, onSuccess) {
 	if(!toggleElement($("#ic_header_popup"))) { toggleElement($("#ic_header_popup")); }
 	
@@ -79,35 +94,12 @@ function initVisualSearch() {
 
 (function($) {
 	var header_sammy = $.sammy("#header", function() {
-		this.get(/(.*)\#me/, function(context) {
-			loadHeaderPopup("me", null);
-		});
-		
 		this.get(/(.*)\#login/, function(context) {
 			loadHeaderPopup("login", null);
 		});
 		
 		this.get(/(.*)\#logout/, function(context) {
 			loadHeaderPopup("logout", null);
-		});
-		
-		this.get(/(.*)\#advanced_search/, function(context) {
-			if(this.params.keys().length <= 10) {
-				loadHeaderPopup("search", function() {
-					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });
-				});
-			} else {
-				var values = this.params;
-				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
-				
-				advanced_search = new InformaCamAdvancedSearch({
-					params : _.map(params, function(p) {
-						return { key : p, value : values[p] };
-					})
-				});
-				
-				onViewerModeChanged("search");
-			}
 		});
 	});
 	
@@ -131,10 +123,6 @@ function initVisualSearch() {
 		
 		onConfLoaded();
 		initUser();
-		header_sammy.run();
-		
-		window.setTimeout(function() {
-			initVisualSearch();
-		}, 2000);
+		header_sammy.run();		
 	})
 })(jQuery);

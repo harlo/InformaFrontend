@@ -33,10 +33,6 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		var search_query = {};
 		var search_type = this.get('search_type');
 		
-		if(search_type == "submission") {
-			search_query['cast_as'] = "media_id";
-		}
-		
 		_.each(this.get('params'), function(p) {
 			_.extend(search_query, _.object([p.key], [p.value]));
 		});

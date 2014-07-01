@@ -1,4 +1,4 @@
-var document_browser, current_collection, current_asset, current_mode;
+var document_browser, current_collection, current_mode, visual_search, advanced_search;
 
 function initAssetBrowser() {
 	doInnerAjax("documents", "post", 
@@ -141,21 +141,6 @@ function loadModule(module_name) {
 	
 }
 
-function loadAsset(asset_type, _id) {
-	if(asset_type == "submission") {
-		current_asset = new InformaCamSubmission({ _id : _id });
-	} else if(asset_type == "source") {
-		current_asset = new InformaCamSource({ _id : _id });
-	}
-	
-	try {
-		current_asset.updateInfo();
-	} catch(err) {
-		console.warn("COULD NOT LOAD WHOLE ASSET AT THIS TIME");
-		console.warn(err);
-	}
-}
-
 function buildDocumentCollection(collection) {
 	current_collection = new InformaCamCollection(collection);
 	
@@ -229,12 +214,35 @@ function onViewerModeChanged(mode, force_reload) {
 		this.get('/#(submission|source)/:_id', function() {
 			loadAsset(this.params['_id'], this.params.splat[0]);
 		});
+		
+		this.get(/(.*)\#advanced_search/, function(context) {
+			if(this.params.keys().length <= 10) {
+				loadHeaderPopup("search", function() {
+					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });
+				});
+			} else {
+				var values = this.params;
+				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
+				
+				advanced_search = new InformaCamAdvancedSearch({
+					params : _.map(params, function(p) {
+						return { key : p, value : values[p] };
+					})
+				});
+				
+				onViewerModeChanged("search");
+			}
+		});
 	});
 	
 	$(function() {
 		content_sammy.run();
 		window.setTimeout(function() {
 			initAssetBrowser();
+			initVisualSearch();
+			$($("#ic_navigation").find("ul")[0]).append(
+				$(document.createElement('li'))
+					.html('<a href="/#advanced_search">Advanced Search</a>'));
 		}, 2000);
 	});
 })(jQuery);

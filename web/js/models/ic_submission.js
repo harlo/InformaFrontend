@@ -50,13 +50,15 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			asset + ".html", this.toJSON(),
 			"#ic_asset_view_panel", callback, "/web/layout/views/document/");
 		
-		$.each($("#ic_asset_main_ctrl").children('li'), function() {
-			if($(this).attr('id') == 'ic_d_' + asset) {
-				$(this).addClass("ic_active");
-			} else {
-				$(this).removeClass("ic_active");
-			}
-		});
+		if($("#ic_asset_main_ctrl")) {
+			$.each($("#ic_asset_main_ctrl").children('li'), function() {
+				if($(this).attr('id') == 'ic_d_' + asset) {
+					$(this).addClass("ic_active");
+				} else {
+					$(this).removeClass("ic_active");
+				}
+			});
+		}
 	},
 	loadJ3M: function(el) {
 		if(!el) { el = "#ic_j3m_holder"; }
@@ -66,6 +68,8 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			j3m = JSON.parse(j3m.responseText);
 			if(j3m.result == 200) {
 				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
+				
+				// TODO: this should be nice...
 				insertTemplate("j3m_stub.html", ctx.get('j3m').toJSON(), el, function() {
 					$("#ic_j3m_output").html(JSON.stringify(ctx.get('j3m').toJSON()));
 				});

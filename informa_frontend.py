@@ -45,6 +45,8 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js'],
+			'source' : [
+				'/web/js/modules/ic_source.js'],
 			'main' : [
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
