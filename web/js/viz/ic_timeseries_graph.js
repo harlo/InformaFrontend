@@ -23,7 +23,6 @@ var InformaCamTimeseriesGraph = UnveillanceViz.extend({
 		
 		var x_range = [0, 
 			this.dims.width - (this.dims.padding.left + this.dims.padding.right)];
-		console.info(x_range);
 		
 		this.scale.x = d3.scale.linear().domain(this.dims.axis.x).range(x_range);
 		var x_axis = d3.svg.axis().scale(this.scale.x).orient("bottom").ticks(10)

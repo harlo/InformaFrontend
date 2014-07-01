@@ -44,6 +44,11 @@ var InformaCamVisualSearch = Backbone.Model.extend({
 							return doc.alias == value;
 						}
 						break;
+					case "Public Hash":
+						filter_func = function(doc) {
+							return doc.public_hash == value;
+						}
+						break;
 				}
 				
 				if(!filter_func) { return; }

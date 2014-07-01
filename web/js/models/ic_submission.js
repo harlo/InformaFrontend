@@ -28,21 +28,10 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			case "options":
 				break;
 			case "viewer":
-				var has_j3m = this.getAssetsByTagName("j3m").length > 0;
-				if(has_j3m) {
-					callback = this.loadJ3M();
+				asset += "_submission";
+				if(this.getAssetsByTagName("j3m").length > 0) {
+					callback = this.loadViewer();
 				}
-				
-				var mt = "image";
-				switch(this.get('mime_type')) {
-					case "informacam/log":
-						mt = "log";
-						break;
-					case "video/x-matroska":
-						mt = "video";
-						break;
-				}
-				asset += ("_" + mt);
 				break;
 		}
 		
@@ -60,19 +49,58 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			});
 		}
 	},
-	loadJ3M: function(el) {
-		if(!el) { el = "#ic_j3m_holder"; }
-		
+	loadViewer: function() {		
 		var ctx = this;
+		
 		doInnerAjax("documents", "post", { _id : this.get("j3m_id") }, function(j3m) {
 			j3m = JSON.parse(j3m.responseText);
 			if(j3m.result == 200) {
 				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
 				
-				// TODO: this should be nice...
-				insertTemplate("j3m_stub.html", ctx.get('j3m').toJSON(), el, function() {
-					$("#ic_j3m_output").html(JSON.stringify(ctx.get('j3m').toJSON()));
-				});
+				// merge j3m and submission info
+				var merged_asset = ctx.toJSON();
+				merged_asset.j3m = ctx.get('j3m').toJSON();
+				
+				var view_type;
+				switch(ctx.get('mime_type')) {
+					case "image/jpeg":
+						view_type = "image";
+						break;
+					case "video/x-matroska":
+						view_type = "video";
+						break;
+					case "informacam/log":
+						view_type = "log";
+						break;
+				}
+				
+				if(!view_type) { return; }
+							
+				insertTemplate("viewer_" + view_type + ".html", merged_asset,
+					"#ic_mime_type_view_holder", function() {
+						
+						// append j3m viewer to dom
+						insertTemplate("j3m_visualizer.html", merged_asset,
+							"#ic_j3m_holder", function() {
+								// setup the j3m
+								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
+
+								// extra magic logic...
+								$("#ic_j3m_readout_holder").html(
+									JSON.stringify(ctx.get('j3m').toJSON()));
+
+								// translate all...
+								$.each(".uv_translate", function(idx, item) {
+									$(item).html(translate($(item)));
+								});
+
+							}, "/web/layout/views/document/"
+						);
+
+					}, "/web/layout/views/document/"
+				);
+				
+				
 			}
 		});
 	}

@@ -16,6 +16,24 @@ function CFSort(dimension) {
 var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
+		// try to get best location
+		// try to 
+	},
+	buildVisualizer: function(el) {
+		$(el).empty();
+		this.build();
+		
+		_.each(this.j3m_info, function(ji) {
+			var ji_id = "ic_j3m_" + randomString().toLowerCase();
+			var ji_holder = $(document.createElement('div'))
+				.attr({ id : ji_id })
+				.addClass("ic_j3m_info_module")
+				.append($(document.createElement('h3')).html(ji.label))
+				.append($(document.createElement('div')).addClass("ic_j3m_info_viz"));			
+			
+			$(el).append($(document.createElement('li')).append(ji_holder));
+			ji.build("#" + ji_id);
+		});
 	},
 	setInfo: function(item) {
 		var info_holder = $(document.createElement('div'));
@@ -31,9 +49,7 @@ var InformaCamJ3M = Backbone.Model.extend({
 			item.viz = item.build("#" + id);
 		});
 	},
-	build: function() {
-		console.info("loading j3m into view");
-		
+	build: function() {		
 		this.j3m_info = {};
 		var sensorEvents = crossfilter(this.get("data").sensorCapture);
 		var d = CFSort(sensorEvents.dimension(function(se) { return se.timestamp; }));

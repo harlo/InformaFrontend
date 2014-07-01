@@ -15,7 +15,8 @@ class InformaFrontend(UnveillanceFrontend):
 		self.reserved_routes.extend(["ictd", "commit"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
-			(r"/commit/", self.DriveHandler)])
+			(r"/commit/", self.DriveHandler),
+			(r"/submissions/", self.SubmissionShortcutHandler)])
 		
 		self.default_on_loads = [
 			'http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js',
@@ -89,6 +90,15 @@ class InformaFrontend(UnveillanceFrontend):
 			if res.result == 200 and hasattr(res, "data"):
 				endpoint += "#collection=%s" % json.dumps(res.data)
 			
+			self.redirect(endpoint)
+	
+	class SubmissionShortcutHandler(tornado.web.RequestHandler):
+		def get(self):
+			endpoint = "/"
+			
+			# depending on the query params, we might want to look up a submission by
+			# public_hash, _id, or other publicly-available params TBD
+
 			self.redirect(endpoint)
 	
 if __name__ == "__main__":
