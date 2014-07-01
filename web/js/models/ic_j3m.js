@@ -16,8 +16,6 @@ function CFSort(dimension) {
 var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
-		// try to get best location
-		// try to 
 	},
 	buildVisualizer: function(el) {
 		$(el).empty();
@@ -27,9 +25,8 @@ var InformaCamJ3M = Backbone.Model.extend({
 			var ji_id = "ic_j3m_" + randomString().toLowerCase();
 			var ji_holder = $(document.createElement('div'))
 				.attr({ id : ji_id })
-				.addClass("ic_j3m_info_module")
-				.append($(document.createElement('h3')).html(ji.label))
-				.append($(document.createElement('div')).addClass("ic_j3m_info_viz"));			
+				.addClass("ic_j3m_info_viz")
+				.append($(document.createElement('h3')).html(ji.label));
 			
 			$(el).append($(document.createElement('li')).append(ji_holder));
 			ji.build("#" + ji_id);
