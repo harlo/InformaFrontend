@@ -1,9 +1,22 @@
 <div>
-	<p>Attachments:</p>
+	<h3>Attachments:</h3>
 	<ul id="ic_log_attachments_holder">
 	{{ # attachments }}
 		<li>{{ _id }}</li>
 	{{ / attachments }}
+	</ul>
+</div>
+
+<div>
+	<h3>Form Data</h3>
+	<ul id="ic_log_form_data_holder">
+	{{ # j3m.data.userAppendedData }}
+		{{ # associatedForms }}
+			{{ # answer_kvp }}
+				<li><span class="ic_label">{{ key }}</span>: {{ value }}</li>
+			{{ / answer_kvp }}
+		{{ / associatedForms }}
+	{{ / j3m.data.userAppendedData }}
 	</ul>
 </div>
 

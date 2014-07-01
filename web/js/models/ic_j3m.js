@@ -16,6 +16,7 @@ function CFSort(dimension) {
 var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
+		this.massage();
 	},
 	buildVisualizer: function(el) {
 		$(el).empty();
@@ -31,6 +32,22 @@ var InformaCamJ3M = Backbone.Model.extend({
 			$(el).append($(document.createElement('li')).append(ji_holder));
 			ji.build("#" + ji_id);
 		});
+	},
+	massage: function() {
+		if(this.get('data').userAppendedData) {
+			_.each(this.get('data').userAppendedData, function(ad) {
+				_.each(ad.associatedForms, function(form) {
+					form.answer_kvp = [];
+					for(var key in form.answerData) {
+						form.answer_kvp.push({
+							key: key,
+							value: form.answerData[key]
+						});
+					};
+				}); 
+			});
+			
+		}
 	},
 	setInfo: function(item) {
 		var info_holder = $(document.createElement('div'));
