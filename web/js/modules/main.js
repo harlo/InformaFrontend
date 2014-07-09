@@ -190,7 +190,7 @@ function onViewerModeChanged(mode, force_reload) {
 		callback = function(res) {
 			try {
 				current_asset.initViewer();
-				current_asset.setInPanel('info');
+				current_asset.setInPanel('viewer');
 				$("#ic_asset_collection_toggle").prop('checked', false);
 			} catch(err) {
 				console.warn("COULD NOT INIT ASSET VIEWER AT THIS TIME");

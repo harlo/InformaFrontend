@@ -1,16 +1,20 @@
 <div class="ic_module">
 	<ul id="ic_asset_main_ctrl">
-		<li id="ic_d_info">
-			<a onclick="current_asset.setInPanel('info');">Info</a>
-		</li>
 		<li id="ic_d_original">
 			<a onclick="current_asset.setInPanel('viewer');">Viewer</a>
 		</li>
-		<!--
-		<li id="ic_d_options">
-			<a onclick="current_asset.setInPanel('options');">Options</a>
+		<li id="ic_d_info">
+			<a onclick="current_asset.setInPanel('info');">Info</a>
 		</li>
-		-->
 	</ul>
 </div>
 <div id="ic_asset_view_panel"></div>
+<script type="text/javascript">
+	if(window.InformaCamUserAdmin || current_user) {
+		$("#ic_asset_main_ctrl").append(
+			$(document.createElement('li'))
+				.attr('id', "ic_d_options")
+				.html('<a onclick="current_asset.setInPanel(\'options\');">Options</a>')
+		);
+	}
+</script>

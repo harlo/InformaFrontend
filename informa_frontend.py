@@ -1,4 +1,4 @@
-import os, json, re, tornado.web
+import os, json, re, tornado.web, requests
 from sys import exit, argv
 from time import sleep
 
@@ -11,11 +11,12 @@ class InformaFrontend(UnveillanceFrontend):
 	def __init__(self):
 		UnveillanceFrontend.__init__(self)
 				
-		self.reserved_routes.extend(["ictd", "commit"])
+		self.reserved_routes.extend(["ictd", "commit", "leaflet", "submissions"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
 			(r"/commit/", self.DriveHandler),
-			(r"/submissions/", self.SubmissionShortcutHandler)])
+			(r"/submissions/", self.SubmissionShortcutHandler),
+			(r"/leaflet/(.*)", self.LeafletHandler)])
 		
 		self.default_on_loads.extend([
 			'/web/js/lib/sammy.js',
@@ -36,7 +37,7 @@ class InformaFrontend(UnveillanceFrontend):
 		
 		self.on_loads.update({
 			'submission' : [
-				"//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js",
+				'/leaflet/leaflet.js',
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
@@ -47,7 +48,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'source' : [
 				'/web/js/modules/ic_source.js'],
 			'main' : [
-				"//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js",
+				'/leaflet/leaflet.js',
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
@@ -78,7 +79,6 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/models/ic_user_admin.js'
 		])
 		
-		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
 			self.init_vars.update(json.loads(IV.read())['web'])
 				
@@ -93,6 +93,12 @@ class InformaFrontend(UnveillanceFrontend):
 	"""
 		Custom handlers
 	"""
+	class LeafletHandler(tornado.web.RequestHandler):
+		@tornado.web.asynchronous
+		def get(self, uri):
+			r = requests.get("http://cdn.leafletjs.com/leaflet-0.6.4/%s" % uri)
+			self.finish(r.content)
+			
 	class ICTDHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
 		def get(self):

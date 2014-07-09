@@ -143,6 +143,10 @@ div.ic_module {
 	margin:0.1em 0.35em;
 }
 
+#ic_j3m_visualizer {
+	margin-bottom:6em;
+}
+
 #ic_j3m_readout_holder {
 	width:100%;
 	height:30em;
