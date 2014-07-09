@@ -93,7 +93,6 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 									root_el: "#ic_j3m_readout_holder",
 									data: merged_asset.j3m
 								});
-								console.info(j3m_readout);
 								
 								//$("#ic_j3m_readout_holder").html(
 									//JSON.stringify(merged_asset.j3m));
