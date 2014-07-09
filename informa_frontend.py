@@ -36,6 +36,7 @@ class InformaFrontend(UnveillanceFrontend):
 		
 		self.on_loads.update({
 			'submission' : [
+				"//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js",
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
@@ -46,6 +47,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'source' : [
 				'/web/js/modules/ic_source.js'],
 			'main' : [
+				"//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js",
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
