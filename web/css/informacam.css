@@ -1,3 +1,31 @@
+@font-face {
+	font-family: 'lato-hairline';
+	src: url('fonts/lato-hairline-webfont.eot');
+	src: url('fonts/lato-hairline-webfont.eot?#iefix') format('embedded-opentype'),
+		url('fonts/lato-hairline-webfont.woff') format('woff'),
+		url('fonts/lato-hairline-webfont.svg#webfont') format('svg');
+}
+
+@font-face {
+	font-family: 'lato-hairline-italic';
+	src: url('fonts/lato-hairlineitalic-webfont.eot');
+	src: url('fonts/lato-hairlineitalic-webfont.eot?#iefix') format('embedded-opentype'),
+		url('fonts/lato-hairlineitalic-webfont.woff') format('woff'),
+		url('fonts/lato-hairlineitalic-webfont.svg#webfont') format('svg');
+}
+
+@font-face {
+	font-family: 'lato-regular';
+	src: url('fonts/lato-regular-webfont.eot');
+	src: url('fonts/lato-regular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('fonts/lato-regular-webfont.woff') format('woff'),
+		url('fonts/lato-regular-webfont.svg#webfont') format('svg');
+}
+
+h1, h2, h3, h4 {
+	font-family: 'lato-regular';
+}
+
 #header {
 	position:relative;
 	top:0;
@@ -15,7 +43,7 @@
 	right:2%;
 }
 
-#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list {
+#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list, #ic_av_search_clause_holder {
 	list-style-type: none;
 }
 
@@ -50,6 +78,14 @@
 	min-height:10em;
 	z-index:1;
 	background-color:#fff;
+}
+
+#ic_header_popup #ic_header_popup_content {
+	margin:0 1em 1em 1em;
+}
+
+#ic_header_popup #ic_header_popup_content h2 {
+	margin-top:0 !important;
 }
 
 #ic_asset_browser_holder .ic_dir_root {
@@ -170,6 +206,14 @@ div.ic_module {
 	overflow-y:auto;
 	overflow-x:hidden;
 	margin:1em 0;
+}
+
+.ic_clause_template {
+	display:inline-flex;
+}
+
+.ic_clause_template .ic_clause_options {
+	margin-left:1em;
 }
 
 .uv_it_node {
