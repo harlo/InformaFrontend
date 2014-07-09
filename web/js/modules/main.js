@@ -234,7 +234,7 @@ function onViewerModeChanged(mode, force_reload) {
 			loadAsset(this.params['_id'], this.params.splat[0]);
 		});
 		
-		this.get(/(.*)\#advanced_search/, function(context) {
+		this.get(/\#advanced_search/, function(context) {
 			if(this.params.keys().length <= 10) {
 				loadHeaderPopup("search", function() {
 					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });

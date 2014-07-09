@@ -43,7 +43,7 @@ h1, h2, h3, h4 {
 	right:2%;
 }
 
-#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list, #ic_av_search_clause_holder {
+#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list, #ic_av_search_clause_holder, #ic_av_search_query {
 	list-style-type: none;
 }
 
@@ -55,6 +55,10 @@ h1, h2, h3, h4 {
 #header #ic_navigation ul li, #ic_collection_common_funcs_list li, #ic_asset_main_ctrl li {
 	float:left;
 	margin:0 0 0 0.6em;
+}
+
+#header #ic_navigation ul li {
+	padding-right:1em;
 }
 
 #ic_asset_main_ctrl li {
