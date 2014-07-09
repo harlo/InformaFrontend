@@ -88,11 +88,17 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 						insertTemplate("j3m_visualizer.html", merged_asset,
 							"#ic_j3m_holder", function() {
 								// extra magic logic...
-								$("#ic_j3m_readout_holder").html(
-									JSON.stringify(merged_asset.j3m));
+								
+								var j3m_readout = new UVIndentedTree({
+									root_el: "#ic_j3m_readout_holder",
+									data: merged_asset.j3m
+								});
+								console.info(j3m_readout);
+								
+								//$("#ic_j3m_readout_holder").html(
+									//JSON.stringify(merged_asset.j3m));
 								
 								// setup the j3m...
-								
 								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
 
 							}, "/web/layout/views/document/"

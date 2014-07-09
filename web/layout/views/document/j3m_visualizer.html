@@ -33,12 +33,12 @@
 		<li>
 			<div class="ic_pod">
 				<p>Export J3M 
-					<select>
-						<option name="null">as...</option>
-						<option name="json">json</option>
-						<option name="csv">csv</option>
-						<option name="tsv">tsv</option>
-						<option name="html">html</option>
+					<select id="ic_j3m_export_select">
+						<option value="null">as...</option>
+						<option value="json">json</option>
+						<option value="csv">csv</option>
+						<option value="tsv">tsv</option>
+						<option value="html">html</option>
 					</select>
 				</p>
 			</div>
@@ -52,8 +52,5 @@
 	</ul>
 </div>
 
-<div>
-	<textarea id="ic_j3m_readout_holder" style="display:none;"></textarea>
-</div>
-
+<div id="ic_j3m_readout_holder" style="display:none;"></div>
 <div id="ic_j3m_visualizer"></div>
