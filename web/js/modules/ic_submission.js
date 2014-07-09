@@ -16,6 +16,20 @@
 	});
 	
 	$(function() {
+		try {
+			updateConf();
+		} catch(err) {
+			console.warn(err);
+			console.warn("no updateConf()");
+		}
+		
+		try {
+			onConfLoaded();
+		} catch(err) {
+			console.warn(err);
+			console.warn("no onConfLoaded()");
+		}
+		
 		sub_sammy.run();
 	});
 })(jQuery);

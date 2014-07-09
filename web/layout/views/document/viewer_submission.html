@@ -1,2 +1,11 @@
-<h3>{{ file_name }}</h3>
+<h3 id="ic_submission_header">{{ file_name }} <a class="ic_button" href="/#share/{{ _id }}">share</a>&nbsp;</h3>
 <div id="ic_mime_type_view_holder"></div>
+<script type="text/javascript">
+	if(window.InformaCamUser && current_user) {
+		$("#ic_submission_header")
+			.append($(document.createElement('a'))
+				.html("save")
+				.addClass('ic_button')
+				.click(current_asset.save));
+	}
+</script>

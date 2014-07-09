@@ -234,20 +234,29 @@ function onViewerModeChanged(mode, force_reload) {
 			loadAsset(this.params['_id'], this.params.splat[0]);
 		});
 		
+		this.get('/#share/:_id', function() {
+			loadHeaderPopup("share");
+		});
+		
 		this.get(/\#advanced_search/, function(context) {
+			console.info("ADV SEARCH!!!!");
 			if(this.params.keys().length <= 10) {
 				loadHeaderPopup("search", function() {
 					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });
 				});
 			} else {
 				var values = this.params;
-				var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
+				try {
+					var params = _.difference(this.params.keys(), UV.SPLAT_PARAM_IGNORE);
 				
-				advanced_search = new InformaCamAdvancedSearch({
-					params : _.map(params, function(p) {
-						return { key : p, value : values[p] };
-					})
-				});
+					advanced_search = new InformaCamAdvancedSearch({
+						params : _.map(params, function(p) {
+							return { key : p, value : values[p] };
+						})
+					});
+				} catch(err) {
+					console.warn("NO, CANNOT ACCESS VARS YET");
+				}
 				
 				onViewerModeChanged("search", force_reload=true);
 			}
@@ -259,6 +268,20 @@ function onViewerModeChanged(mode, force_reload) {
 	});
 	
 	$(function() {
+		try {
+			updateConf();
+		} catch(err) {
+			console.warn(err);
+			console.warn("no updateConf()");
+		}
+		
+		try {
+			onConfLoaded();
+		} catch(err) {
+			console.warn(err);
+			console.warn("no onConfLoaded()");
+		}
+		
 		content_sammy.run();
 	});
 })(jQuery);

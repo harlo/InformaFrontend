@@ -13,6 +13,10 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 		}
 	},
 	
+	save: function() {
+	
+	},
+
 	initViewer: function() {
 		if(!this.has('available_views')) {
 			this.set('available_views', []);

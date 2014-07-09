@@ -223,3 +223,7 @@ div.ic_module {
 .uv_it_node {
 	cursor:pointer;
 }
+
+#ic_as_permalink {
+	width:80%;
+}

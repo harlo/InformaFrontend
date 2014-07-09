@@ -1,0 +1,12 @@
+<h2>Share</h2>
+<div id="ic_asset_share">
+	<p>permalink: <input id="ic_as_permalink" type="text" /></p>
+	<p>embed:</p>
+	<textarea id="ic_as_embed"></textarea>
+</div>
+<script type="text/javascript">
+	$("#ic_as_permalink").val(
+		window.location.protocol + "//" +
+		window.location.host + 
+		"/submissions/" + current_asset.get('_id') + "/");
+</script>

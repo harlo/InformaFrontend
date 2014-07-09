@@ -141,6 +141,8 @@ var InformaCamJ3M = Backbone.Model.extend({
 			})[0];
 			
 			if(gps) {
+				console.info("GPS FOUND DESPITE IT ALL");
+				console.info(gps);
 				this.get('data').exif.location = gps.sensorPlayback.gps_coords;
 			}
 		}
