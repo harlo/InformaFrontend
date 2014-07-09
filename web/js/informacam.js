@@ -22,14 +22,18 @@ function updateConf() {
 		submission : ["genealogy.createdOnDevice"],
 		source : ["fingerprint", "alias", "email"]
 	};
-	UV.SEARCH_TRANSLATE_VALUES = [
+	
+	UV.TRANSLATE_VALUES = _.union(UV.TRANSLATE_VALUES, [
 		{
 			keys : ["genealogy.dateCreated", "upper"],
-			func: function(val) {
+			enc: function(val) {
 				return moment(val, "MM/DD/YYYY HH:mm").unix() * 1000;
+			},
+			dec: function(val) {
+				return moment(Number(val)).format("MM/DD/YYYY HH:mm");
 			}
 		}
-	];
+	]);
 	
 	UV.SEARCH_CLAUSE_SELECTORS = {
 		submission : [

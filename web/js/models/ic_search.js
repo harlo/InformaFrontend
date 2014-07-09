@@ -124,11 +124,11 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				var key = $(item).attr('name');
 				var value = $(item).val();
 				
-				var trans = _.find(UV.SEARCH_TRANSLATE_VALUES, function(k) {
+				var trans = _.find(UV.TRANSLATE_VALUES, function(k) {
 					return _.contains(k.keys, key);
 				});
 				
-				if(trans) { value = trans.func(value); }
+				if(trans) { value = trans.enc(value); }
 				
 				if(!ctx.has('params')) { ctx.set({ params : [] }); };
 				
