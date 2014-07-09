@@ -79,7 +79,8 @@ function loadHeaderPopup(view, onSuccess) {
 
 function closeHeaderPopup() {
 	toggleElement('#ic_header_popup');
-	window.back();
+	window.history.back();
+	window.location.reload();
 }
 
 (function($) {

@@ -10,7 +10,7 @@
 </div>
 <div id="ic_asset_view_panel"></div>
 <script type="text/javascript">
-	if(window.InformaCamUserAdmin || current_user) {
+	if(window.InformaCamUserAdmin && current_user) {
 		$("#ic_asset_main_ctrl").append(
 			$(document.createElement('li'))
 				.attr('id', "ic_d_options")

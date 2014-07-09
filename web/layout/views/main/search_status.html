@@ -9,12 +9,17 @@
 <div id="ic_av_status_holder"></div>
 <ol id="ic_av_results"></ol>
 <script type="text/javascript">
-	if(window.InformaCamUser && current_user) {
-		console.info("OK");
+	if(window.UnveillanceUser && current_user) {
+		var html = "save search";
+		var cb = advanced_search.save
+		
+		if(advanced_search.hasSearch()) {
+			html = "search saved (remove?)";
+			cb = advanced_search.removeSearch;
+		}
+		
 		$("#ic_av_status_holder").append(
-			$(document.createElement('a'))
-				.html('save search')
-				.on('click', advanced_search.save)
+			$(document.createElement('a')).html(html).on('click', cb)
 		);
 	}
 </script>

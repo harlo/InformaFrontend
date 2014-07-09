@@ -124,8 +124,7 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				
 				var param = _.findWhere(ctx.get('params'), {key : $(item).attr('name')});
 				if(param) {
-					param.key = [param.value];
-					param.key.push($(item).val());					
+					param.value = [param.value, $(item).val()];
 				} else {
 					ctx.get('params').push({
 						key: $(item).attr('name'),
@@ -135,8 +134,72 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 			}
 		);
 		
-		console.info(this.get('params'));
-		// redir to advanced_search?params...
-		this.perform();
+		if(!ctx.has('params') || ctx.get('params').length == 0) { return; }
+		
+		var default_params = [
+			{
+				key: "mime_type",
+				value: this.get('search_type') == "source" ? 
+					"application/pgp" : "informacam/j3m"
+			},
+			{
+				key: "cast_as",
+				value: "media_id"
+			}
+		]
+				
+		this.set('params', _.union(this.get('params'), default_params));
+
+		var search_uri = _.map(this.get('params'), function(p) {
+			return p.key + "=" + JSON.stringify(p.value);
+		}).join("&").replace(/\"/g, "");
+		console.info(search_uri);
+		
+		toggleElement("#ic_header_popup");
+		window.location = "/#advanced_search?" + search_uri;
+		//window.location.reload();
+	},
+	save: function() {
+		if(!window.location.hash.match(/\#advanced_search(?:\?.+)/)) { return false; }
+		if(!window.UnveillanceUser || !current_user) { return false; }
+		
+		var searches = current_user.getDirective("searches");
+		try {
+			searches.push(window.location.hash);
+			current_user.save();
+			return true;
+		} catch(err) {
+			cosole.error(err);
+		}
+		
+		return false;
+	},
+	removeSearch: function(search_uri) {
+		if(!window.UnveillanceUser || !current_user) { return false; }
+		if(!search_uri) { search_uri = window.location.hash; }
+
+		if(!search_uri.match(/\#advanced_search(?:\?.+)/)) { return false; }
+		
+		var searches = current_user.getDirective("searches");
+		if(this.hasSearch(search_uri)) {
+			searches = searches.remove(search_uri);
+			current_user.save();
+			return true;
+		}
+		
+		return false;
+		
+	},
+	hasSearch: function(search_uri) {
+		if(!window.UnveillanceUser || !current_user) { return false; }
+		if(!search_uri) { search_uri = window.location.hash; }
+		
+		if(!search_uri.match(/\#advanced_search(?:\?.+)/)) { return false; }
+				
+		if(_.contains(current_user.getDirective("searches"), search_uri)) {
+			return true;
+		}
+		
+		return false;
 	}
 });

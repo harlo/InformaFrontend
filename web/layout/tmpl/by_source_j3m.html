@@ -1,3 +1,12 @@
 <span>were taken by</span>
-<input type="text" rel="sourceID" name="sourceID" />
-<input type="hidden" name="tag" value="sourceID" />
+<input id="ic_av_source_holder" type="text" rel="source" name="genealogy.createdOnDevice" /> (by 
+<select id="ic_av_source_select">
+	<option value="genealogy.createdOnDevice">PGP fingerprint</option>
+	<option value="intent.alias">alias</option>
+</select>&nbsp;)
+<script type="text/javascript">
+	$("#ic_av_source_select").change(function() {
+		$("#ic_av_source_holder").attr('name', $(this).val());
+		console.info($("#ic_av_source_holder"));
+	});
+</script>

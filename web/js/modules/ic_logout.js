@@ -15,6 +15,16 @@ function initUser() {
 				"/web/layout/views/popup/"
 			);
 		});
+		
+		this.get(/\#me$/, function() {
+			insertTemplate("user.html",
+				current_user.toJSON(), $("#ic_header_popup_content"),
+				function() {
+					toggleElement("#ic_header_popup");
+				},
+				"/web/layout/views/popup/"
+			);
+		});
 	});
 		
 	$(function() {
