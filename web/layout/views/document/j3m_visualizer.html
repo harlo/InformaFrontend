@@ -42,6 +42,22 @@
 					</select>
 				</p>
 			</div>
+			<script type="text/javascript">
+				$("#ic_j3m_export_select").change(function() {
+					if($(this).val() != "null") {
+						try {
+							var ic_export = current_asset.get('j3m')
+								.exportAs($(this).val());
+						} catch(err) {
+							console.warn(err);
+						}
+						
+						if(ic_export) {
+							console.info(ic_export);
+						}
+					}
+				});
+			</script>
 		</li>
 		
 		<li>

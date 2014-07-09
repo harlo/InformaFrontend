@@ -32,8 +32,88 @@ var InformaCamJ3M = Backbone.Model.extend({
 			ji.build("#" + ji_id);
 		});
 	},
+	exportAs: function(extension) {
+		var export_func;
+		
+		var toXSV = function(d, delim, indent) {
+			var result = [];
+			for(var key in d) {
+				var line = [];
+				for(var i=0; i<indent; i++) {
+					line.push("");
+				}
+				
+				if(d[key] instanceof Array || d[key] instanceof Object) {
+					line.push(key + " : ");
+					result.push(line.join(delim));
+					result.push(toXSV(d[key]), delim, (indent + 1));
+				} else {
+					if(d instanceof Array) {
+						line.push(d[key]);
+					} else {
+						line.push(key + " : ");
+						line.push(JSON.stringify(d[key]));
+					}
+					
+					result.push(line.join(delim));
+				}
+			}
+			
+			return result.join('\n');
+		};
+		
+		var toHTML = function(d) {
+			var result = [];
+			result.push("<ul>");
+			
+			for(var key in d) {
+				var line = [];
+				
+				if(d[key] instanceof Array || d[key] instanceof Object) {
+					line.push("<li>" + key + " :</li>");
+					result.push(line.join(""));
+					result.push(toHTML(d[key]));
+				} else {
+					if(d instanceof Array) {
+						line.push("<li>" + d[key] + "</li>");
+					} else {
+						line.push(
+							"<li>" + key + " : " + JSON.stringify(d[key] + "</li>"));
+					}
+					
+					result.push(line.join(""));
+				}
+			}
+			
+			result.push("</ul>");
+			return result.join('\n');
+		};
+		
+		var export_data = this.toJSON();
+		
+		switch(extension) {
+			case "csv":
+				export_data = toXSV(export_data, ',', 0);
+				break;
+			case "tsv":
+				export_data = toXSV(export_data, '\t', 0);
+				break;
+			case "html":
+				export_data = [
+					"<html><head></head><body>",
+					toHTML(export_data),
+					"</body></html>"
+				].join('\n');
+				break;
+		}
+		
+		var export_blob = new Blob([export_data], { type : "text/plain" });		
+		return {
+			file_name : this.get('media_id') + "." + extension,
+			blob_url : URL.createObjectURL(export_blob),
+		};
+	},
 	massage: function() {
-		console.info("MASSAGING JEM");
 		if(this.get('data').userAppendedData) {
 			_.each(this.get('data').userAppendedData, function(ad) {
 				_.each(ad.associatedForms, function(form) {
@@ -71,9 +151,8 @@ var InformaCamJ3M = Backbone.Model.extend({
 			var id = item.label.replace(/ /g, "").replace(/,/g, "").toLowerCase();
 		
 			$($(info_holder).find(".ic_j3m_info_vizualization")[0])
-				.attr({
-					'id' : id
-				});
+				.attr({ 'id' : id });
+			
 			$("#ic_j3m_info_holder").append(info_holder);
 		
 			item.viz = item.build("#" + id);
