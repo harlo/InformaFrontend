@@ -171,3 +171,7 @@ div.ic_module {
 	overflow-x:hidden;
 	margin:1em 0;
 }
+
+.uv_it_node {
+	cursor:pointer;
+}
