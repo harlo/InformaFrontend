@@ -11,7 +11,6 @@ var InformaCamTimeseriesMap = UnveillanceViz.extend({
 			'height' : '60%'
 		});
 		
-		console.info(this.get('data'));
 		this.map = L.map($(this.root_el).attr('id')).setView([
 			this.get('data')[0].sensorPlayback.gps_coords[1].toFixed(3),
 			this.get('data')[0].sensorPlayback.gps_coords[0].toFixed(3)
@@ -23,7 +22,6 @@ var InformaCamTimeseriesMap = UnveillanceViz.extend({
 		).addTo(this.map);
 		
 		_.each(this.get('data'), function(loc) {
-			console.info(loc);
 			var marker = L.marker([
 				loc.sensorPlayback.gps_coords[1].toFixed(3),
 				loc.sensorPlayback.gps_coords[0].toFixed(3)

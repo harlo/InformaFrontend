@@ -107,6 +107,35 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		$(ui_parent).remove();
 	},
 	buildAndPerform: function() {
-	
+		var ctx = this;
+		
+		$.each($("#ic_av_search_clause_holder").find("input"),
+			function(idx, item) {
+				console.info($(item));
+				// for all inputs
+				// might need some massaging beforehand, but:
+				// if value is not null: push kvp
+				if($(item).val() == "") { return; }
+				if($(item).attr('rel') && $(item).val() == $(item).attr('rel')) {
+					return;
+				}
+			
+				if(!ctx.has('params')) { ctx.set({ params : [] }); };
+				
+				var param = _.findWhere(ctx.get('params'), {key : $(item).attr('name')});
+				if(param) {
+					param.key = [param.value];
+					param.key.push($(item).val());					
+				} else {
+					ctx.get('params').push({
+						key: $(item).attr('name'),
+						value: $(item).val()
+					});
+				}
+			}
+		);
+		
+		console.info(this.get('params'));
+		this.perform();
 	}
 });

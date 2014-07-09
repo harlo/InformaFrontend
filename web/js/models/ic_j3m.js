@@ -16,7 +16,6 @@ function CFSort(dimension) {
 var InformaCamJ3M = Backbone.Model.extend({
 	constructor: function(inflate) {
 		Backbone.Model.apply(this, arguments);
-		this.massage();
 	},
 	buildVisualizer: function(el) {
 		$(el).empty();
@@ -34,6 +33,7 @@ var InformaCamJ3M = Backbone.Model.extend({
 		});
 	},
 	massage: function() {
+		console.info("MASSAGING JEM");
 		if(this.get('data').userAppendedData) {
 			_.each(this.get('data').userAppendedData, function(ad) {
 				_.each(ad.associatedForms, function(form) {

@@ -1,7 +1,6 @@
-var informacam_user = null;
 var current_asset;
 
-var onConfLoaded = function() {	
+function updateConf() {
 	var map_id = "harlo.ibn0kk8l";
 	var key = "23c00ae936704081ab019253c36a55b3";
 	UV.CM_API = {
@@ -9,6 +8,13 @@ var onConfLoaded = function() {
 		MAX_ZOOM: 18,
 		ATTRIBUTION: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	};
+	
+	UV.DEFAULT_MIME_TYPES = [
+		"application/pgp",
+		"image/jpeg",
+		"video/x-matroska",
+		"informacam/log"
+	];
 	
 	UV.SEARCH_FACETS.push("Public Hash");
 	
@@ -49,21 +55,6 @@ var onConfLoaded = function() {
 	};
 }
 
-function initUser() {
-	doInnerAjax("get_user_status", "post", null, function(json) {
-		json = JSON.parse(json.responseText);
-		if(json.result == 200) {
-			status = Number(json.data);
-			if(status == 0) { return; }
-			
-			if(status != 4) {
-				informacam_user = new InformaCamUser();
-			}
-		}
-	});
-	
-}
-
 function loadAsset(asset_type, _id) {
 	if(asset_type == "submission") {
 		current_asset = new InformaCamSubmission({ _id : _id });
@@ -91,21 +82,7 @@ function closeHeaderPopup() {
 	window.back();
 }
 
-function initVisualSearch() {
-	visual_search = new InformaCamVisualSearch();
-}
-
 (function($) {
-	var header_sammy = $.sammy("#header", function() {
-		this.get(/(.*)\#login/, function(context) {
-			loadHeaderPopup("login", null);
-		});
-		
-		this.get(/(.*)\#logout/, function(context) {
-			loadHeaderPopup("logout", null);
-		});
-	});
-	
 	$(function() {
 		var css_stub = $(document.createElement('link'))
 			.attr({
@@ -114,11 +91,13 @@ function initVisualSearch() {
 				'media' : "screen"
 			});
 		
-		_.each(['informacam', 'visualsearch-datauri', 'visualsearch'], function(c) {
-			var css = $(css_stub).clone();
-			css.attr('href', "/web/css/" + c + ".css");
-			document.getElementsByTagName("head")[0].appendChild(css.get(0));
-		});
+		_.each(['bootstrap.min', 'informacam', 'visualsearch-datauri', 'visualsearch'],
+			function(c) {
+				var css = $(css_stub).clone();
+				css.attr('href', "/web/css/" + c + ".css");
+				document.getElementsByTagName("head")[0].appendChild(css.get(0));
+			}
+		);
 		
 		css = $(css_stub).clone();
 		css.attr('href', "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css");
@@ -128,11 +107,6 @@ function initVisualSearch() {
 			.attr({
 				'type' : "text/javascript",
 				'src' : "/web/js/conf.js?t=" + new Date().getTime()
-			})
-			.on("load", function() {
-				onConfLoaded();
-				initUser();
-				header_sammy.run();
 			});
 		document.getElementsByTagName("head")[0].appendChild(conf.get(0));
 			

@@ -22,3 +22,8 @@
 
 <h3>J3M Data</h3>
 <div id="ic_j3m_holder">Loading...</div>
+<script type="text/javascript">
+	if($("#ic_log_attachments_holder").children('li').length == 0) {
+		$($("#ic_log_attachments_holder").parent()).remove();
+	}
+</script>

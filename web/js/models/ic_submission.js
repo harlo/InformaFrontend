@@ -18,9 +18,12 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			this.set('available_views', []);
 		}
 	},
-	setInPanel: function(asset) {
+	setInPanel: function(asset, panel) {
 		var callback = null;
 		var ctx = this;
+		var asset_tmpl = asset;
+		
+		if(!panel) { panel = "#ic_asset_view_panel"; }
 		
 		switch(asset) {
 			case "info":
@@ -28,16 +31,17 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			case "options":
 				break;
 			case "viewer":
-				asset += "_submission";
+				asset_tmpl += "_submission";
 				if(this.getAssetsByTagName("j3m").length > 0) {
 					callback = this.loadViewer();
 				}
+				
 				break;
 		}
 		
 		insertTemplate(
-			asset + ".html", this.toJSON(),
-			"#ic_asset_view_panel", callback, "/web/layout/views/document/");
+			asset_tmpl + ".html", this.toJSON(),
+			panel, callback, "/web/layout/views/document/");
 		
 		if($("#ic_asset_main_ctrl")) {
 			$.each($("#ic_asset_main_ctrl").children('li'), function() {
@@ -56,6 +60,7 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			j3m = JSON.parse(j3m.responseText);
 			if(j3m.result == 200) {
 				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
+				ctx.get('j3m').massage();
 				
 				// merge j3m and submission info
 				var merged_asset = ctx.toJSON();
@@ -87,12 +92,8 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 									JSON.stringify(merged_asset.j3m));
 								
 								// setup the j3m...
+								
 								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
-
-								// translate all...
-								$.each(".uv_translate", function(idx, item) {
-									$(item).html(translate($(item)));
-								});
 
 							}, "/web/layout/views/document/"
 						);

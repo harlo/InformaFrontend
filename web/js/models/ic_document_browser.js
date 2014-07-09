@@ -48,7 +48,18 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		$.each($(this.root_el).find("input:checkbox"), function() {
 			$(this).prop('checked', false);
 			var _id = $($(this).parent()).attr('id').replace("ic_db_", "");
-			ctx.get('collection').removeItem(_id);
+			
+			try {	
+				ctx.get('collection').removeItem(_id);
+			} catch(err) {}
+		});
+	},
+	
+	selectAllVisible: function() {
+		var ctx = this;
+		
+		$.each($(this.root_el).find("input:checkbox"), function() {
+			$(this).prop('checked', true);
 		});
 	},
 	
@@ -110,11 +121,6 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		}
 	},
 	
-	exportCollection: function() {
-		console.info("EXPORTING CURRENT COLLECTION");
-		this.get('collection').save();
-	},
-
 	buildDocumentTree: function(dir) {
 		$(this.root_el).empty();
 		this.clearCollection();

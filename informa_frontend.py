@@ -1,10 +1,9 @@
-import os, json, re, tornado.web, requests
+import os, json, re, tornado.web
 from sys import exit, argv
 from time import sleep
 
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
-from lib.Frontend.lib.Core.Utils.funcs import parseRequestEntity, generateMD5Hash, asTrueValue
 
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE, buildServerURL
 
@@ -30,7 +29,6 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/lib/jquery.ui.menu.js',
 			'/web/js/lib/jquery.ui.autocomplete.js',
 			'/web/js/viz/uv_viz.js',
-			'/web/js/models/ic_user.js',
 			'/web/js/models/ic_visual_search.js',
 			'/web/js/models/ic_search.js',
 			'/web/js/informacam.js',
@@ -59,6 +57,25 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_submission.js',
 				'/web/js/modules/main.js']
 		})
+		
+		self.on_loads_by_status[1].extend([
+			'/web/js/modules/ic_login.js',
+			'/web/js/models/unveillance_user.js'
+		])
+		
+		self.on_loads_by_status[2].extend([
+			'/web/js/models/unveillance_user.js',
+			'/web/js/modules/ic_logout.js',
+			'/web/js/models/ic_user.js'
+		])
+		
+		self.on_loads_by_status[3].extend([
+			'/web/js/models/unveillance_user.js',
+			'/web/js/modules/ic_logout.js',
+			'/web/js/models/ic_user.js',
+			'/web/js/models/ic_user_admin.js'
+		])
+		
 		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
 			self.init_vars.update(json.loads(IV.read())['web'])

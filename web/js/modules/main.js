@@ -1,8 +1,22 @@
 var document_browser, current_collection, current_mode, visual_search, advanced_search;
 
+function onConfLoaded() {
+	window.setTimeout(function() {
+		initAssetBrowser();
+		initVisualSearch();
+		$($("#ic_navigation").find("ul")[0]).append(
+			$(document.createElement('li'))
+				.html('<a href="/#advanced_search">Advanced Search</a>'));
+	}, 200);
+}
+
+function initVisualSearch() {
+	visual_search = new InformaCamVisualSearch();
+}
+
 function initAssetBrowser() {
 	doInnerAjax("documents", "post", 
-		{ mime_type : "[application/pgp,image/jpeg,video/x-matroska,informacam/log]" },
+		{ mime_type : "[" + UV.DEFAULT_MIME_TYPES.join() + "]" },
 		function(json) {
 			try {
 				json = JSON.parse(json.responseText);
@@ -237,12 +251,5 @@ function onViewerModeChanged(mode, force_reload) {
 	
 	$(function() {
 		content_sammy.run();
-		window.setTimeout(function() {
-			initAssetBrowser();
-			initVisualSearch();
-			$($("#ic_navigation").find("ul")[0]).append(
-				$(document.createElement('li'))
-					.html('<a href="/#advanced_search">Advanced Search</a>'));
-		}, 2000);
 	});
 })(jQuery);
