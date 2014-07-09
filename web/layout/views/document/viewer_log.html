@@ -1,5 +1,5 @@
 <div>
-	<h3>Attachments:</h3>
+	<h4>Attachments:</h4>
 	<ul id="ic_log_attachments_holder">
 	{{ # attachments }}
 		<li>{{ _id }}</li>
@@ -8,7 +8,7 @@
 </div>
 
 <div>
-	<h3>Form Data</h3>
+	<h4>Form Data</h4>
 	<ul id="ic_log_form_data_holder">
 	{{ # j3m.data.userAppendedData }}
 		{{ # associatedForms }}
@@ -20,10 +20,12 @@
 	</ul>
 </div>
 
-<h3>J3M Data</h3>
+<h4>J3M Data</h4>
 <div id="ic_j3m_holder">Loading...</div>
-<script type="text/javascript">
-	if($("#ic_log_attachments_holder").children('li').length == 0) {
-		$($("#ic_log_attachments_holder").parent()).remove();
-	}
+<script type="text/javascript">	
+	_.each(["ic_log_attachments_holder","ic_log_form_data_holder"], function(div) {
+		if($("#" + div).children('li').length == 0) {
+			$($("#" + div).parent()).remove();
+		}
+	});
 </script>

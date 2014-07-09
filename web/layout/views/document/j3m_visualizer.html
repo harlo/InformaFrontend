@@ -29,26 +29,31 @@
 				<p>Submitted by: <span class="uv_translate uv_unknown_if_null">{{ j3m.intent.alias }}</span> (<span class="uv_translate uv_none_if_null">{{ j3m.intent.pgpKeyFingerprint }}</span>)</p>
 			</div>
 		</li>
+		
+		<li>
+			<div class="ic_pod">
+				<p>Export J3M 
+					<select>
+						<option name="null">as...</option>
+						<option name="json">json</option>
+						<option name="csv">csv</option>
+						<option name="tsv">tsv</option>
+						<option name="html">html</option>
+					</select>
+				</p>
+			</div>
+		</li>
+		
+		<li>
+			<div class="ic_pod">
+				<p><a onclick="toggleElement('#ic_j3m_readout_holder');">View raw J3M data</a></p>
+			</div>
+		</li>
 	</ul>
 </div>
 
-<div id="ic_j3m_visualizer"></div>
-
 <div>
-	<div class="ic_toggle ic_header">
-		<a onclick="toggleElement('#ic_j3m_readout_holder');">View raw J3M data</a>
-	</div>
 	<textarea id="ic_j3m_readout_holder" style="display:none;"></textarea>
 </div>
 
-<div>
-	<div class="ic_header"><span>Export J3M as...</span></div>
-	<div id="ic_export_holder">
-		<ul>
-			<li><a href="/submission/{{ j3m._id }}/json/">json</a></li>
-			<li><a href="/submission/{{ j3m._id }}/csv/">csv</a></li>
-			<li><a href="/submission/{{ j3m._id }}/tsv/">tsv</a></li>
-			<li><a href="/submission/{{ j3m._id }}/html/">html</a></li>
-		</ul>
-	</div>
-</div>
+<div id="ic_j3m_visualizer"></div>

@@ -19,9 +19,25 @@
 	list-style-type: none;
 }
 
-#header #ic_navigation ul li, #ic_asset_main_ctrl li, #ic_collection_common_funcs_list li {
+#ic_asset_main_ctrl {
+	margin:0;
+	padding:0;
+}
+
+#header #ic_navigation ul li, #ic_collection_common_funcs_list li, #ic_asset_main_ctrl li {
 	float:left;
 	margin:0 0 0 0.6em;
+}
+
+#ic_asset_main_ctrl li {
+	border:1px solid #ccc;
+	font-size:18px;
+	margin:0 !important;
+	padding:0 0.6em;
+}
+
+#ic_asset_main_ctrl li a:hover {
+	text-decoration:none;
 }
 
 #header #ic_header_popup {
