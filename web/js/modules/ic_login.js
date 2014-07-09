@@ -9,7 +9,7 @@ function init() {
 		this.get("#login", function() {
 			insertTemplate("login.html", null, $("#ic_header_popup_content"), function() {
 				toggleElement("#ic_header_popup");
-			});
+			}, "/web/layout/views/popup/");
 		});
 	});
 	

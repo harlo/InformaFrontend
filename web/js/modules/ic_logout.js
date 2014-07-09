@@ -11,7 +11,8 @@ function initUser() {
 				current_user.toJSON(), $("#ic_header_popup_content"),
 				function() {
 					toggleElement("#ic_header_popup");
-				}
+				},
+				"/web/layout/views/popup/"
 			);
 		});
 	});
