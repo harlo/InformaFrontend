@@ -105,9 +105,8 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		
 		if(is_real_collection) {
 			console.info("CURRENT MODE: " + current_mode);
-			if(!_.contains(["search", "home"], current_mode)) {
-				onViewerModeChanged("collection");
-			}
+			
+			onViewerModeChanged("collection");
 			
 			$("#ic_asset_collection_toggle").prop('checked', true);
 			$($(this.root_el).find("input:checkbox")).change(function() {

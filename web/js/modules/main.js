@@ -253,7 +253,7 @@ function onViewerModeChanged(mode, force_reload) {
 			}
 		});
 		
-		this.get('/', function(context) {
+		this.get(/\/\#?/, function(context) {
 			onViewerModeChanged("home");
 		});
 	});
