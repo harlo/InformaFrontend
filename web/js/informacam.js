@@ -100,7 +100,7 @@ function closeHeaderPopup() {
 		);
 		
 		css = $(css_stub).clone();
-		css.attr('href', "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css");
+		css.attr('href', "//cdn.leafletjs.com/leaflet-0.6.4/leaflet.css");
 		document.getElementsByTagName("head")[0].appendChild(css.get(0));
 		
 		var conf = $(document.createElement('script'))
