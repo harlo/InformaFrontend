@@ -136,6 +136,7 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		);
 		
 		console.info(this.get('params'));
+		// redir to advanced_search?params...
 		this.perform();
 	}
 });
