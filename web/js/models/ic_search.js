@@ -141,12 +141,15 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				key: "mime_type",
 				value: this.get('search_type') == "source" ? 
 					"application/pgp" : "informacam/j3m"
-			},
-			{
+			}
+		];
+		
+		if(this.get('search_type') != "source") {
+			default_params.push({
 				key: "cast_as",
 				value: "media_id"
-			}
-		]
+			});
+		}
 				
 		this.set('params', _.union(this.get('params'), default_params));
 
@@ -157,7 +160,6 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		
 		toggleElement("#ic_header_popup");
 		window.location = "/#advanced_search?" + search_uri;
-		//window.location.reload();
 	},
 	save: function() {
 		if(!window.location.hash.match(/\#advanced_search(?:\?.+)/)) { return false; }
