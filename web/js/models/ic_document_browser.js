@@ -78,7 +78,7 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 			$(cb).unbind();
 		});
 		
-		if(current_mode != "search") {
+		if(!_.contains(["search", "home"], current_mode)) {
 			onViewerModeChanged("asset");
 		}
 		
@@ -105,7 +105,7 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		
 		if(is_real_collection) {
 			console.info("CURRENT MODE: " + current_mode);
-			if(current_mode != "search") {
+			if(!_.contains(["search", "home"], current_mode)) {
 				onViewerModeChanged("collection");
 			}
 			

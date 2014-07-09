@@ -185,6 +185,7 @@ function onViewerModeChanged(mode, force_reload) {
 				console.warn(err);
 			}
 		};
+		
 	} else if(current_mode == "asset" && current_asset) {
 		data = current_asset.toJSON();
 		callback = function(res) {
@@ -196,12 +197,16 @@ function onViewerModeChanged(mode, force_reload) {
 				console.warn("COULD NOT INIT ASSET VIEWER AT THIS TIME");
 				console.warn(err);
 			}
-		}
+		};
+		
 	} else if(current_mode == "search" && advanced_search) {
 		data = advanced_search.toJSON();
 		callback = function(res) {
 			advanced_search.perform();
-		}
+		};
+		
+	} else if(current_mode == "home") {
+		console.info("HOME");
 	}
 	
 	insertTemplate(mode + "_status.html", data, 
@@ -246,6 +251,10 @@ function onViewerModeChanged(mode, force_reload) {
 				
 				onViewerModeChanged("search");
 			}
+		});
+		
+		this.get('/', function(context) {
+			onViewerModeChanged("home");
 		});
 	});
 	

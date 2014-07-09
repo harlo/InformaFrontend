@@ -15,11 +15,11 @@
 	right:2%;
 }
 
-#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder {
+#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list {
 	list-style-type: none;
 }
 
-#header #ic_navigation ul li, #ic_asset_main_ctrl li {
+#header #ic_navigation ul li, #ic_asset_main_ctrl li, #ic_collection_common_funcs_list li {
 	float:left;
 	margin:0 0 0 0.6em;
 }
@@ -80,10 +80,11 @@
 	shape-rendering: crispEdges;
 }
 
-.ic_button, .uv_button {
+.ic_button, .uv_button, .ic_file_name {
 	border:1px solid #ccc;
 	padding:0.2em;
 	margin:0.1em;
+	font-size:14px;
 }
 
 .ic_button:hover, .uv_button:hover {
