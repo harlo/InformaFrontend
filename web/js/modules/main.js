@@ -249,7 +249,7 @@ function onViewerModeChanged(mode, force_reload) {
 					})
 				});
 				
-				onViewerModeChanged("search");
+				onViewerModeChanged("search", force_reload=true);
 			}
 		});
 		
