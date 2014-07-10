@@ -57,9 +57,16 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			});
 		}
 	},
+	showError: function() {
+		alert("This submission cannot be displayed.");
+	},
 	loadViewer: function() {		
-		var ctx = this;
+		if(!this.has("j3m_id")) {
+			this.showError();
+			return;
+		}
 		
+		var ctx = this;
 		doInnerAjax("documents", "post", { _id : this.get("j3m_id") }, function(j3m) {
 			j3m = JSON.parse(j3m.responseText);
 			if(j3m.result == 200) {
@@ -83,7 +90,10 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 						break;
 				}
 				
-				if(!view_type) { return; }
+				if(!view_type) {
+					this.loadError();
+					return;
+				}
 							
 				insertTemplate("viewer_" + view_type + ".html", merged_asset,
 					"#ic_mime_type_view_holder", function() {

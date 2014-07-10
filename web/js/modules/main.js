@@ -1,8 +1,9 @@
 var document_browser, current_collection, current_mode, visual_search, advanced_search;
 
 function onConfLoaded() {
+	initAssetBrowser();
+	
 	window.setTimeout(function() {
-		initAssetBrowser();
 		initVisualSearch();
 		$($("#ic_navigation").find("ul")[0]).append(
 			$(document.createElement('li'))
