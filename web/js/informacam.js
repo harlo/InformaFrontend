@@ -16,6 +16,8 @@ function updateConf() {
 		"informacam/log"
 	];
 	
+	UV.DATA_MAX = 800;
+	
 	UV.SEARCH_FACETS.push("Public Hash");
 	
 	UV.SEARCH_TYPES = {

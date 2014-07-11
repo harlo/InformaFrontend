@@ -62,8 +62,14 @@
 		</li>
 		
 		<li>
-			<div class="ic_pod">
+			<div class="ic_pod" id="ic_j3m_readout_header">
 				<p><a onclick="toggleElement('#ic_j3m_readout_holder');">View raw J3M data</a></p>
+				<p id="ic_j3m_readout_header_is_sampled">In order to provide a better viewing experience, the J3M data has been sampled.  If you need access to the full J3M, please download it and open it in your editor of choice.</p>
+				<script>
+					if(!current_asset.get('j3m').is_sampled) {
+						$("#ic_j3m_readout_header_is_sampled").css('display', 'none');
+					}
+				</script>
 			</div>
 		</li>
 	</ul>

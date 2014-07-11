@@ -8,9 +8,26 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			document_browser.get('data'), { _id : this.get('_id') });
 		
 		if(updated_info) {
-			this.set(updated_info);
+			this.set(updated_info);			
 			onViewerModeChanged("asset", force_reload=true);
 		}
+	},
+	
+	updateJ3M: function() {
+		if(!this.has('j3m_id')) { return; }
+		
+		var ctx = this;
+		
+		doInnerAjax("documents", "post", { _id : this.get("j3m_id") },
+			function(j3m) {
+				j3m = JSON.parse(j3m.responseText);
+				if(j3m.result != 200) { return; }
+	
+				// merge j3m and submission info
+				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
+				ctx.get('j3m').massage();
+			}, 
+		false);
 	},
 	
 	save: function() {
@@ -34,23 +51,11 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			case "viewer":
 				asset_tmpl += "_submission";
 				
-				if(this.has("j3m_id")) {
-					var ctx = this;
-					
-					doInnerAjax("documents", "post", { _id : ctx.get("j3m_id") },
-						function(j3m) {
-							j3m = JSON.parse(j3m.responseText);
-							if(j3m.result != 200) { return; }
+				if(!this.has("j3m")) { this.updateJ3M(); }
 				
-							// merge j3m and submission info
-							ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
-							ctx.get('j3m').massage();
-							
-							merged_asset.j3m = j3m.data;
-						}, 
-					false);
-					
-					j3m_callback = ctx.loadViewer;
+				if(this.has("j3m")) {
+					merged_asset.j3m = this.get('j3m').toJSON();
+					j3m_callback = this.loadViewer;
 				}
 				
 				var view_type;
@@ -94,7 +99,9 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 		alert("This submission cannot be displayed.");
 	},
 	loadViewer: function() {
-		var ctx = this;		
+		var ctx = this;
+		console.info(this);
+				
 		var merged_asset = this.toJSON();
 		merged_asset.j3m = this.get('j3m').toJSON();
 				

@@ -114,6 +114,31 @@ var InformaCamJ3M = Backbone.Model.extend({
 		};
 	},
 	massage: function() {
+		// pare down the sensor capture data: it's overkill
+		// append the first 200, last 50 and sample the middle
+		console.info("DO WE NEED TO SAMPLE?");
+		console.info(this.get('data').sensorCapture.length);
+		
+		if(this.get('data').sensorCapture && 
+			this.get('data').sensorCapture.length > UV.DATA_MAX
+		) {
+			console.info("SAMPLING DATA BECAUSE SIZE = " + 
+				this.get('data').sensorCapture.length);
+
+			var first_sample = 200;
+			
+			this.get('data').sensorCapture = _.union(
+				_.first(this.get('data').sensorCapture, first_sample),
+				_.sample(_.rest(this.get('data').sensorCapture, first_sample - 1),
+					UV.DATA_MAX - (first_sample + 1)),
+				_.last(this.get('data').sensorCapture)
+			);
+			
+			console.info("DATA SAMPLED TO SIZE " + this.get('data').sensorCapture.length);
+			this.is_sampled = true;
+		}
+		
+		// format the form data so it can be parsed by Mustache
 		if(this.get('data').userAppendedData) {
 			_.each(this.get('data').userAppendedData, function(ad) {
 				_.each(ad.associatedForms, function(form) {
@@ -141,8 +166,6 @@ var InformaCamJ3M = Backbone.Model.extend({
 			})[0];
 			
 			if(gps) {
-				console.info("GPS FOUND DESPITE IT ALL");
-				console.info(gps);
 				this.get('data').exif.location = gps.sensorPlayback.gps_coords;
 			}
 		}
