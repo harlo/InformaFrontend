@@ -17,15 +17,12 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 	
 	},
 
-	initViewer: function() {
-		if(!this.has('available_views')) {
-			this.set('available_views', []);
-		}
-	},
 	setInPanel: function(asset, panel) {
-		var callback = null;
+		var callback = j3m_callback = null;
 		var ctx = this;
+		
 		var asset_tmpl = asset;
+		var merged_asset = this.toJSON();
 		
 		if(!panel) { panel = "#ic_asset_view_panel"; }
 		
@@ -36,15 +33,51 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 				break;
 			case "viewer":
 				asset_tmpl += "_submission";
-				if(this.getAssetsByTagName("j3m").length > 0) {
-					callback = this.loadViewer();
+				
+				if(this.has("j3m_id")) {
+					var ctx = this;
+					
+					doInnerAjax("documents", "post", { _id : ctx.get("j3m_id") },
+						function(j3m) {
+							j3m = JSON.parse(j3m.responseText);
+							if(j3m.result != 200) { return; }
+				
+							// merge j3m and submission info
+							ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
+							ctx.get('j3m').massage();
+							
+							merged_asset.j3m = j3m.data;
+						}, 
+					false);
+					
+					j3m_callback = ctx.loadViewer;
 				}
 				
+				var view_type;
+				switch(this.get('mime_type')) {
+					case "image/jpeg":
+						view_type = "image";
+						break;
+					case "video/x-matroska":
+						view_type = "video";
+						break;
+					case "informacam/log":
+						view_type = "log";
+						break;
+				}
+								
+				callback = function() {
+					insertTemplate("viewer_" + view_type + ".html", merged_asset,
+						"#ic_mime_type_view_holder", j3m_callback,
+						"/web/layout/views/document/", ctx
+					);
+				};
+
 				break;
 		}
 		
 		insertTemplate(
-			asset_tmpl + ".html", this.toJSON(),
+			asset_tmpl + ".html", merged_asset,
 			panel, callback, "/web/layout/views/document/");
 		
 		if($("#ic_asset_main_ctrl")) {
@@ -60,68 +93,24 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 	showError: function() {
 		alert("This submission cannot be displayed.");
 	},
-	loadViewer: function() {		
-		if(!this.has("j3m_id")) {
-			this.showError();
-			return;
-		}
+	loadViewer: function() {
+		var ctx = this;		
+		var merged_asset = this.toJSON();
+		merged_asset.j3m = this.get('j3m').toJSON();
+				
+		$("#ic_j3m_holder").html("Loading...");
 		
-		var ctx = this;
-		doInnerAjax("documents", "post", { _id : this.get("j3m_id") }, function(j3m) {
-			j3m = JSON.parse(j3m.responseText);
-			if(j3m.result == 200) {
-				ctx.set({ j3m : new InformaCamJ3M(j3m.data) });
-				ctx.get('j3m').massage();
+		insertTemplate("j3m_visualizer.html", merged_asset,
+			"#ic_j3m_holder", function() {
 				
-				// merge j3m and submission info
-				var merged_asset = ctx.toJSON();
-				merged_asset.j3m = ctx.get('j3m').toJSON();
-				
-				var view_type;
-				switch(ctx.get('mime_type')) {
-					case "image/jpeg":
-						view_type = "image";
-						break;
-					case "video/x-matroska":
-						view_type = "video";
-						break;
-					case "informacam/log":
-						view_type = "log";
-						break;
-				}
-				
-				if(!view_type) {
-					this.loadError();
-					return;
-				}
-							
-				insertTemplate("viewer_" + view_type + ".html", merged_asset,
-					"#ic_mime_type_view_holder", function() {
-						
-						// append j3m viewer to dom
-						insertTemplate("j3m_visualizer.html", merged_asset,
-							"#ic_j3m_holder", function() {
-								// extra magic logic...
-								
-								var j3m_readout = new UVIndentedTree({
-									root_el: "#ic_j3m_readout_holder",
-									data: merged_asset.j3m
-								});
-								
-								//$("#ic_j3m_readout_holder").html(
-									//JSON.stringify(merged_asset.j3m));
-								
-								// setup the j3m...
-								ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
+				var j3m_readout = new UVIndentedTree({
+					root_el: "#ic_j3m_readout_holder",
+					data: merged_asset.j3m
+				});
+			
+				ctx.get('j3m').buildVisualizer("#ic_j3m_visualizer");
 
-							}, "/web/layout/views/document/"
-						);
-
-					}, "/web/layout/views/document/"
-				);
-				
-				
-			}
-		});
+			}, "/web/layout/views/document/"
+		);
 	}
 });

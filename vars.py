@@ -28,7 +28,11 @@ informacam_mime_type_map = {
 
 informacam_asset_tags = {
 	'J3M' : "j3m",
-	'PGP_KEY' : "pgp_key"
+	'PGP_KEY' : "pgp_key",
+	'THUMB' : "thumbnail",
+	'HIGH' : "hi_res",
+	'MED' : "medium_res",
+	'LOW' : "low_res"
 }
 
 MIME_TYPES.update(informacam_mime_types)

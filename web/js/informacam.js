@@ -115,5 +115,8 @@ function closeHeaderPopup() {
 		css = $(css_stub).clone();
 		css.attr('href', "/leaflet/leaflet.css");
 		document.getElementsByTagName("head")[0].appendChild(css.get(0));
+		
+		css = null;
+		delete css;
 	})
 })(jQuery);

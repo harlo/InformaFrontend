@@ -43,6 +43,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_image.js',
 				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js'],
 			'source' : [
@@ -55,6 +56,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_image.js',
 				'/web/js/models/ic_collection.js',
 				'/web/js/models/ic_source.js',
 				'/web/js/models/ic_submission.js',

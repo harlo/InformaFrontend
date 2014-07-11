@@ -191,7 +191,6 @@ function onViewerModeChanged(mode, force_reload) {
 		data = current_asset.toJSON();
 		callback = function(res) {
 			try {
-				current_asset.initViewer();
 				current_asset.setInPanel('viewer');
 				$("#ic_asset_collection_toggle").prop('checked', false);
 			} catch(err) {

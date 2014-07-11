@@ -1,1 +1,8 @@
-original goes here (TBD)
+<div id="ic_img_holder_{{ _id }}"></div>
+<script type="text/javascript">
+	var asset_img = new InformaCamImage({
+		parent : $("#ic_img_holder_{{ _id }}"),
+		asset: current_asset,
+		on_load: UV.ASSET_TAGS.MED
+	});
+</script>
