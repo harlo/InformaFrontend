@@ -26,7 +26,13 @@ var InformaCamImage = Backbone.Model.extend({
 	},
 	
 	getImageAsset: function(tag) {
-		return "/files/" + this.get('asset').get('base_path') + "/" +
-			this.get('asset').getAssetsByTagName(tag)[0].file_name;
+		try {
+			return "/files/" + this.get('asset').get('base_path') + "/" +
+				this.get('asset').getAssetsByTagName(tag)[0].file_name;
+		} catch(err) {
+			console.warn(err);
+		}
+		
+		return "/web/images/no_media.png";
 	}
 });

@@ -8,7 +8,10 @@ var InformaCamSubmission = UnveillanceDocument.extend({
 			document_browser.get('data'), { _id : this.get('_id') });
 		
 		if(updated_info) {
-			this.set(updated_info);			
+			this.set(updated_info);
+			
+			
+			
 			onViewerModeChanged("asset", force_reload=true);
 		}
 	},

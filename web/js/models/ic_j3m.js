@@ -89,6 +89,7 @@ var InformaCamJ3M = Backbone.Model.extend({
 			return result.join('\n');
 		};
 		
+		// TODO: if sampled, not this!
 		var export_data = this.toJSON();
 		
 		switch(extension) {
