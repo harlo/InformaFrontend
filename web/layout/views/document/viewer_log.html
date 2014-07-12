@@ -21,9 +21,22 @@
 </div>
 
 <script type="text/javascript">
-	_.each(["ic_log_attachments_holder","ic_log_form_data_holder"], function(div) {
+	var holders = ["ic_log_attachments_holder","ic_log_form_data_holder"];
+	_.each(holders, function(div) {
 		if($("#" + div).children('li').length == 0) {
 			$($("#" + div).parent()).remove();
+			return;
+		}
+		
+		var uniq_els = _.unique(_.map($("#" + div).children('li'), function(el) {
+			return $(el).html();
+		}));
+		
+		if(uniq_els.length < $("#" + div).children('li').length) {
+			$("#" + div).empty();
+			$("#" + div).append(_.map(uniq_els, function(el) { 
+				return $(document.createElement('li')).html(el);
+			}));
 		}
 	});
 </script>
