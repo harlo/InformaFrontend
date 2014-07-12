@@ -34,6 +34,20 @@ function updateConf() {
 			dec: function(val) {
 				return moment(Number(val)).format("MM/DD/YYYY HH:mm");
 			}
+		},
+		{
+			keys: ["ic_file_name_from_id"],
+			enc: function(val) {
+				try {
+					if(document_browser && document_browser.has('data')) {
+						return _.findWhere(document_browser.get('data'), {
+							_id : val
+						}).file_name;
+					}
+				} catch(err) {}
+				
+				return val;
+			}
 		}
 	]);
 	
