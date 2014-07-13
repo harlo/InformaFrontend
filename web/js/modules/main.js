@@ -11,6 +11,20 @@ function onConfLoaded() {
 	}, 200);
 }
 
+function getHomeData() {
+	if(!document_browser) { return null; }
+
+	var default_home = UV.DEFAULT_HOME_MIME_TYPES;
+	
+	if(!default_home) {
+		default_home = ["image/jpeg", "video/matroska"];
+	}
+		
+	return _.filter(document_browser.get('data'), function(doc) {
+		return _.contains(default_home, doc.mime_type) && doc.j3m_id;
+	});
+}
+
 function initVisualSearch() {
 	visual_search = new InformaCamVisualSearch();
 }
@@ -37,6 +51,13 @@ function initAssetBrowser() {
 							return _.extend(doc, { asset_type : asset_type });
 						})
 					});
+					
+					if(current_mode == "home") {
+						console.info("HEEEY");
+						try {
+							onViewerModeChanged("home", true);
+						} catch(err) {}
+					}
 				}
 			
 				if(current_asset) { current_asset.updateInfo(); }
@@ -206,7 +227,7 @@ function onViewerModeChanged(mode, force_reload) {
 		};
 		
 	} else if(current_mode == "home") {
-		console.info("HOME");
+		data = getHomeData();
 	}
 	
 	insertTemplate(mode + "_status.html", data, 

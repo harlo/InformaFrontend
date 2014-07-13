@@ -10,13 +10,18 @@ if __name__ == "__main__":
 		with open(os.path.join(CONF_ROOT, "unveillance.secrets.json", 'rb') as CONF:
 			config = json.loads(CONF.read())
 	except Exception as e:
-		print "NO CONF?"
-		exit(1)
+		print "NO CONF?"	
+	
+	if 'web_home_mime_types' in config.keys():
+		default_home_mime_types = config['web_home_mime_types']
+	else:
+		default_home_mime_types = ["image/jpeg", "video/x-matroska"]
 	
 	with open(os.path.join(COMPASS_CONF_ROOT, "compass.init.json"), 'wb+') as WEB:
 		WEB.write(json.dumps({
 			'web' : {
-				'BATCH_SALT' : generateNonce()
+				'BATCH_SALT' : generateNonce(),
+				'DEFAULT_HOME_MIME_TYPES' : default_home_mime_types
 			}
 		})
 		

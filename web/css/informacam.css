@@ -61,6 +61,20 @@ h1, h2, h3, h4 {
 	padding-right:1em;
 }
 
+#ic_home_sub_list {
+	width:100%;
+	height:auto;
+	display:table;
+	position:relative;
+}
+
+#ic_home_sub_list div {
+	float:left;
+	border:1px solid #000;
+	margin:0.15em;
+	padding:0 0.15em;
+}
+
 #ic_asset_main_ctrl li {
 	border:1px solid #ccc;
 	font-size:18px;
