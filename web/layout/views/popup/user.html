@@ -1,0 +1,9 @@
+<h2>Hello, {{ username }}</h2>
+<ul>
+	{{ #actions }}
+	<li>
+		<a class="uv_button" onclick="current_user.showAction('{{ el }}');">{{ label }}</a>
+		<div class="ic_module" id="{{ el }}"></div>
+	</li>
+	{{ /actions }}
+</ul>

@@ -1,6 +1,7 @@
 var current_user;
 
 function initUser() {
+	console.info("INIT USER");
 	current_user = new InformaCamUser();
 }
 
