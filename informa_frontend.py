@@ -32,7 +32,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/viz/uv_viz.js',
 			'/web/js/models/ic_visual_search.js',
 			'/web/js/models/ic_search.js',
-			'/web/js/informacam.js',
+			'/web/js/informacam.js'
 		])
 		
 		self.on_loads.update({
@@ -54,6 +54,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
+				'/web/js/models/unveillance_dropzone.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_image.js',

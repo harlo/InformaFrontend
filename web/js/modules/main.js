@@ -5,9 +5,14 @@ function onConfLoaded() {
 	
 	window.setTimeout(function() {
 		initVisualSearch();
-		$($("#ic_navigation").find("ul")[0]).append(
-			$(document.createElement('li'))
-				.html('<a href="/#advanced_search">Advanced Search</a>'));
+		_.each([
+			'<a href="/#advanced_search">Advanced Search</a>',
+			'<a href="/#import">Import</a>'], function(a) {
+				$($("#ic_navigation").find("ul")[0]).append(
+					$(document.createElement('li'))
+						.html(a));
+			}
+		)
 	}, 200);
 }
 
@@ -173,8 +178,6 @@ function loadModule(module_name) {
 				break;
 		}
 	});
-	
-	
 }
 
 function buildDocumentCollection(collection) {
@@ -257,6 +260,10 @@ function onViewerModeChanged(mode, force_reload) {
 		
 		this.get('/#share/:_id', function() {
 			loadHeaderPopup("share");
+		});
+
+		this.get('/#import', function() {
+			loadHeaderPopup("import");
 		});
 		
 		this.get(/\#advanced_search/, function(context) {
