@@ -50,6 +50,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/modules/ic_source.js'],
 			'main' : [
 				'/leaflet/leaflet.js',
+				'/web/js/lib/dropzone.js',
 				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',

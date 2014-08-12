@@ -267,7 +267,6 @@ function onViewerModeChanged(mode, force_reload) {
 		});
 		
 		this.get(/\#advanced_search/, function(context) {
-			console.info("ADV SEARCH!!!!");
 			if(this.params.keys().length <= 10) {
 				loadHeaderPopup("search", function() {
 					advanced_search = new InformaCamAdvancedSearch({ as_stub : true });
