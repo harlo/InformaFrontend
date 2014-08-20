@@ -12,6 +12,8 @@ USER_CREDENTIAL_PACK = {
 
 from lib.Frontend.vars import *
 
+IMPORTER_SOURCES.append("web_frontend")
+
 informacam_mime_types = {
 	'j3m' : "informacam/j3m",
 	'video' : "video/x-matroska",
