@@ -18,7 +18,10 @@ var submission;
 			console.info(submission);
 
 			$(submission.get('root_el'))
-				.html("Submission is here in the DOM.  What does this look like?");
+				.html("Submission is here in the DOM.  What does this look like?")
+				.append($(document.createElement('textarea'))
+					.addClass("ic_json_pre")
+					.html(JSON.stringify(submission.toJSON())));
 		});
 	});
 	

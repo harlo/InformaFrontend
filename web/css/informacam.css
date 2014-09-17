@@ -30,6 +30,12 @@ ul {
 	list-style-type: none;
 }
 
+.ic_json_pre {
+	height:auto;
+	width:100%;
+	min-height: 10em !important;
+}
+
 #header {
 	position:relative;
 	top:0;
