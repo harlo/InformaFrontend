@@ -1,84 +1,72 @@
-var InformaCamAdvancedSearch = Backbone.Model.extend({
-	constructor: function(inflate) {
+var InformaCamSearch = Backbone.Model.extend({
+	constructor: function() {
 		Backbone.Model.apply(this, arguments);
-		
-		var search_type = "submission";
-		if(this.has('params')) {
-			if(_.intersection(this.get('params'), UV.SEARCH_TYPES.source).length > 0) {
-				search_type = "source";
-			}
-			
-		}
-		
-		this.set('search_type', search_type);
 
-		if(this.has('as_stub') && this.get('as_stub')) {
-			getTemplate("advanced_search_clause_builder.html", function(html) {
-				this.clause_tmpl = html.responseText;
-			}, null, this);
-		}
-	},
-	setSearchType: function() {
-		var search_type = "submission";
-		if($("#ic_av_search_type").val() == "source") {
-			search_type = "source";
-		}
+		this.set('search_type', "any");
 		
-		this.set('search_type', search_type);
-		$("#ic_av_search_clause_holder").empty();
-	},
-	perform: function() {
-		if(!this.has('params') || !this.has('search_type')) { return; }
-		
-		var search_query = {};
-		var search_type = this.get('search_type');
-		
-		_.each(this.get('params'), function(p) {
-			_.extend(search_query, _.object([p.key], [p.value]));
-		});
-				
-		doInnerAjax("documents", "post", search_query, function(json) {
-			json = JSON.parse(json.responseText);
-			if(json.result == 200) {				
-				_.each(json.data.documents, function(doc) {
-					var tmpl;
-					
-					switch(search_type) {
-						case "submission":
-							tmpl = '<a href="/#submission/<%= _id %>"><%= _id %></a> (<span class="uv_translate uv_date"><%= date_added %></span>)';
-							break;
-						case "source":
-							tmpl = '<a href="/#source/<%= _id %>"><%= _id %></a>';
-							break;
-					}
-					
-					if(tmpl) {
-						$("#ic_av_results").append(
-							$(document.createElement('li')).html(_.template(tmpl, doc)));
-					}
-				});
-				
-				$.each($("#ic_av_results").find(".uv_translate"), function(idx, item) {
-					$(item).html(translate(item));
-				});
-				
-				$("#ic_av_status_holder").html("<p>" + json.data.documents.length + " result(s) found.</p>");
-				
-			} else {
-				$("#ic_av_status_holder").html("<p>There are no results matching your query.</p>");
+		this.set({
+			search_bar : VS.init({
+				container : this.get('search_el'),
+				query : '',
+				callbacks: {
+					search: this.addParamsFromSearchBar,
+					facetMatches: this.facetMatches,
+					valueMatches: this.valueMatches
+				}
+			}),
+			advanced_search : {
+				container : this.get('advanced_el'),
+				clause_tmpl : getTemplate("advanced_search_clause_builder.html")
 			}
 		});
+
+		$("#ic_search_button").click(_.bind(this.buildAndPerform, this));
+		$("#ic_av_add_clause").click(_.bind(this.addClause, this));
+		$("#ic_av_search_type").change(_.bind(this.setSearchType, this, $("#ic_av_search_type")));
+	},
+	buildAndPerform: function() {
+		window.location = "/search/?" + this.build()[1];
+	},
+	perform: function(query) {		
+		if(_.isString(query)) {
+			if(query[0] == "?") { query = query.substr(1); }
+
+			query = _.map(query.split("&"), function(kvp) {
+				return _.object([kvp.split("=")]);
+			});
+
+			return this.perform(_.reduce(query, function(m, n) {
+				return _.extend(m, n);
+			}, {}))
+		}
+
+		if(!(_.isObject(query))) { return null; }
+		return doInnerAjax("documents", "post", query, null, false);
+	},
+	setSearchType: function(search_type) {
+		if(_.isObject(search_type)) {
+			search_type = $("#ic_av_search_type").val();
+			$("#ic_av_search_clause_holder").empty();
+		}
+
+		this.set('search_type', search_type);
 	},
 	addClause: function() {
-		if(!this.clause_tmpl) { return; }
-		
-		var clause_ui = $(document.createElement('li')).html(this.clause_tmpl);
+		var clause_li = $(this.get('advanced_search').clause_tmpl).clone();
+		var clause_opts = $(clause_li).children('.ic_clause_options').children('a');
+
+		$(clause_opts[0]).click(_.bind(this.removeClause, this, clause_opts[0]));
+		$(clause_opts[1]).click(_.bind(this.addClause, this));
+
+		var clause_ui = $(document.createElement('li')).append(clause_li);
 
 		var stub = "____________________________";
 		var default_stub = $(document.createElement('option')).html(stub);
 		$($(clause_ui).find(".ic_clause_selector")[0]).append(default_stub);
 
-		_.each(UV.SEARCH_CLAUSE_SELECTORS[this.get('search_type')], function(cs) {
+		var clause_selector = this.get('search_type') == "application/pgp" ? "source" : "submission";
+
+		_.each(UV.SEARCH_CLAUSE_SELECTORS[clause_selector], function(cs) {
 			var el = $(document.createElement('option'))
 				.html(cs.label)
 				.attr({
@@ -106,12 +94,37 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 		var ui_parent = $($($(holder).parent()).parent()).parent();
 		$(ui_parent).remove();
 	},
-	buildAndPerform: function() {
-		var ctx = this;
+	addParamsFromSearchBar: function(query, search_collection) {
+		if(!(_.isEmpty(search_collection.models))) {
+			search.set('search_bar_params', _.map(search_collection.models, function(m) {
+				if(m.get('category') == "Mime Type") { search.setSearchType(m.get('value')); }
+				
+				return {
+					key : (function(m) {
+						try {
+							return _.findWhere(UV.FACET_VALUES, { category : m })
+								.uri_label;
+						} catch(err) { console.warn(err); }
+
+						return m;
+						})(m.get('category')),
+					value : m.get('value')
+				}
+			}));
+		}
+	},
+	facetMatches: function(callback) { callback(UV.SEARCH_FACETS); },
+	valueMatches: function(facet, search_term, callback) {
+		var values = _.findWhere(UV.FACET_VALUES, { category : facet });
+		if(values) {
+			callback(values.values);
+		}				
+	},
+	build: function() {
+		params = this.get('search_bar_params') || [];
 		
-		$.each($("#ic_av_search_clause_holder").find("input"),
-			function(idx, item) {
-				console.info($(item));
+		_.each($(this.get('advanced_el')).find("input"),
+			function(item) {
 				// for all inputs
 				// might need some massaging beforehand, but:
 				// if value is not null: push kvp
@@ -119,6 +132,10 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				if($(item).val() == "") { return; }
 				if($(item).attr('rel') && $(item).val() == $(item).attr('rel')) {
 					return;
+				}
+
+				if(this.get('search_type') != "j3m") {
+					this.setSearchType("j3m");
 				}
 			
 				var key = $(item).attr('name');
@@ -129,89 +146,57 @@ var InformaCamAdvancedSearch = Backbone.Model.extend({
 				});
 				
 				if(trans) { value = trans.enc(value); }
-				
-				if(!ctx.has('params')) { ctx.set({ params : [] }); };
-				
-				var param = _.findWhere(ctx.get('params'), {key : key});
+								
+				var param = _.findWhere(params, {key : key});
 				if(param) {
 					param.value = [param.value, value];
 				} else {
-					ctx.get('params').push({
+					params.push({
 						key: key,
 						value: value
 					});
 				}
-			}
-		);
-		
-		if(!ctx.has('params') || ctx.get('params').length == 0) { return; }
-		
-		var default_params = [
-			{
-				key: "mime_type",
-				value: this.get('search_type') == "source" ? 
-					"application/pgp" : "informacam/j3m"
-			}
-		];
-		
-		if(this.get('search_type') != "source") {
-			default_params.push({
-				key: "cast_as",
-				value: "media_id"
-			});
-		}
-				
-		this.set('params', _.union(this.get('params'), default_params));
+			}, this);
 
-		var search_uri = _.map(this.get('params'), function(p) {
+		var doc_type = "uv_document";
+		
+		if(this.get('search_type') != "any") {
+			var m = _.findWhere(params, { key : "mime_type" });
+			if(!m) {
+				m = params[Number(params.push({ key : "mime_type" })) - 1];
+			}
+
+			console.info(m);
+
+			switch(this.get('search_type')) {
+				case "j3m":
+					doc_type = "ic_j3m";
+					mime_type = "informacam/j3m";
+
+					params.push({
+						key : "cast_as",
+						value : "media_id"
+					});
+					break;
+				default:
+					mime_type = this.get('search_type');
+					break;
+			}
+
+			m.value = mime_type;
+		}
+
+		params = _.union(params, [
+			{
+				key : "doc_type",
+				value : doc_type
+			}
+		]);
+
+		var search_uri = _.map(params, function(p) {
 			return p.key + "=" + JSON.stringify(p.value);
 		}).join("&").replace(/\"/g, "");
-		console.info(search_uri);
-		
-		toggleElement("#ic_header_popup");
-		window.location = "/#advanced_search?" + search_uri;
-	},
-	save: function() {
-		if(!window.location.hash.match(/\#advanced_search(?:\?.+)/)) { return false; }
-		if(!window.UnveillanceUser || !current_user) { return false; }
-		
-		var searches = current_user.getDirective("searches");
-		try {
-			searches.push(window.location.hash);
-			current_user.save();
-			return true;
-		} catch(err) {
-			cosole.error(err);
-		}
-		
-		return false;
-	},
-	removeSearch: function(search_uri) {
-		if(!window.UnveillanceUser || !current_user) { return false; }
-		if(!search_uri) { search_uri = window.location.hash; }
 
-		if(!search_uri.match(/\#advanced_search(?:\?.+)/)) { return false; }
-		
-		var searches = current_user.getDirective("searches");
-		if(this.hasSearch(search_uri)) {
-			searches = searches.remove(search_uri);
-			current_user.save();
-			return true;
-		}
-		
-		return false;
-		
-	},
-	hasSearch: function(search_uri) {
-		if(!window.UnveillanceUser || !current_user) { return false; }
-		if(!search_uri) { search_uri = window.location.hash; }
-		
-		if(!search_uri.match(/\#advanced_search(?:\?.+)/)) { return false; }
-				
-		if(_.contains(current_user.getDirective("searches"), search_uri)) {
-			return true;
-		}
-		
-		return false;
+		return [params, search_uri];
 	}
 });

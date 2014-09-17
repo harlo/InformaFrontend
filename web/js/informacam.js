@@ -1,5 +1,3 @@
-var current_asset;
-
 function updateConf() {
 	var map_id = "harlo.ibn0kk8l";
 	var key = "23c00ae936704081ab019253c36a55b3";
@@ -19,6 +17,16 @@ function updateConf() {
 	UV.DATA_MAX = 800;
 	
 	UV.SEARCH_FACETS.push("Public Hash");
+	UV.FACET_VALUES = _.union(UV.FACET_VALUES, [
+		{
+			category : "Public Hash",
+			uri_label : "public_hash"
+		},
+		{
+			category : "text",
+			uri_label : "searchable_text"
+		}
+	]);
 	
 	UV.SEARCH_TYPES = {
 		submission : ["genealogy.createdOnDevice"],
@@ -81,21 +89,6 @@ function updateConf() {
 			}
 		]
 	};
-}
-
-function loadAsset(asset_type, _id) {
-	if(asset_type == "submission") {
-		current_asset = new InformaCamSubmission({ _id : _id });
-	} else if(asset_type == "source") {
-		current_asset = new InformaCamSource({ _id : _id });
-	}
-	
-	try {
-		current_asset.updateInfo();
-	} catch(err) {
-		console.warn("COULD NOT LOAD WHOLE ASSET AT THIS TIME");
-		console.warn(err);
-	}
 }
 
 function loadHeaderPopup(view, onSuccess) {

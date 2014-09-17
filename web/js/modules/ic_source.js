@@ -1,13 +1,24 @@
+var source;
+
 (function($) {
 	var source_sammy = $.sammy("#content", function() {
 		this.get(/source\/([a-z0-9]{32})\//, function(context) {
-			doInnerAjax("documents", "post", { _id : this.params.splat[0] }, function(j) {
-				j = JSON.parse(j.responseText);
-				if(j.result == 200) {
-					current_asset = new InformaCamSource(j.data);
-					current_asset.setInPanel('viewer');
-				}
-			});
+
+			source = new InformaCamSource(_.extend({ root_el : $('#ic_source_view_holder')},
+				doInnerAjax("documents", "post", { _id : this.params.splat[0] }, null, false)));
+
+			if(source.get('result') != 200) {
+				failOut(source.get('root_el'));
+				return;
+			}
+
+			source.unset('result');
+
+			console.info("Source " + source.get('data')._id);
+			console.info(source);
+
+			$(source.get('root_el'))
+				.html("Source is here in the DOM.  What does this look like?");
 		});
 	});
 	

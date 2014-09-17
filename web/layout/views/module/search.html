@@ -1,0 +1,23 @@
+<div id="ic_search_holder">
+	<table>
+		<tr>
+			<td width="80%"><div id="ic_visual_search_holder"></div></td>
+			<td><a onclick="toggleElement('#ic_extended_search_holder');">[ Advanced ]</a></td>
+		</tr>
+	</table>
+	<div id="ic_extended_search_holder" class="uv_toggle_none">
+		<div id="ic_av_search_root">
+			<span>Get</span>
+			<select id="ic_av_search_type">
+				<option value="any">any media</option>
+				<option value="image/jpeg">images</option>
+				<option value="video/x-matroska">video</option>
+				<option value="informacam/log">logs</option>
+				<option value="application/pgp">submitter</option>
+			</select>
+			<span id="ic_av_add_clause">that...</span>
+			<ul id="ic_av_search_clause_holder"></ul>
+		</div>
+	</div>
+	<div><a class="uv_button" id="ic_search_button">Search</a></div>
+</div>

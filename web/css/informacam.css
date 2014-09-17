@@ -26,6 +26,10 @@ h1, h2, h3, h4 {
 	font-family: 'lato-regular';
 }
 
+ul {
+	list-style-type: none;
+}
+
 #header {
 	position:relative;
 	top:0;
@@ -43,7 +47,7 @@ h1, h2, h3, h4 {
 	right:2%;
 }
 
-#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list, #ic_av_search_clause_holder, #ic_av_search_query, #ic_log_attachments_holder {
+#header #ic_navigation ul, #ic_j3m_visualizer, #ic_asset_browser_holder, .ic_dir_list, #ic_asset_main_ctrl, #ic_submission_asset_list, #ic_submission_info_list, #ic_info_holder, #ic_log_form_data_holder, #ic_collection_common_funcs_list, #ic_av_`clause_holder, #ic_av_search_query, #ic_log_attachments_holder {
 	list-style-type: none;
 }
 
@@ -137,6 +141,14 @@ h1, h2, h3, h4 {
 
 #ic_j3m_info_holder {
 	margin:2em 0;
+}
+
+#ic_search_holder {
+	width:99%;
+	min-height:5em;
+	margin:0.5em;
+	padding:10px;
+	border:1px solid #000;
 }
 
 .ic_j3m_info_viz {

@@ -1,17 +1,24 @@
+var submission;
+
 (function($) {
-	var sub_sammy = $.sammy("#content", function() {
-		this.get(/.*\#media/, function(context) {
-			console.info("SHOW ORIGINAL IF POSSIBLE, or if log, attachments...");
-		});
-		
+	var source_sammy = $.sammy("#content", function() {
 		this.get(/submission\/([a-z0-9]{32})\//, function(context) {
-			doInnerAjax("documents", "post", { _id : this.params.splat[0] }, function(j) {
-				j = JSON.parse(j.responseText);
-				if(j.result == 200) {
-					current_asset = new InformaCamSubmission(j.data);
-					current_asset.setInPanel('viewer');
-				}
-			});
+
+			submission = new InformaCamSubmission(_.extend({ root_el : $('#ic_submission_view_holder')},
+				doInnerAjax("documents", "post", { _id : this.params.splat[0] }, null, false)));
+
+			if(submission.get('result') != 200) {
+				failOut($(submission.get('root_el')));
+				return;
+			}
+
+			submission.unset('result');
+
+			console.info("Submission " + submission.get('data')._id);
+			console.info(submission);
+
+			$(submission.get('root_el'))
+				.html("Submission is here in the DOM.  What does this look like?");
 		});
 	});
 	
@@ -30,6 +37,6 @@
 			console.warn("no onConfLoaded()");
 		}
 		
-		sub_sammy.run();
+		source_sammy.run();
 	});
 })(jQuery);

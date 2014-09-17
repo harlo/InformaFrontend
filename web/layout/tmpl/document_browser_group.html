@@ -1,0 +1,8 @@
+<li class="ic_list_header">
+	<a onclick="toggleElement('#ic_doc_list_{{ group_hash }}');">{{ group_name }}</a>
+	<ul id="ic_doc_list_{{ group_hash }}" class="uv_toggle_none">
+		{{ #documents }}
+		<li><a href="/{{ group_type }}/{{ _id }}/" class="uv_translate uv_from_rel" rel="{{ file_alias }}">{{ file_name }}</a></li>
+		{{ /documents }}
+	</ul>
+</li>

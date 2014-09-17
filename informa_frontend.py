@@ -19,6 +19,7 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/leaflet/(.*)", self.LeafletHandler)])
 		
 		self.default_on_loads.extend([
+			'/web/js/lib/md5.js',
 			'/web/js/lib/sammy.js',
 			'/web/js/lib/crossfilter.min.js',
 			'/web/js/lib/d3.min.js',
@@ -30,8 +31,6 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/lib/jquery.ui.menu.js',
 			'/web/js/lib/jquery.ui.autocomplete.js',
 			'/web/js/viz/uv_viz.js',
-			'/web/js/models/ic_visual_search.js',
-			'/web/js/models/ic_search.js',
 			'/web/js/informacam.js'
 		])
 		
@@ -42,27 +41,26 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_timeseries_graph.js',
 				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
+				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_image.js',
 				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js'],
 			'source' : [
+				'/web/js/models/unveillance_document.js',
+				'/web/js/models/ic_source.js',
 				'/web/js/modules/ic_source.js'],
 			'main' : [
-				'/leaflet/leaflet.js',
 				'/web/js/lib/dropzone.js',
-				'/web/js/viz/uv_indented_tree.js',
-				'/web/js/viz/ic_timeseries_graph.js',
-				'/web/js/viz/ic_timeseries_chart.js',
-				'/web/js/viz/ic_timeseries_map.js',
+				'/web/js/models/ic_search.js',
 				'/web/js/models/unveillance_dropzone.js',
 				'/web/js/models/ic_document_browser.js',
-				'/web/js/models/ic_j3m.js',
-				'/web/js/models/ic_image.js',
-				'/web/js/models/ic_collection.js',
-				'/web/js/models/ic_source.js',
-				'/web/js/models/ic_submission.js',
-				'/web/js/modules/main.js']
+				'/web/js/modules/main.js'],
+			'search' :[
+				'/web/js/models/ic_search.js',
+				'/web/js/models/ic_document_browser.js',
+				'/web/js/modules/ic_search.js'
+			]
 		})
 		
 		self.on_loads_by_status[1].extend([
@@ -109,6 +107,7 @@ class InformaFrontend(UnveillanceFrontend):
 			self.finish("ICTD GOES HERE")
 	
 	class DriveHandler(tornado.web.RequestHandler):
+		@tornado.web.asynchronous
 		def get(self):
 			endpoint = "/"			
 			res = self.application.routeRequest(Result(), "open_drive_file", self)
@@ -121,6 +120,7 @@ class InformaFrontend(UnveillanceFrontend):
 			self.redirect(endpoint)
 	
 	class SubmissionShortcutHandler(tornado.web.RequestHandler):
+		@tornado.web.asynchronous
 		def get(self):
 			endpoint = "/"
 			
