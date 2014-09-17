@@ -49,6 +49,7 @@ var InformaCamSearch = Backbone.Model.extend({
 			$("#ic_av_search_clause_holder").empty();
 		}
 
+		if(search_type == "informacam/j3m") { search_type = "j3m"; }
 		this.set('search_type', search_type);
 	},
 	addClause: function() {
@@ -102,8 +103,7 @@ var InformaCamSearch = Backbone.Model.extend({
 				return {
 					key : (function(m) {
 						try {
-							return _.findWhere(UV.FACET_VALUES, { category : m })
-								.uri_label;
+							return _.findWhere(UV.FACET_VALUES, { category : m }).uri_label;
 						} catch(err) { console.warn(err); }
 
 						return m;
@@ -165,8 +165,6 @@ var InformaCamSearch = Backbone.Model.extend({
 			if(!m) {
 				m = params[Number(params.push({ key : "mime_type" })) - 1];
 			}
-
-			console.info(m);
 
 			switch(this.get('search_type')) {
 				case "j3m":
