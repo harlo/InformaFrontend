@@ -60,7 +60,12 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_search.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic_search.js'
-			]
+			],
+			'simple' : [
+#				'/web/js/lib/filedrop-min.js',
+#				'/web/js/models/unveillance_filedrop.js']
+				'/web/js/lib/dropzone.js',
+				'/web/js/models/unveillance_dropzone.js']
 		})
 		
 		self.on_loads_by_status[1].extend([
