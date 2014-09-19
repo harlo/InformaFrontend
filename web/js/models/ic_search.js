@@ -2,6 +2,18 @@ var InformaCamSearch = Backbone.Model.extend({
 	constructor: function() {
 		Backbone.Model.apply(this, arguments);
 
+		if(current_user) {
+			var tags;
+			try {
+				tags = current_user.getDirective('tags', false).tags;
+			} catch(err) { console.warn(err); }
+
+			if(tags) {
+				UV.SEARCH_FACETS.push("Tags");
+				_.findWhere(UV.FACET_VALUES, { category : "Tags" }).values = _.pluck(tags, 'label');
+			}
+		}
+
 		this.set('search_type', "any");
 		
 		this.set({
@@ -37,7 +49,7 @@ var InformaCamSearch = Backbone.Model.extend({
 
 			return this.perform(_.reduce(query, function(m, n) {
 				return _.extend(m, n);
-			}, {}))
+			}, {}));
 		}
 
 		if(!(_.isObject(query))) { return null; }
@@ -97,8 +109,15 @@ var InformaCamSearch = Backbone.Model.extend({
 	},
 	addParamsFromSearchBar: function(query, search_collection) {
 		if(!(_.isEmpty(search_collection.models))) {
-			search.set('search_bar_params', _.map(search_collection.models, function(m) {
-				if(m.get('category') == "Mime Type") { search.setSearchType(m.get('value')); }
+			search.set('search_bar_params', _.map(search_collection.models, function(m) {				
+				switch(m.get('category')) {
+					case "Mime Type":
+						search.setSearchType(m.get('value'));
+						break;
+					case "text":
+						search.setSearchType("j3m");
+						break;
+				}
 				
 				return {
 					key : (function(m) {
@@ -162,26 +181,26 @@ var InformaCamSearch = Backbone.Model.extend({
 		
 		if(this.get('search_type') != "any") {
 			var m = _.findWhere(params, { key : "mime_type" });
-			if(!m) {
-				m = params[Number(params.push({ key : "mime_type" })) - 1];
-			}
 
 			switch(this.get('search_type')) {
 				case "j3m":
 					doc_type = "ic_j3m";
-					mime_type = "informacam/j3m";
 
 					params.push({
 						key : "cast_as",
 						value : "media_id"
 					});
+
+					params = _.without(params, m);
 					break;
 				default:
 					mime_type = this.get('search_type');
+					if(!m) {
+						m = params[Number(params.push({ key : "mime_type" })) - 1];
+					}
+					m.value = mime_type;
 					break;
 			}
-
-			m.value = mime_type;
 		}
 
 		params = _.union(params, [

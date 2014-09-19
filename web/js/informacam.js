@@ -25,6 +25,11 @@ function updateConf() {
 		{
 			category : "text",
 			uri_label : "searchable_text"
+		},
+		{
+			category : "Tags",
+			uri_label : "in_pool",
+			values: []
 		}
 	]);
 	
