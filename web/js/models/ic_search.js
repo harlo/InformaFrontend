@@ -159,12 +159,6 @@ var InformaCamSearch = Backbone.Model.extend({
 			
 				var key = $(item).attr('name');
 				var value = $(item).val();
-				
-				var trans = _.find(UV.TRANSLATE_VALUES, function(k) {
-					return _.contains(k.keys, key);
-				});
-				
-				if(trans) { value = trans.enc(value); }
 								
 				var param = _.findWhere(params, {key : key});
 				if(param) {
@@ -203,12 +197,15 @@ var InformaCamSearch = Backbone.Model.extend({
 			}
 		}
 
-		params = _.union(params, [
-			{
-				key : "doc_type",
-				value : doc_type
-			}
-		]);
+		params = _.union(params, [{ key : "doc_type", value : doc_type }]);
+
+		_.each(params, function(p) {
+			var trans = _.find(UV.TRANSLATE_VALUES, function(k) {
+				return _.contains(k.keys, p.key);
+			});
+			
+			if(trans) { p.value = trans.enc(p.value); }
+		});
 
 		var search_uri = _.map(params, function(p) {
 			return p.key + "=" + JSON.stringify(p.value);
