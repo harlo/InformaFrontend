@@ -1,0 +1,22 @@
+<h2 id="ic_upload_instructions">Drop an image, video, or j3m log</h2>
+<div id="ic_import_dropzone_holder">
+	<input type="file" name="uv_import" />
+	<input type="hidden" name="x_token" value="" />
+</div>
+<div id="ic_import_status_holder">
+	<ul></ul>
+</div>
+
+<script type="text/javascript">
+	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
+		function() {
+			// onSuccess
+			$('<h2/>', {
+				text: 'Now what?'
+			}).appendTo('#content');
+		},
+		function() {
+			// onError
+		}
+	);
+</script>
