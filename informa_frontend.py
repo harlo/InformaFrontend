@@ -63,6 +63,10 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic_search.js'
 			],
+			'unveil' : [
+				'/web/js/modules/uv_unveil.js',
+				'/web/js/modules/ic_unveil.js'
+			],
 			'simple' : [
 #				'/web/js/lib/filedrop-min.js',
 #				'/web/js/models/unveillance_filedrop.js']
@@ -89,7 +93,8 @@ class InformaFrontend(UnveillanceFrontend):
 		])
 		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
-			self.init_vars.update(json.loads(IV.read())['web'])
+			init_vars = json.loads(IV.read())['web']
+			self.init_vars.update(init_vars)
 				
 		tmpl_root = os.path.join(INFORMA_BASE_DIR, "web", "layout", "tmpl")
 		self.INDEX_HEADER = os.path.join(tmpl_root, "header.html")
