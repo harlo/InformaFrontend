@@ -5,7 +5,7 @@ from time import sleep
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
 
-from v2.v2j3m import V2J3MVeiwerHandler, J3MHeaderHandler
+from v2.v2j3m import J3MHeaderHandler, J3MRetrieveHandler, LightMeterHandler
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE, buildServerURL
 
 class InformaFrontend(UnveillanceFrontend):
@@ -19,7 +19,8 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/submissions/", self.SubmissionShortcutHandler),
 			(r"/leaflet/(.*)", self.LeafletHandler),
 			(r"/j3mheader/(.*)", J3MHeaderHandler),
-			(r"/v2j3mview/(.*)", V2J3MVeiwerHandler)])
+			(r"/lightMeter/(.*)", LightMeterHandler),
+			(r"/j3mretrieve/(.*)", J3MRetrieveHandler)])
 		
 		self.default_on_loads.extend([
 			'/web/js/lib/md5.js',
