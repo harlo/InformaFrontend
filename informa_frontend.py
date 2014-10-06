@@ -5,7 +5,7 @@ from time import sleep
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
 
-from v2j3m import V2J3MVeiwerHandler
+from v2.v2j3m import V2J3MVeiwerHandler, J3MHeaderHandler
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE, buildServerURL
 
 class InformaFrontend(UnveillanceFrontend):
@@ -18,6 +18,7 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/commit/", self.DriveHandler),
 			(r"/submissions/", self.SubmissionShortcutHandler),
 			(r"/leaflet/(.*)", self.LeafletHandler),
+			(r"/j3mheader/(.*)", J3MHeaderHandler),
 			(r"/v2j3mview/(.*)", V2J3MVeiwerHandler)])
 		
 		self.default_on_loads.extend([

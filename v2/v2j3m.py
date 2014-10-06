@@ -5,9 +5,39 @@ from tornado.escape import json_decode
 from tornado.httpclient import AsyncHTTPClient
 from conf import  DEBUG, buildServerURL
 
+
 objectHandle = ""
 j3mObject = ""
+
+class J3MHeaderHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            http_client = AsyncHTTPClient()
+            url = "%s%s%s" % (buildServerURL(),"/documents/?_id=" ,param)
+            if DEBUG: print "SENDING REQUEST TO %s" % url
+            response = yield http_client.fetch(url)
+            try:
+                self.objectHandle = json_decode(response.body)
+                if DEBUG: print self.objectHandle['data']['j3m_id']
+                
+                url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
+                if DEBUG: print "SENDING REQUEST TO %s" % url
+                self.j3mObject = yield http_client.fetch(url)
+                j3mResponse = yield http_client.fetch(url)
+                self.j3mObject = json_decode(j3mResponse.body)
+                del self.j3mObject['data']['data']['sensorCapture']
+                self.write(self.j3mObject)
+
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()
+
 class V2J3MVeiwerHandler(tornado.web.RequestHandler):
+    
         
         @tornado.web.asynchronous
         def get(self,param):
