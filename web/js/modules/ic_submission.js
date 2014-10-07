@@ -1,4 +1,5 @@
 var submission;
+var app = app || {};//global Backbone
 
 (function($) {
 	var source_sammy = $.sammy("#content", function() {
@@ -18,9 +19,8 @@ var submission;
 			console.info(submission);
 			
 			var j3m = submission.get('j3m');
-			console.log(j3m.getHeader());
 			
-
+			var x = j3m.getHeader();
 /*
 			$(submission.get('root_el'))
 				.html("Submission is here in the DOM.  What does this look like?")
@@ -28,10 +28,14 @@ var submission;
 					.addClass("ic_json_pre")
 					.html(JSON.stringify(submission.toJSON())));
 
-*/
+*/			
 			$(submission.get('root_el'))
-				.append(Mustache.to_html(getTemplate("j3m_lightmeter.html"), j3m.getLightMeterValues()))
 				.append(Mustache.to_html(getTemplate("j3m_header.html"), j3m.getHeader()));				
+
+			$(submission.get('root_el'))
+				.append(Mustache.to_html(getTemplate("j3m_lightmeter.html"), j3m.getLightMeterValues()));				
+
+
 				
 		});
 
@@ -52,6 +56,6 @@ var submission;
 			console.warn("no onConfLoaded()");
 		}
 		
-		source_sammy.run();
+//		source_sammy.run();
 	});
 })(jQuery);
