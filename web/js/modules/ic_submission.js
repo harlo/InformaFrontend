@@ -30,8 +30,9 @@ var submission;
 
 */
 			$(submission.get('root_el'))
-				.append(Mustache.to_html(getTemplate("j3m_header.html"), j3m.getHeader()));
-
+				.append(Mustache.to_html(getTemplate("j3m_lightmeter.html"), j3m.getLightMeterValues()))
+				.append(Mustache.to_html(getTemplate("j3m_header.html"), j3m.getHeader()));				
+				
 		});
 
 	});
