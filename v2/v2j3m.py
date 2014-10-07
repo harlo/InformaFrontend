@@ -1,5 +1,4 @@
 import tornado.web
-import time
 from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient
@@ -22,6 +21,16 @@ def getJ3mDoc(self,param):
     j3mResponse = yield http_client.fetch(url)
     raise gen.Return(j3mResponse.body)
 
+def getTimeValues(self,j3mDoc,valueKey):
+    sensors = j3mDoc['data']['data']['sensorCapture']
+    values=[]
+    for element in sensors: 
+        try: 
+            value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
+            values.insert(element['timestamp'],value)
+        except KeyError: pass
+    return values
+    
 
 class J3MRetrieveHandler(tornado.web.RequestHandler):
     
@@ -63,16 +72,71 @@ class LightMeterHandler(tornado.web.RequestHandler):
             try:
                 j3m = yield getJ3mDoc(self,param)
                 j3mDoc = json_decode(j3m)
-                sensors = j3mDoc['data']['data']['sensorCapture']
+                self.write(json_encode(getTimeValues(self,j3mDoc,"lightMeterValue")))
                 
-                values=[]
-                for element in sensors: 
-                    try: 
-                        value = {"lightMeterValue": element['sensorPlayback']['lightMeterValue'],"timestamp":element['timestamp']}
-                        values.append(value)
-                    except KeyError: pass
-                        
-                self.write(json_encode(values))
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()    
+            
+class pressureHPAOrMBARHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                self.write(json_encode(getTimeValues(self,j3mDoc,"pressureHPAOrMBAR")))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()    
+
+class pressureAltitudeHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                self.write(json_encode(getTimeValues(self,j3mDoc,"pressureAltitude")))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()    
+
+class GPSBearingHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                self.write(json_encode(getTimeValues(self,j3mDoc,"gps_bearing")))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()    
+
+class GPSCoordsHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                self.write(json_encode(getTimeValues(self,j3mDoc,"gps_coords")))
                 
             except Exception, e:
                 self.write('No Document found')  
