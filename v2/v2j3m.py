@@ -27,7 +27,7 @@ def getTimeValues(self,j3mDoc,valueKey):
     for element in sensors: 
         try: 
             value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
-            values.insert(element['timestamp'],value)
+            values.insert(int(element['timestamp']),value)
         except KeyError: pass
     return values
     
@@ -144,3 +144,121 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
                 
             self.finish()
             self.flush()    
+
+class GPSAccuracyHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                self.write(json_encode(getTimeValues(self,j3mDoc,"gps_accuracy")))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()    
+
+class VisibleWifiNetworksHandler(tornado.web.RequestHandler):
+    @gen.coroutine
+    def get(self,param):
+        try:
+            j3m = yield getJ3mDoc(self,param)
+            j3mDoc = json_decode(j3m)
+            sensors = j3mDoc['data']['data']['sensorCapture']
+            values=[]
+            for element in sensors: 
+                try:
+                    for wifi in element['sensorPlayback']['visibleWifiNetworks']:
+                        wifi['timestamp'] = element['timestamp']
+                        values.insert(int(element['timestamp']),wifi)
+                except KeyError: pass    
+            self.write(json_encode(values))
+                
+        except Exception, e:
+            self.write('No Document found')  
+            print 'no Doc retrieved EXCEPTION!', e
+                
+        self.finish()
+        self.flush() 
+        
+class DocumentWrapperHandler (tornado.web.RequestHandler):
+    @gen.coroutine
+    def get(self,param):
+        try:
+            http_client = AsyncHTTPClient()
+            url = "%s%s%s" % (buildServerURL(),"/documents/?_id=" ,param)
+            if DEBUG: print "SENDING REQUEST TO %s" % url
+    
+            response = yield http_client.fetch(url) 
+            self.write(response.body)  
+                 
+        except Exception, e:
+            self.write('No Document found')  
+            print 'no Doc retrieved EXCEPTION!', e
+                
+        self.finish()
+        self.flush()   
+
+class AccelerometerHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                
+                sensors = j3mDoc['data']['data']['sensorCapture']
+                values=[]
+                for element in sensors: 
+                    try:
+                        value = {"acc_x":element['sensorPlayback']['acc_x']}
+                        value['acc_y'] = element['sensorPlayback']['acc_y']
+                        value['acc_z'] = element['sensorPlayback']['acc_z']
+                        value['timestamp'] = element['timestamp']
+                        
+                        values.insert(int(element['timestamp']),value)
+                    except KeyError: pass
+                self.write(json_encode(values))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()  
+            
+class PitchRollAzimuthHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                
+                sensors = j3mDoc['data']['data']['sensorCapture']
+                values=[]
+                for element in sensors: 
+                    try:
+                        value = {"azimuth":element['sensorPlayback']['azimuth']}
+                        value['pitch'] = element['sensorPlayback']['pitch']
+                        value['roll'] = element['sensorPlayback']['roll']
+                        try:
+                            value['azimuthCorrected'] = element['sensorPlayback']['azimuthCorrected']
+                            value['pitchCorrected'] = element['sensorPlayback']['pitchCorrected']
+                            value['rollCorrected'] = element['sensorPlayback']['rollCorrected']
+                        except KeyError: pass
+                        value['timestamp'] = element['timestamp']
+                        
+                        values.insert(int(element['timestamp']),value)
+                    except KeyError: pass
+                self.write(json_encode(values))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION!', e
+                
+            self.finish()
+            self.flush()  
