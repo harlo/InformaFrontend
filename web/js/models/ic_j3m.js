@@ -71,13 +71,11 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 			this.model.fetch();
 			this.key = options.key;
+			this.header = options.header;
 		},
 		render: function() {
+			this.$el.append('<h2>' + this.header + '</h2>');
 			var data = this.model.get("values");
-			data.sort(function(a, b) {
-				if (a == b) { return 0 }
-				return a.timestamp > b.timestamp;
-			});
 			var key = this.key;
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
@@ -100,8 +98,9 @@ jQuery(document).ready(function($) {
 				.orient("left");
 
 			var line = d3.svg.line()
+				.interpolate("basis")
 				.x(function(d) { return x(d.timestamp); })
-			.y(function(d) { return y(d[key]); });
+				.y(function(d) { return y(d[key]); });
 
 			var svg = d3.select(this.el).append("svg")
 				.attr({width: totalWidth,
@@ -111,7 +110,11 @@ jQuery(document).ready(function($) {
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-			y.domain([0, d3.max(data, function(d) { return d[key]; })]);
+			if (d3.min(data, function(d) { return d[key]; }) < 0) {
+				y.domain(d3.extent(data, function(d) { return d[key]; }));
+			} else {
+				y.domain([0, d3.max(data, function(d) { return d[key]; })]);
+			}
 
 			svg.append("g")
 				.attr("class", "x axis")
@@ -144,7 +147,6 @@ jQuery(document).ready(function($) {
 	app.InformaCamJ3MAppView = Backbone.View.extend({
 		el: '#ic_submission_view_holder',
 		initialize: function() {
-
 			this.headerView = new app.InformaCamJ3MHeaderView({
 				model: new app.InformaCamJ3MHeader({
 					id: app.docid
@@ -154,21 +156,43 @@ jQuery(document).ready(function($) {
 			this.lightMeterView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/lightMeter',
-					id: app.docid
+					id: app.docid,
 				}),
 				el: '#ic_lightMeterValue_view_holder',
 				key: 'lightMeterValue',
+				header: 'Light Meter',
 			});
 			
-			this.gps_bearingView = new app.InformaCamJ3MTimeStampedDataView({
+			this.gps_bearingView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/GPSBearing',
-					id: app.docid
+					id: app.docid,
 				}),
 				el: '#ic_gps_bearing_view_holder',
-				template: getTemplate("j3m_gps_bearing.html"),
-			}); 
+				key: 'gps_bearing',
+				header: 'GPS Bearing',
+			});
 			
+			this.gps_accuracyView = new app.InformaCamJ3MLineChart({
+				model: new app.InformaCamJ3MTimeStampedData({
+					urlRoot: '/GPSAccuracy',
+					id: app.docid,
+				}),
+				el: '#ic_gps_accuracy_view_holder',
+				key: 'gps_accuracy',
+				header: 'GPS Accuracy',
+			}); 
+
+			this.pressureAltitudeView = new app.InformaCamJ3MLineChart({
+				model: new app.InformaCamJ3MTimeStampedData({
+					urlRoot: '/pressureAltitude',
+					id: app.docid
+				}),
+				el: '#ic_pressureAltitude_view_holder',
+				key: 'pressureAltitude',
+				header: 'Pressure Alitude',
+			}); 
+
 			this.gps_coordsView = new app.InformaCamJ3MTimeStampedDataView({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/GPSCoords',
@@ -178,26 +202,27 @@ jQuery(document).ready(function($) {
 				template: getTemplate("j3m_gps_coords.html"),
 			}); 
 			
-			this.gps_accuracyView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSAccuracy',
-					id: app.docid
-				}),
-				el: '#ic_gps_accuracy_view_holder',
-				key: 'gps_accuracy',
-			}); 
 
-			this.pressureAltitudeView = new app.InformaCamJ3MTimeStampedDataView({
+			this.accelerometerView = new app.InformaCamJ3MTimeStampedDataView({
 				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/pressureAltitude',
+					urlRoot: '/Accelerometer',
 					id: app.docid
 				}),
-				el: '#ic_pressureAltitude_view_holder',
-				template: getTemplate("j3m_pressureAltitude.html"),
+				el: '#ic_accelerometer_view_holder',
+				template: getTemplate("j3m_accelerometer.html"),
 			}); 
 			
 			//LISTENERS
+/*			
+			views = [this.headerView, this.lightMeterView, this.gps_bearingView, this.gps_coordsView, this.gps_accuracyView, this.pressureAltitudeView, ];
+			
+			_.each(views, function(view) {
+				this.listenTo(view.model, 'change', function() {
+					view.$el.append(view.render().el);
+				});
+			}, this);
 
+*/
 			this.listenTo(this.headerView.model, 'change', function() {
 				this.headerView.$el.append(this.headerView.render().el);
 			});
@@ -222,6 +247,7 @@ jQuery(document).ready(function($) {
 				this.pressureAltitudeView.$el.append(this.pressureAltitudeView.render().el);
 			});
 
+
 		},
 	});
 
@@ -233,4 +259,36 @@ jQuery(document).ready(function($) {
 		console.log(foo);
 	}
 });
+
+/*
+think about these:
+
+http://localhost:8888/GPSAccuracy/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/Accelerometer/4c20d05a772723f1b5e97166ca1f3709/
+//acc_x, acc_y, acc_z
+http://localhost:8888/DocumentWrapper/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/PitchRollAzimuth/f76f260fb500ac1a58e0c35c97d5361e/
+//pitch, roll, azimuth, plus all 3 corrected
+http://localhost:8888/VisibleWifiNetworks/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/j3mheader/4c20d05a772723f1b5e97166ca1f3709/
+
+
+http://localhost:8888/GPSAccuracy/f76f260fb500ac1a58e0c35c97d5361e/
+http://localhost:8888/GPSCoords/f76f260fb500ac1a58e0c35c97d5361e/
+
+
+http://localhost:8888/GPSAccuracy/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/GPSBearing/4c20d05a772723f1b5e97166ca1f3709/
+gps_bearing
+http://localhost:8888/GPSCoords/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/lightMeter/f76f260fb500ac1a58e0c35c97d5361e/
+
+http://localhost:8888/GPSAccuracy/f76f260fb500ac1a58e0c35c97d5361e/
+
+http://localhost:8888/lightMeter/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/pressureAltitude/4c20d05a772723f1b5e97166ca1f3709/
+*/
 
