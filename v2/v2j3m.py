@@ -3,6 +3,7 @@ from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient
 from conf import  DEBUG, buildServerURL
+from operator import itemgetter
 
 @gen.coroutine
 def getJ3mDoc(self,param):
@@ -29,7 +30,7 @@ def getTimeValues(self,j3mDoc,valueKey):
             value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
             values.insert(int(element['timestamp']),value)
         except KeyError: pass
-    return values
+    return sorted(values, key=itemgetter('timestamp'))
     
 
 class J3MRetrieveHandler(tornado.web.RequestHandler):
@@ -175,7 +176,7 @@ class VisibleWifiNetworksHandler(tornado.web.RequestHandler):
                         wifi['timestamp'] = element['timestamp']
                         values.insert(int(element['timestamp']),wifi)
                 except KeyError: pass    
-            self.write(json_encode(values))
+            self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
         except Exception, e:
             self.write('No Document found')  
@@ -221,7 +222,7 @@ class AccelerometerHandler(tornado.web.RequestHandler):
                         
                         values.insert(int(element['timestamp']),value)
                     except KeyError: pass
-                self.write(json_encode(values))
+                self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
             except Exception, e:
                 self.write('No Document found')  
@@ -254,7 +255,7 @@ class PitchRollAzimuthHandler(tornado.web.RequestHandler):
                         
                         values.insert(int(element['timestamp']),value)
                     except KeyError: pass
-                self.write(json_encode(values))
+                self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
             except Exception, e:
                 self.write('No Document found')  
