@@ -137,7 +137,12 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
             try:
                 j3m = yield getJ3mDoc(self,param)
                 j3mDoc = json_decode(j3m)
-                self.write(json_encode(getTimeValues(self,j3mDoc,"gps_coords")))
+                vals = getTimeValues(self,j3mDoc,"gps_coords")
+                for element in vals:
+                    element['gps_lat'] = element['gps_coords'][0]
+                    element['gps_long'] = element['gps_coords'][1]
+                    del element['gps_coords']
+                self.write(json_encode(vals))
                 
             except Exception, e:
                 self.write('No Document found')  
