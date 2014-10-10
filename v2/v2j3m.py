@@ -3,6 +3,7 @@ from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient
 from conf import  DEBUG, buildServerURL
+from operator import itemgetter
 
 @gen.coroutine
 def getJ3mDoc(self,param):
@@ -29,7 +30,7 @@ def getTimeValues(self,j3mDoc,valueKey):
             value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
             values.insert(int(element['timestamp']),value)
         except KeyError: pass
-    return values
+    return sorted(values, key=itemgetter('timestamp'))
     
 
 class J3MRetrieveHandler(tornado.web.RequestHandler):
@@ -136,7 +137,12 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
             try:
                 j3m = yield getJ3mDoc(self,param)
                 j3mDoc = json_decode(j3m)
-                self.write(json_encode(getTimeValues(self,j3mDoc,"gps_coords")))
+                vals = getTimeValues(self,j3mDoc,"gps_coords")
+                for element in vals:
+                    element['gps_lat'] = element['gps_coords'][0]
+                    element['gps_long'] = element['gps_coords'][1]
+                    del element['gps_coords']
+                self.write(json_encode(vals))
                 
             except Exception, e:
                 self.write('No Document found')  
@@ -175,7 +181,7 @@ class VisibleWifiNetworksHandler(tornado.web.RequestHandler):
                         wifi['timestamp'] = element['timestamp']
                         values.insert(int(element['timestamp']),wifi)
                 except KeyError: pass    
-            self.write(json_encode(values))
+            self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
         except Exception, e:
             self.write('No Document found')  
@@ -221,7 +227,7 @@ class AccelerometerHandler(tornado.web.RequestHandler):
                         
                         values.insert(int(element['timestamp']),value)
                     except KeyError: pass
-                self.write(json_encode(values))
+                self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
             except Exception, e:
                 self.write('No Document found')  
@@ -254,7 +260,7 @@ class PitchRollAzimuthHandler(tornado.web.RequestHandler):
                         
                         values.insert(int(element['timestamp']),value)
                     except KeyError: pass
-                self.write(json_encode(values))
+                self.write(json_encode(sorted(values, key=itemgetter('timestamp'))))
                 
             except Exception, e:
                 self.write('No Document found')  
