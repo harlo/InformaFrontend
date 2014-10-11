@@ -5,7 +5,7 @@ from time import sleep
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
 
-from v2.v2j3m import J3MHeaderHandler, J3MRetrieveHandler, LightMeterHandler
+from v2.v2j3m import *
 from conf import INFORMA_BASE_DIR, INFORMA_CONF_ROOT, DEBUG, WEB_TITLE, buildServerURL
 
 class InformaFrontend(UnveillanceFrontend):
@@ -20,6 +20,15 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/leaflet/(.*)", self.LeafletHandler),
 			(r"/j3mheader/(.*)", J3MHeaderHandler),
 			(r"/lightMeter/(.*)", LightMeterHandler),
+			(r"/pressureHPAOrMBAR/(.*)", pressureHPAOrMBARHandler),
+			(r"/pressureAltitude/(.*)", pressureAltitudeHandler),
+			(r"/GPSBearing/(.*)", GPSBearingHandler),
+			(r"/GPSCoords/(.*)", GPSCoordsHandler),
+			(r"/GPSAccuracy/(.*)", GPSAccuracyHandler),
+			(r"/Accelerometer/(.*)", AccelerometerHandler),
+			(r"/DocumentWrapper/(.*)", DocumentWrapperHandler),
+			(r"/PitchRollAzimuth/(.*)", PitchRollAzimuthHandler),
+			(r"/VisibleWifiNetworks/(.*)", VisibleWifiNetworksHandler),
 			(r"/j3mretrieve/(.*)", J3MRetrieveHandler)])
 		
 		self.default_on_loads.extend([
