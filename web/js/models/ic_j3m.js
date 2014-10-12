@@ -36,6 +36,7 @@ jQuery(document).ready(function($) {
 		template: getTemplate("j3m_header.html"),
 		render: function() {
 			json = this.model.toJSON().data;
+			json.URL = document.URL;
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
@@ -214,9 +215,6 @@ jQuery(document).ready(function($) {
 		},
 	});
 
-	app.docid = /submission\/([a-z0-9]{32})\//.exec(window.location)[1];
-	new app.InformaCamJ3MAppView;
-	
 
 	function $c(foo) {
 		console.log(foo);
