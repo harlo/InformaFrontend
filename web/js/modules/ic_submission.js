@@ -19,6 +19,10 @@ jQuery(document).ready(function($) {
 
 	});
 	
+	app.docid = /submission\/([a-z0-9]{32})\//.exec(window.location)[1];
+	new app.InformaCamJ3MAppView;
+	
+
 	$(function() {
 		try {
 			updateConf();
