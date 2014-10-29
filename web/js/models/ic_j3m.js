@@ -62,16 +62,27 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 		},
 		render: function() {
-			var map = L.map(this.$el.attr('id')).setView([51.505, -0.09], 13);
-			this.$el.css({height:'300px'});
+			json = {values: this.model.get("values")};
+			$c(json);
+			//These are switched, I think!
+			lat = json.values[0].gps_long;
+			long = json.values[0].gps_lat;
+			this.$el.css({height:'400px'});
+			var map = L.map(this.$el.attr('id')).setView([lat,long], 20);
 
 			L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-				maxZoom: 18,
+				maxZoom: 20,
 				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 				id: 'examples.map-i875mjb7'
 			}).addTo(map);
+			
+			_.each(json.values, function(latlong) {
+				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
+				L.marker([latlong.gps_long,latlong.gps_lat]).addTo(map)
+				.bindPopup(timestamp.toString());
+			});
 
 
 			return this;
