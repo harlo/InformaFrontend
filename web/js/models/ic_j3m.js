@@ -58,6 +58,26 @@ jQuery(document).ready(function($) {
 		},
 	});
 
+	app.InformaCamJ3MTimeseriesMapView = Backbone.View.extend({
+		initialize: function(options) {
+		},
+		render: function() {
+			var map = L.map(this.$el.attr('id')).setView([51.505, -0.09], 13);
+			this.$el.css({height:'300px'});
+
+			L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				id: 'examples.map-i875mjb7'
+			}).addTo(map);
+
+
+			return this;
+		},
+	});
+
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
 			this.key = options.key;
@@ -173,7 +193,7 @@ jQuery(document).ready(function($) {
 				header: 'GPS Bearing',
 			});
 			
-			this.gps_coordsView = new app.InformaCamJ3MTimeStampedDataView({
+			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/GPSCoords',
 					id: app.docid
