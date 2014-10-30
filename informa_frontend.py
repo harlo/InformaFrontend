@@ -121,7 +121,7 @@ class InformaFrontend(UnveillanceFrontend):
 	class LeafletHandler(tornado.web.RequestHandler):
 		@tornado.web.asynchronous
 		def get(self, uri):
-			r = requests.get("http://cdn.leafletjs.com/leaflet-0.6.4/%s" % uri)
+			r = requests.get("http://cdn.leafletjs.com/leaflet-0.7.3/%s" % uri)
 			self.finish(r.content)
 			
 	class ICTDHandler(tornado.web.RequestHandler):
