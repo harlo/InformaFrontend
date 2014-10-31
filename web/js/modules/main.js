@@ -8,7 +8,7 @@ function onConfLoaded() {
 	try {
 		documents = new InformaCamDocumentBrowser(_.extend(
 			doInnerAjax("documents", "post", 
-				{ mime_type : "[" + UV.DEFAULT_MIME_TYPES.join() + "]" }, null, false),
+				{ mime_type : "[" + UV.DEFAULT_MIME_TYPES.join() + "]", doc_type : "uv_document" }, null, false),
 			{ root_el : $("#ic_document_browser") }));
 
 		if(documents.get('result') != 200) {
