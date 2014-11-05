@@ -47,21 +47,6 @@ jQuery(document).ready(function($) {
 		},
 	});
 
-	//abstracted class for arrays of 2-tuples, one of which is a timestamp
-	app.InformaCamJ3MTimeStampedDataView = Backbone.View.extend({
-		initialize: function(options) {
-			this.template = options.template;
-			this.xLabel = options.xLabel;
-			this.yLabel = options.yLabel;
-		},
-		render: function() {
-			json = {values: this.model.get("values")};
-			html = Mustache.to_html(this.template, json);
-			this.$el.html(html);
-			return this;
-		},
-	});
-
 	app.InformaCamJ3MTimeseriesMapView = Backbone.View.extend({
 		initialize: function(options) {
 			this.maps = [];
@@ -86,7 +71,6 @@ jQuery(document).ready(function($) {
 			
 			if (values.length > 1) {
 				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
-				$c(latlngs);
 				L.polyline(latlngs, {color: 'red', weight:2}).addTo(this.maps[mapID]);
 				var myIcon = L.icon({
 					iconUrl: '/web/images/ic_map_icon.png',
@@ -109,15 +93,31 @@ jQuery(document).ready(function($) {
 		},
 	});
 
+	//abstracted class for arrays of 2-tuples, one of which is a timestamp
+	app.InformaCamJ3MTimeStampedDataView = Backbone.View.extend({
+		initialize: function(options) {
+			this.template = options.template;
+			this.xLabel = options.xLabel;
+			this.yLabel = options.yLabel;
+		},
+		render: function() {
+			json = {values: this.model.get("values")};
+			$c(this.model.get("values"));
+			html = Mustache.to_html(this.template, json);
+			this.$el.html(html);
+			return this;
+		},
+	});
+
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
-			this.key = options.key;
+			this.keys = options.keys;
 			this.header = options.header;
 		},
 		render: function() {
 			this.$el.prepend('<h2>' + this.header + '</h2>');
 			var data = this.model.get("values");
-			var key = this.key;
+			var key = this.keys[0];
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
 			width = totalWidth - margin.left - margin.right,
@@ -137,12 +137,21 @@ jQuery(document).ready(function($) {
 			var yAxis = d3.svg.axis()
 				.scale(y)
 				.orient("left");
+/*
+			_.each(this.keys, function(key) {
+				this.lines.push(
+					d3.svg.line()
+					.interpolate("basis")
+					.x(function(d) { return x(d.timestamp); })
+					.y(function(d) { return y(d[key]); })
+				);
+			}, this);
 
 			var line = d3.svg.line()
 				.interpolate("basis")
 				.x(function(d) { return x(d.timestamp); })
 				.y(function(d) { return y(d[key]); });
-
+*/
 			var svg = d3.select(this.el).append("svg")
 				.attr({width: totalWidth,
 				height:totalHeight,
@@ -172,10 +181,17 @@ jQuery(document).ready(function($) {
 				.style("text-anchor", "end")
 				.text(this.yLabel);
 
-			svg.append("path")
-				.datum(data)
-				.attr("class", "line")
-				.attr("d", line);
+			_.each(this.keys, function(key) {
+				var line = d3.svg.line()
+					.interpolate("basis")
+					.x(function(d) { return x(d.timestamp); })
+					.y(function(d) { return y(d[key]); });
+					
+				svg.append("path")
+					.datum(data)
+					.attr("class", "line")
+					.attr("d", line);
+			}, this);
 				
 				scaleGraphs();
 
@@ -200,7 +216,7 @@ jQuery(document).ready(function($) {
 					id: app.docid,
 				}),
 				el: '#ic_lightMeterValue_view_holder',
-				key: 'lightMeterValue',
+				keys: ['lightMeterValue'],
 				header: 'Light Meter',
 			});
 			
@@ -210,7 +226,7 @@ jQuery(document).ready(function($) {
 					id: app.docid,
 				}),
 				el: '#ic_gps_accuracy_view_holder',
-				key: 'gps_accuracy',
+				keys: ['gps_accuracy'],
 				header: 'GPS Accuracy',
 			}); 
 
@@ -220,7 +236,7 @@ jQuery(document).ready(function($) {
 					id: app.docid,
 				}),
 				el: '#ic_gps_bearing_view_holder',
-				key: 'gps_bearing',
+				keys: ['gps_bearing'],
 				header: 'GPS Bearing',
 			});
 			
@@ -239,22 +255,24 @@ jQuery(document).ready(function($) {
 					id: app.docid
 				}),
 				el: '#ic_pressureAltitude_view_holder',
-				key: 'pressureAltitude',
+				keys: ['pressureAltitude'],
 				header: 'Pressure Alitude',
 			}); 
 
-			this.accelerometerView = new app.InformaCamJ3MTimeStampedDataView({
+			this.accelerometerView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/Accelerometer',
-					id: app.docid
+					id: app.docid,
 				}),
 				el: '#ic_accelerometer_view_holder',
-				template: getTemplate("j3m_accelerometer.html"),
-			}); 
-		
+				keys: ['acc_x', 'acc_y', ],
+				header: 'Accelerometer',
+			});
+
 			//LISTENERS
 			
-			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
+//			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
+			views = [this.accelerometerView, ];
 			
 			_.each(views, function(view) {
 				this.listenTo(view.model, 'change', function() {
