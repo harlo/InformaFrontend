@@ -37,8 +37,12 @@ jQuery(document).ready(function($) {
 		render: function() {
 			json = this.model.toJSON().data;
 			json.URL = document.URL;
+			json.genealogy.dateFormatted = moment(Number(json.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss")
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
+			$('#submission_permalink').click(function() {
+				this.select();
+			});
 			return this;
 		},
 	});
