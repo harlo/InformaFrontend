@@ -29,22 +29,14 @@ jQuery(document).ready(function($) {
 		},
 	});
 
-
-	app.InformaCamJ3MTimeStampedCollection = Backbone.Collection.extend({
-		initialize: function() {
-		}
-	});
-	
 	/* BACKBONE VIEWS */
 
 	app.InformaCamJ3MHeaderView = Backbone.View.extend({
 		el: $('#ic_j3mheader_view_holder'),
 		template: getTemplate("j3m_header.html"),
-		initialize: function() {
-			this.model.fetch();
-		},
 		render: function() {
 			json = this.model.toJSON().data;
+			json.URL = document.URL;
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
@@ -57,7 +49,6 @@ jQuery(document).ready(function($) {
 			this.template = options.template;
 			this.xLabel = options.xLabel;
 			this.yLabel = options.yLabel;
-			this.model.fetch();
 		},
 		render: function() {
 			json = {values: this.model.get("values")};
@@ -69,7 +60,6 @@ jQuery(document).ready(function($) {
 
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
-			this.model.fetch();
 			this.key = options.key;
 			this.header = options.header;
 		},
@@ -163,6 +153,16 @@ jQuery(document).ready(function($) {
 				header: 'Light Meter',
 			});
 			
+			this.gps_accuracyView = new app.InformaCamJ3MLineChart({
+				model: new app.InformaCamJ3MTimeStampedData({
+					urlRoot: '/GPSAccuracy',
+					id: app.docid,
+				}),
+				el: '#ic_gps_accuracy_view_holder',
+				key: 'gps_accuracy',
+				header: 'GPS Accuracy',
+			}); 
+
 			this.gps_bearingView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/GPSBearing',
@@ -173,15 +173,14 @@ jQuery(document).ready(function($) {
 				header: 'GPS Bearing',
 			});
 			
-			this.gps_accuracyView = new app.InformaCamJ3MLineChart({
+			this.gps_coordsView = new app.InformaCamJ3MTimeStampedDataView({
 				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSAccuracy',
-					id: app.docid,
+					urlRoot: '/GPSCoords',
+					id: app.docid
 				}),
-				el: '#ic_gps_accuracy_view_holder',
-				key: 'gps_accuracy',
-				header: 'GPS Accuracy',
-			}); 
+				el: '#ic_gps_coords_view_holder',
+				template: getTemplate("j3m_gps_coords.html"),
+			}); 			
 
 			this.pressureAltitudeView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
@@ -193,16 +192,6 @@ jQuery(document).ready(function($) {
 				header: 'Pressure Alitude',
 			}); 
 
-			this.gps_coordsView = new app.InformaCamJ3MTimeStampedDataView({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSCoords',
-					id: app.docid
-				}),
-				el: '#ic_gps_coords_view_holder',
-				template: getTemplate("j3m_gps_coords.html"),
-			}); 
-			
-
 			this.accelerometerView = new app.InformaCamJ3MTimeStampedDataView({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/Accelerometer',
@@ -211,49 +200,21 @@ jQuery(document).ready(function($) {
 				el: '#ic_accelerometer_view_holder',
 				template: getTemplate("j3m_accelerometer.html"),
 			}); 
-			
+		
 			//LISTENERS
-/*			
-			views = [this.headerView, this.lightMeterView, this.gps_bearingView, this.gps_coordsView, this.gps_accuracyView, this.pressureAltitudeView, ];
+			
+			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
 			
 			_.each(views, function(view) {
 				this.listenTo(view.model, 'change', function() {
 					view.$el.append(view.render().el);
 				});
+				view.model.fetch();
 			}, this);
-
-*/
-			this.listenTo(this.headerView.model, 'change', function() {
-				this.headerView.$el.append(this.headerView.render().el);
-			});
-
-			this.listenTo(this.lightMeterView.model, 'change', function() {
-				this.lightMeterView.$el.append(this.lightMeterView.render().el);
-			});
-
-			this.listenTo(this.gps_bearingView.model, 'change', function() {
-				this.gps_bearingView.$el.append(this.gps_bearingView.render().el);
-			});
-
-			this.listenTo(this.gps_coordsView.model, 'change', function() {
-				this.gps_coordsView.$el.append(this.gps_coordsView.render().el);
-			});
-
-			this.listenTo(this.gps_accuracyView.model, 'change', function() {
-				this.gps_accuracyView.$el.append(this.gps_accuracyView.render().el);
-			});
-
-			this.listenTo(this.pressureAltitudeView.model, 'change', function() {
-				this.pressureAltitudeView.$el.append(this.pressureAltitudeView.render().el);
-			});
-
 
 		},
 	});
 
-	app.docid = /submission\/([a-z0-9]{32})\//.exec(window.location)[1];
-	new app.InformaCamJ3MAppView;
-	
 
 	function $c(foo) {
 		console.log(foo);
