@@ -117,6 +117,7 @@ jQuery(document).ready(function($) {
 		render: function() {
 			this.$el.prepend('<h2>' + this.header + '</h2>');
 			var data = this.model.get("values");
+			$c(data);
 			var key = this.keys[0];
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
@@ -137,21 +138,7 @@ jQuery(document).ready(function($) {
 			var yAxis = d3.svg.axis()
 				.scale(y)
 				.orient("left");
-/*
-			_.each(this.keys, function(key) {
-				this.lines.push(
-					d3.svg.line()
-					.interpolate("basis")
-					.x(function(d) { return x(d.timestamp); })
-					.y(function(d) { return y(d[key]); })
-				);
-			}, this);
 
-			var line = d3.svg.line()
-				.interpolate("basis")
-				.x(function(d) { return x(d.timestamp); })
-				.y(function(d) { return y(d[key]); });
-*/
 			var svg = d3.select(this.el).append("svg")
 				.attr({width: totalWidth,
 				height:totalHeight,
@@ -160,10 +147,17 @@ jQuery(document).ready(function($) {
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-			if (d3.min(data, function(d) { return d[key]; }) < 0) {
-				y.domain(d3.extent(data, function(d) { return d[key]; }));
+			
+			//lump all Y vals into one array for determining domain
+			this.allYVals = [];
+			_.each(this.keys, function(key) {
+				this.allYVals = this.allYVals.concat(_.pluck(data, key));
+			}, this);
+
+			if (d3.min(this.allYVals) < 0) {
+				y.domain(d3.extent(this.allYVals));
 			} else {
-				y.domain([0, d3.max(data, function(d) { return d[key]; })]);
+				y.domain([0, d3.max(this.allYVals)]);
 			}
 
 			svg.append("g")
@@ -265,14 +259,13 @@ jQuery(document).ready(function($) {
 					id: app.docid,
 				}),
 				el: '#ic_accelerometer_view_holder',
-				keys: ['acc_x', 'acc_y', ],
+				keys: ['acc_x', 'acc_y', 'acc_z', ],
 				header: 'Accelerometer',
 			});
 
 			//LISTENERS
 			
-//			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
-			views = [this.accelerometerView, ];
+			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
 			
 			_.each(views, function(view) {
 				this.listenTo(view.model, 'change', function() {
