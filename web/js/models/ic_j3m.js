@@ -1,14 +1,6 @@
 var app = app || {};//global Backbone
 
 jQuery(document).ready(function($) {
-
-	//do we still need this?
-	app.InformaCamJ3M = Backbone.Model.extend({
-		constructor: function() {
-			Backbone.Model.apply(this, arguments);
-		},
-	});
-
 	/* BACKBONE MODELS */
 
 	app.InformaCamJ3MHeader = Backbone.Model.extend({
@@ -93,22 +85,6 @@ jQuery(document).ready(function($) {
 		},
 	});
 
-	//abstracted class for arrays of 2-tuples, one of which is a timestamp
-	app.InformaCamJ3MTimeStampedDataView = Backbone.View.extend({
-		initialize: function(options) {
-			this.template = options.template;
-			this.xLabel = options.xLabel;
-			this.yLabel = options.yLabel;
-		},
-		render: function() {
-			json = {values: this.model.get("values")};
-			$c(this.model.get("values"));
-			html = Mustache.to_html(this.template, json);
-			this.$el.html(html);
-			return this;
-		},
-	});
-
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
 			this.keys = options.keys;
@@ -117,12 +93,16 @@ jQuery(document).ready(function($) {
 		render: function() {
 			this.$el.prepend('<h2>' + this.header + '</h2>');
 			var data = this.model.get("values");
-			$c(data);
-			var key = this.keys[0];
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
 			width = totalWidth - margin.left - margin.right,
 			height = totalHeight - margin.top - margin.bottom;
+
+			//lump all Y vals into one array for determining domain
+			this.allYVals = [];
+			_.each(this.keys, function(key) {
+				this.allYVals = this.allYVals.concat(_.pluck(data, key));
+			}, this);
 
 			var x = d3.time.scale()
 				.range([0, width]);
@@ -148,12 +128,6 @@ jQuery(document).ready(function($) {
 
 			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
 			
-			//lump all Y vals into one array for determining domain
-			this.allYVals = [];
-			_.each(this.keys, function(key) {
-				this.allYVals = this.allYVals.concat(_.pluck(data, key));
-			}, this);
-
 			if (d3.min(this.allYVals) < 0) {
 				y.domain(d3.extent(this.allYVals));
 			} else {
@@ -183,7 +157,7 @@ jQuery(document).ready(function($) {
 					
 				svg.append("path")
 					.datum(data)
-					.attr("class", "line")
+					.attr("class", "line " + key)
 					.attr("d", line);
 			}, this);
 				
@@ -234,15 +208,6 @@ jQuery(document).ready(function($) {
 				header: 'GPS Bearing',
 			});
 			
-			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSCoords',
-					id: app.docid
-				}),
-				el: '#ic_gps_coords_view_holder',
-				header: 'GPS Coordinates',
-			}); 			
-
 			this.pressureAltitudeView = new app.InformaCamJ3MLineChart({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/pressureAltitude',
@@ -250,7 +215,7 @@ jQuery(document).ready(function($) {
 				}),
 				el: '#ic_pressureAltitude_view_holder',
 				keys: ['pressureAltitude'],
-				header: 'Pressure Alitude',
+				header: 'Pressure Altitude',
 			}); 
 
 			this.accelerometerView = new app.InformaCamJ3MLineChart({
@@ -262,6 +227,15 @@ jQuery(document).ready(function($) {
 				keys: ['acc_x', 'acc_y', 'acc_z', ],
 				header: 'Accelerometer',
 			});
+
+			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
+				model: new app.InformaCamJ3MTimeStampedData({
+					urlRoot: '/GPSCoords',
+					id: app.docid
+				}),
+				el: '#ic_gps_coords_view_holder',
+				header: 'GPS Coordinates',
+			}); 			
 
 			//LISTENERS
 			
