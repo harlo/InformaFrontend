@@ -58,13 +58,60 @@ jQuery(document).ready(function($) {
 		},
 	});
 
+	app.InformaCamJ3MTimeseriesMapView = Backbone.View.extend({
+		initialize: function(options) {
+			this.maps = [];
+			this.header = options.header;
+		},
+		render: function() {
+			this.$el.prepend('<h2>' + this.header + '</h2>');
+			this.json = {values: this.model.get("values")};
+			this.loadMap('mapOverview', [this.json.values[0]], 4);
+			this.loadMap('mapZoom', this.json.values, 19);
+
+			return this;
+		},
+		
+		loadMap: function(mapID, values, zoom) {
+			$('#' + mapID).addClass("rendered");
+			this.maps[mapID] = L.map(mapID).setView([values[0].gps_lat, values[0].gps_long], zoom);
+			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				maxZoom: 19,
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			}).addTo(this.maps[mapID]);
+			
+			if (values.length > 1) {
+				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
+				$c(latlngs);
+				L.polyline(latlngs, {color: 'red', weight:2}).addTo(this.maps[mapID]);
+				var myIcon = L.icon({
+					iconUrl: '/web/images/ic_map_icon.png',
+					iconRetinaUrl: '/web/images/ic_map_icon.png',
+					iconSize: [5, 5]
+        		});
+			} else {
+				var myIcon = L.icon({
+					iconUrl: '/web/images/ic_map_icon.png',
+					iconRetinaUrl: '/web/images/ic_map_icon.png',
+					iconSize: [18, 18]
+        		});
+			}
+
+			_.each(values, function(latlong) {
+				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
+				L.marker([latlong.gps_lat,latlong.gps_long]).setIcon(myIcon).addTo(this.maps[mapID])
+				.bindPopup(timestamp);
+			}, this);
+		},
+	});
+
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
 			this.key = options.key;
 			this.header = options.header;
 		},
 		render: function() {
-			this.$el.append('<h2>' + this.header + '</h2>');
+			this.$el.prepend('<h2>' + this.header + '</h2>');
 			var data = this.model.get("values");
 			var key = this.key;
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
@@ -173,13 +220,13 @@ jQuery(document).ready(function($) {
 				header: 'GPS Bearing',
 			});
 			
-			this.gps_coordsView = new app.InformaCamJ3MTimeStampedDataView({
+			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
 				model: new app.InformaCamJ3MTimeStampedData({
 					urlRoot: '/GPSCoords',
 					id: app.docid
 				}),
 				el: '#ic_gps_coords_view_holder',
-				template: getTemplate("j3m_gps_coords.html"),
+				header: 'GPS Coordinates',
 			}); 			
 
 			this.pressureAltitudeView = new app.InformaCamJ3MLineChart({
@@ -211,7 +258,7 @@ jQuery(document).ready(function($) {
 				});
 				view.model.fetch();
 			}, this);
-
+			
 		},
 	});
 
