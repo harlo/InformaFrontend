@@ -1,7 +1,8 @@
-var submission;
+//var submission;
 var app = app || {};//global Backbone
 
 jQuery(document).ready(function($) {
+/*
 	var source_sammy = $.sammy("#content", function() {
 		this.get(/submission\/([a-z0-9]{32})\//, function(context) {
 
@@ -18,7 +19,7 @@ jQuery(document).ready(function($) {
 		});
 
 	});
-	
+*/	
 	app.docid = /submission\/([a-z0-9]{32})\//.exec(window.location)[1];
 	new app.InformaCamJ3MAppView;
 	
