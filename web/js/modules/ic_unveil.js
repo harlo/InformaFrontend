@@ -14,7 +14,8 @@ function onReindexRequested(el, task_path) {
 }
 
 function onAssetRequested(file_name) {
-
+	setRawAsset($("#uv_document_asset_viewer"),
+		[".data", document_browser.get('data')._id, file_name].join('/'));
 }
 
 (function($) {
