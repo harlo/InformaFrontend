@@ -84,6 +84,12 @@ jQuery(document).ready(function($) {
 			}, this);
 		},
 	});
+	
+	app.InformaCamJ3MLineChartMultiView = Backbone.View.extend({
+		initialize: function(options) {
+		},
+	});
+
 
 	app.InformaCamJ3MLineChart = Backbone.View.extend({
 		initialize: function(options) {
@@ -235,7 +241,29 @@ jQuery(document).ready(function($) {
 				}),
 				el: '#ic_gps_coords_view_holder',
 				header: 'GPS Coordinates',
-			}); 			
+			});
+			
+
+			/* MULTI-VIEW LINE CHART */	
+					//http://stackoverflow.com/questions/7385629/backbone-js-complex-views-combining-multiple-models
+			var lineChartMultiModel = new Backbone.Model();
+			var gps_coords = new app.InformaCamJ3MTimeStampedData({
+				urlRoot: '/GPSCoords',
+				id: app.docid
+			});
+			
+			var accelerometer = new app.InformaCamJ3MTimeStampedData({
+				urlRoot: '/Accelerometer',
+				id: app.docid
+			});
+			
+			lineChartMultiModel.set({gps_coords: gps_coords, accelerometer: accelerometer});
+			
+			this.lineChartMultiView = new app.InformaCamJ3MLineChartMultiView({
+				model: lineChartMultiModel,
+			});	
+			/* END MULTI-VIEW LINE CHART */	
+
 
 			//LISTENERS
 			
