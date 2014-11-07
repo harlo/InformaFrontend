@@ -87,7 +87,12 @@ jQuery(document).ready(function($) {
 	
 	app.InformaCamJ3MLineChartMultiView = Backbone.View.extend({
 		initialize: function(options) {
+			this.model.get('gps_coords').bind('change', this.render);
+			this.model.get('accelerometer').bind('change', this.render);
 		},
+		render: function() {
+			$c('renderink!');
+		}
 	});
 
 
@@ -262,6 +267,12 @@ jQuery(document).ready(function($) {
 			this.lineChartMultiView = new app.InformaCamJ3MLineChartMultiView({
 				model: lineChartMultiModel,
 			});	
+
+			lineChartMultiModel.get("gps_coords").fetch();
+			lineChartMultiModel.get("accelerometer").fetch();
+
+
+
 			/* END MULTI-VIEW LINE CHART */	
 
 
