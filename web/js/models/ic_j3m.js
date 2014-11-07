@@ -87,11 +87,13 @@ jQuery(document).ready(function($) {
 	
 	app.InformaCamJ3MLineChartMultiView = Backbone.View.extend({
 		initialize: function(options) {
-			this.model.get('gps_coords').bind('change', this.render);
-			this.model.get('accelerometer').bind('change', this.render);
+			this.model.get('gps_coords').bind('change', this.render, this);
+			this.model.get('accelerometer').bind('change', this.render, this);
 		},
-		render: function() {
+		render: function(model) {
+			var data = model.get("values");
 			$c('renderink!');
+			$c(data);
 		}
 	});
 
@@ -250,26 +252,23 @@ jQuery(document).ready(function($) {
 			
 
 			/* MULTI-VIEW LINE CHART */	
-					//http://stackoverflow.com/questions/7385629/backbone-js-complex-views-combining-multiple-models
-			var lineChartMultiModel = new Backbone.Model();
-			var gps_coords = new app.InformaCamJ3MTimeStampedData({
-				urlRoot: '/GPSCoords',
-				id: app.docid
-			});
-			
-			var accelerometer = new app.InformaCamJ3MTimeStampedData({
-				urlRoot: '/Accelerometer',
-				id: app.docid
-			});
-			
-			lineChartMultiModel.set({gps_coords: gps_coords, accelerometer: accelerometer});
-			
+					// http://stackoverflow.com/questions/7385629/backbone-js-complex-views-combining-multiple-models
+					// http://stackoverflow.com/questions/7734559/backbone-js-passing-2-models-to-1-view
 			this.lineChartMultiView = new app.InformaCamJ3MLineChartMultiView({
-				model: lineChartMultiModel,
+				model: new Backbone.Model({
+					accelerometer: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/Accelerometer',
+						id: app.docid
+					}),
+					gps_coords: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/GPSCoords',
+						id: app.docid
+					}),
+				}),
 			});	
 
-			lineChartMultiModel.get("gps_coords").fetch();
-			lineChartMultiModel.get("accelerometer").fetch();
+			this.lineChartMultiView.model.get("gps_coords").fetch();
+			this.lineChartMultiView.model.get("accelerometer").fetch();
 
 
 
