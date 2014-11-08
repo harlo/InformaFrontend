@@ -87,25 +87,16 @@ jQuery(document).ready(function($) {
 	
 	app.InformaCamJ3MLineChartMultiView = Backbone.View.extend({
 		initialize: function(options) {
-			this.model.get('gps_coords').bind('change', this.render, this);
-			this.model.get('accelerometer').bind('change', this.render, this);
+			this.model.get('pressureAltitude').bind('change', this.render, this);
+			this.model.get('lightMeter').bind('change', this.render, this);
+			this.model.get('GPSAccuracy').bind('change', this.render, this);
+			this.model.get('GPSBearing').bind('change', this.render, this);
+			this.model.get('Accelerometer').bind('change', this.render, this);
+			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
 		},
 		render: function(model) {
 			var data = model.get("values");
-			$c('renderink!');
-			$c(data);
-		}
-	});
-
-
-	app.InformaCamJ3MLineChart = Backbone.View.extend({
-		initialize: function(options) {
-			this.keys = options.keys;
-			this.header = options.header;
-		},
-		render: function() {
-			this.$el.prepend('<h2>' + this.header + '</h2>');
-			var data = this.model.get("values");
+			
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
 			width = totalWidth - margin.left - margin.right,
@@ -113,7 +104,7 @@ jQuery(document).ready(function($) {
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
-			_.each(this.keys, function(key) {
+			_.each(model.get("keys"), function(key) {
 				this.allYVals = this.allYVals.concat(_.pluck(data, key));
 			}, this);
 
@@ -140,17 +131,19 @@ jQuery(document).ready(function($) {
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-			
+		
 			if (d3.min(this.allYVals) < 0) {
 				y.domain(d3.extent(this.allYVals));
 			} else {
 				y.domain([0, d3.max(this.allYVals)]);
 			}
 
-			svg.append("g")
-				.attr("class", "x axis")
-				.attr("transform", "translate(0," + height + ")")
-				.call(xAxis);
+			if (this.$el.find('svg').length == 1) {
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + height + ")")
+					.call(xAxis);
+			}
 
 			svg.append("g")
 				.attr("class", "y axis")
@@ -162,7 +155,7 @@ jQuery(document).ready(function($) {
 				.style("text-anchor", "end")
 				.text(this.yLabel);
 
-			_.each(this.keys, function(key) {
+			_.each(model.get("keys"), function(key) {
 				var line = d3.svg.line()
 					.interpolate("basis")
 					.x(function(d) { return x(d.timestamp); })
@@ -172,15 +165,15 @@ jQuery(document).ready(function($) {
 					.datum(data)
 					.attr("class", "line " + key)
 					.attr("d", line);
-			}, this);
-				
-				scaleGraphs();
+			}, model);
 
+			scaleGraphs();
+			
 			return this;
 		},
-		
-		
 	});
+
+
 
 	app.InformaCamJ3MAppView = Backbone.View.extend({
 		el: '#ic_submission_view_holder',
@@ -189,56 +182,6 @@ jQuery(document).ready(function($) {
 				model: new app.InformaCamJ3MHeader({
 					id: app.docid
 				})
-			});
-
-			this.lightMeterView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/lightMeter',
-					id: app.docid,
-				}),
-				el: '#ic_lightMeterValue_view_holder',
-				keys: ['lightMeterValue'],
-				header: 'Light Meter',
-			});
-			
-			this.gps_accuracyView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSAccuracy',
-					id: app.docid,
-				}),
-				el: '#ic_gps_accuracy_view_holder',
-				keys: ['gps_accuracy'],
-				header: 'GPS Accuracy',
-			}); 
-
-			this.gps_bearingView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSBearing',
-					id: app.docid,
-				}),
-				el: '#ic_gps_bearing_view_holder',
-				keys: ['gps_bearing'],
-				header: 'GPS Bearing',
-			});
-			
-			this.pressureAltitudeView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/pressureAltitude',
-					id: app.docid
-				}),
-				el: '#ic_pressureAltitude_view_holder',
-				keys: ['pressureAltitude'],
-				header: 'Pressure Altitude',
-			}); 
-
-			this.accelerometerView = new app.InformaCamJ3MLineChart({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/Accelerometer',
-					id: app.docid,
-				}),
-				el: '#ic_accelerometer_view_holder',
-				keys: ['acc_x', 'acc_y', 'acc_z', ],
-				header: 'Accelerometer',
 			});
 
 			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
@@ -256,19 +199,52 @@ jQuery(document).ready(function($) {
 					// http://stackoverflow.com/questions/7734559/backbone-js-passing-2-models-to-1-view
 			this.lineChartMultiView = new app.InformaCamJ3MLineChartMultiView({
 				model: new Backbone.Model({
-					accelerometer: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/Accelerometer',
-						id: app.docid
+					pressureAltitude: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/pressureAltitude',
+						id: app.docid,
+						title: 'Pressure Altitude',
+						keys: ['pressureAltitude'],
 					}),
-					gps_coords: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/GPSCoords',
-						id: app.docid
+					lightMeter: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/lightMeter',
+						id: app.docid,
+						title: 'Light Meter',
+						keys: ['lightMeterValue'],
+					}),
+					GPSAccuracy: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/GPSAccuracy',
+						id: app.docid,
+						title: 'GPS Accuracy',
+						keys: ['gps_accuracy'],
+					}),
+					GPSBearing: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/GPSBearing',
+						id: app.docid,
+						title: 'GPS Bearing',
+						keys: ['gps_bearing'],
+					}),
+					Accelerometer: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/Accelerometer',
+						id: app.docid,
+						title: 'Accelerometer',
+						keys: ['acc_x', 'acc_y', 'acc_z', ],
+					}),
+					pressureHPAOrMBAR: new app.InformaCamJ3MTimeStampedData({
+						urlRoot: '/pressureHPAOrMBAR',
+						id: app.docid,
+						title: 'pressureHPAOrMBAR',
+						keys: ['pressureHPAOrMBAR', ],
 					}),
 				}),
+				el: '#ic_linechart_view_holder',
 			});	
 
-			this.lineChartMultiView.model.get("gps_coords").fetch();
-			this.lineChartMultiView.model.get("accelerometer").fetch();
+			this.lineChartMultiView.model.get("pressureAltitude").fetch();
+			this.lineChartMultiView.model.get("lightMeter").fetch();
+			this.lineChartMultiView.model.get("GPSAccuracy").fetch();
+			this.lineChartMultiView.model.get("GPSBearing").fetch();
+			this.lineChartMultiView.model.get("Accelerometer").fetch();
+			this.lineChartMultiView.model.get("pressureHPAOrMBAR").fetch();
 
 
 
@@ -277,7 +253,7 @@ jQuery(document).ready(function($) {
 
 			//LISTENERS
 			
-			views = [this.headerView, this.lightMeterView, this.gps_accuracyView, this.gps_bearingView, this.gps_coordsView, this.pressureAltitudeView, this.accelerometerView, ];
+			views = [this.headerView, this.gps_coordsView, ];
 			
 			_.each(views, function(view) {
 				this.listenTo(view.model, 'change', function() {
@@ -325,5 +301,7 @@ http://localhost:8888/GPSAccuracy/f76f260fb500ac1a58e0c35c97d5361e/
 http://localhost:8888/lightMeter/4c20d05a772723f1b5e97166ca1f3709/
 
 http://localhost:8888/pressureAltitude/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/pressureHPAOrMBAR/4c20d05a772723f1b5e97166ca1f3709/
 */
 
