@@ -31,7 +31,7 @@ You may edit any of the directives to suit your needs, or add others that might 
 *	**api.port (int)**
 	The port the Frontend should run on
 
-*	**annex_local (str)
+*	**annex_local (str)**
 	The full path to your local folder (which should not exist beforehand!)
 
 *	**web_home_mime_types (list str)**
