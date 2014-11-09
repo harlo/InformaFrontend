@@ -25,13 +25,23 @@ You may edit any of the directives to suit your needs, or add others that might 
 
 *	ssh_root (str)
 	The full path to your SSH config
+
+*	api.port (int)
+	
+	The port the Frontend should run on
+
 *	web_home_mime_types (list str)
+
 	Home page will automatically query for documents matching these mime types
 
 ###### Annex-specific Directives
 
-*	server_host
+*	server_host (str)
 	The Annex server's hostname
+*	server_user (str)
+	The user to invoke via SSH when communicating to the server
+*	uv_uuid (str)
+	The shortcode for the server
 *	server_message_port (int)
 	The port the Annex Channel broadcast's on.  (It is assumed that the annex channel is on the same host as the Annex.)
 *	annex_remote (str)
