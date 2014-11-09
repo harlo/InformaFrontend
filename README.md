@@ -93,10 +93,10 @@ The annex channel will also send messages acknowledging the status of the connec
 
 #### Status Codes
 
-*	201 (Created) Task has been registered.
-*	302 (Found) Task is valid, and can start.
-*	404 (Not Found) Task is not registered; cannot start.
-*	200 (OK) Task completed; finishing.
-*	412 (Precondition Failed) Task failed; will finish in failed state.
-*	205 (Reset Content) Task persists, and will run again after the designated period.
-*	410 (Gone) Task deleted from task queue.
+*	**201 (Created)** Task has been registered.
+*	**302 (Found)** Task is valid, and can start.
+*	**404 (Not Found)** Task is not registered; cannot start.
+*	**200 (OK)** Task completed; finishing.
+*	**412 (Precondition Failed)** Task failed; will finish in failed state.
+*	**205 (Reset Content)** Task persists, and will run again after the designated period.
+*	**410 (Gone)** Task deleted from task queue.
