@@ -6,7 +6,7 @@
 	
 	`git submodule update --init --recursive`
 
-1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see *Configure* for more info) with `./setup.sh /path/to/config.json`.
+1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see _*Configure*_ for more info) with `./setup.sh /path/to/config.json`.
 1.	Follow the prompts.
 
 ## Configure
@@ -23,24 +23,22 @@ You may edit any of the directives to suit your needs, or add others that might 
 
 ###### Local Directives
 
-*	ssh_root (str)
+*	_ssh_root (str)_
 	The full path to your SSH config
 
-*	api.port (int)
-	
+*	_api.port (int)_
 	The port the Frontend should run on
 
-*	web_home_mime_types (list str)
-
+*	_web_home_mime_types (list str)_
 	Home page will automatically query for documents matching these mime types
 
 ###### Annex-specific Directives
 
-*	server_host (str)
+*	_server_host (str)_
 	The Annex server's hostname
-*	server_user (str)
+*	_server_user (str)_
 	The user to invoke via SSH when communicating to the server
-*	uv_uuid (str)
+*	_uv_uuid (str)_
 	The shortcode for the server
 *	server_message_port (int)
 	The port the Annex Channel broadcast's on.  (It is assumed that the annex channel is on the same host as the Annex.)
