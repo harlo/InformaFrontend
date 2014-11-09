@@ -1,4 +1,4 @@
-# InformaCam-Unveillance
+# InformaCam-UnveillanceFrontend
 
 ## Setup
 
@@ -17,6 +17,8 @@ If you have access to the corresponding Annex, create a config file like so:
 1.	`python unveillance_annex.py -config`
 1.	copy the output json object into a file of your choosing.
 
+If you don't have access, ask your administrator.
+
 You may edit any of the directives to suit your needs, or add others that might help with your specific setup using the following directives as your guide.
 
 #### Configuration Directives
@@ -26,26 +28,55 @@ You may edit any of the directives to suit your needs, or add others that might 
 *	**ssh_root (str)**
 	The full path to your SSH config
 
-*	_api.port (int)_
+*	**api.port (int)**
 	The port the Frontend should run on
 
-*	_web_home_mime_types (list str)_
+*	**annex_local (str)
+	The full path to your local folder (which should not exist beforehand!)
+
+*	**web_home_mime_types (list str)**
 	Home page will automatically query for documents matching these mime types
 
 ###### Annex-specific Directives
 
-*	_server_host (str)_
+*	**annex_admin_email (str)**
+	Email address for the Annex's administrator.
+
+*	**server_host (str)**
 	The Annex server's hostname
-*	_server_user (str)_
+
+*	**server_port (int)**
+	The Annex server's port
+
+*	**server_user (str)**
 	The user to invoke via SSH when communicating to the server
-*	_uv_uuid (str)_
+
+*	**uv_uuid (str)**
 	The shortcode for the server
-*	server_message_port (int)
-	The port the Annex Channel broadcast's on.  (It is assumed that the annex channel is on the same host as the Annex.)
-*	annex_remote (str)
+
+*	**annex_remote (str)**
 	The remote folder on the Annex server that holds submissions
 
+*	**annex_remote_port (int)**
+	The port the Annex uses SSH over (most likely 22, but some installations via Docker will necessarily be on other ports)
+
+*	**server_use_ssl (bool)**
+	Whether or not the server uses SSL
+
+*	**server_message_port (int)**
+	The port the Annex Channel broadcast's on.  (It is assumed that the annex channel is on the same host as the Annex.)
+
+*	**server_message_use_ssl (bool)**
+	Whether or not the Annex Channel broadcasts over SSL.  (If server_message_port is 443, this will default to True)
+
+###### Google Drive-specific Directives
+
+*	**gdrive_auth_no_ask (bool)**
+	Asks whether or not the Frontend should import documents from Google Drive.  Experimental.  Set it to True unless you know what you're doing.
+
 ## Messaging
+
+The Annex will broadcast the status of all tasks to connected web Frontend clients via websocket.
 
 #### Format
 
