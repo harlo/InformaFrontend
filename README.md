@@ -6,7 +6,7 @@
 	
 	`git submodule update --init --recursive`
 
-1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see _*Configure*_ for more info) with `./setup.sh /path/to/config.json`.
+1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see **Configure** for more info) with `./setup.sh /path/to/config.json`.
 1.	Follow the prompts.
 
 ## Configure
@@ -23,7 +23,7 @@ You may edit any of the directives to suit your needs, or add others that might 
 
 ###### Local Directives
 
-*	_ssh_root (str)_
+*	**ssh_root (str)**
 	The full path to your SSH config
 
 *	_api.port (int)_
