@@ -2,11 +2,12 @@
 
 ## Setup
 
-1.	After cloning this repo, pull down the necessary submodules with
+1.	After cloning this repo, `cd /path/to/InformaFrontend` and pull down the necessary submodules with
 	
 	`git submodule update --init --recursive`
 
-1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see Configure for more info) with `./setup.sh /path/to/config.json`.
+1.	Run `./setup.sh` or pre-configure the Frontend with a .json config file (see *Configure* for more info) with `./setup.sh /path/to/config.json`.
+1.	Follow the prompts.
 
 ## Configure
 
@@ -16,10 +17,25 @@ If you have access to the corresponding Annex, create a config file like so:
 1.	`python unveillance_annex.py -config`
 1.	copy the output json object into a file of your choosing.
 
-You may edit any of the directives to suit your needs, or add others that might help with your specific setup.
+You may edit any of the directives to suit your needs, or add others that might help with your specific setup using the following directives as your guide.
 
 #### Configuration Directives
- 
+
+###### Local Directives
+
+*	ssh_root (str)
+	The full path to your SSH config
+*	web_home_mime_types (list str)
+	Home page will automatically query for documents matching these mime types
+
+###### Annex-specific Directives
+
+*	server_host
+	The Annex server's hostname
+*	server_message_port (int)
+	The port the Annex Channel broadcast's on.  (It is assumed that the annex channel is on the same host as the Annex.)
+*	annex_remote (str)
+	The remote folder on the Annex server that holds submissions
 
 ## Messaging
 
