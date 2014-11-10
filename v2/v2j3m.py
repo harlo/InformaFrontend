@@ -100,7 +100,7 @@ class J3MRetrieveHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION (J3MRetrieveHandler)!', e
                 
             self.finish()
             self.flush()
@@ -117,7 +117,7 @@ class J3MHeaderHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION (J3MHeaderHandler)!', e
                 
             self.finish()
             self.flush()
@@ -134,7 +134,7 @@ class LightMeterHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (LightMeterHandler)', e
                 
             self.finish()
             self.flush()    
@@ -150,7 +150,7 @@ class pressureHPAOrMBARHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (pressureHPAOrMBARHandler)', e
                 
             self.finish()
             self.flush()    
@@ -166,7 +166,7 @@ class pressureAltitudeHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (pressureAltitudeHandler)', e
                 
             self.finish()
             self.flush()    
@@ -182,7 +182,7 @@ class GPSBearingHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (GPSBearingHandler)', e
                 
             self.finish()
             self.flush()    
@@ -203,7 +203,7 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (GPSCoordsHandler)', e
                 
             self.finish()
             self.flush()    
@@ -219,7 +219,7 @@ class GPSAccuracyHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (GPSAccuracyHandler)', e
                 
             self.finish()
             self.flush()    
@@ -242,7 +242,7 @@ class VisibleWifiNetworksHandler(tornado.web.RequestHandler):
                 
         except Exception, e:
             self.write('No Document found')  
-            print 'no Doc retrieved EXCEPTION!', e
+            print 'no Doc retrieved EXCEPTION (VisibleWifiNetworksHandler)!', e
                 
         self.finish()
         self.flush() 
@@ -256,7 +256,7 @@ class DocumentWrapperHandler (tornado.web.RequestHandler):
                  
         except Exception, e:
             self.write('No Document found')  
-            print 'no Doc retrieved EXCEPTION!', e
+            print 'no Doc retrieved EXCEPTION! (DocumentWrapperHandler)', e
                 
         self.finish()
         self.flush()   
@@ -284,7 +284,7 @@ class AccelerometerHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (AccelerometerHandler)', e
                 
             self.finish()
             self.flush()  
@@ -317,7 +317,7 @@ class PitchRollAzimuthHandler(tornado.web.RequestHandler):
                 
             except Exception, e:
                 self.write('No Document found')  
-                print 'no Doc retrieved EXCEPTION!', e
+                print 'no Doc retrieved EXCEPTION! (PitchRollAzimuthHandler)', e
                 
             self.finish()
             self.flush()  
