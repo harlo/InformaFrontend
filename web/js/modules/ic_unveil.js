@@ -5,10 +5,7 @@ function onConfLoaded() {
 function onReindexRequested(el, task_path) {
 	console.info("REINDEXING");
 	document_browser.reindex(function(json) {
-		json = JSON.parse(json.responseText);
-		console.info(json);
-
-		
+		json = JSON.parse(json.responseText);		
 	}, { _id : document_browser.get('data')._id });
 
 }
@@ -42,6 +39,7 @@ function onAssetRequested(file_name) {
 
 		if(initDocumentBrowser()) {
 			content_sammy.run();
+			$("#content").prepend(getTemplate('default_task_update.html'));
 		} else {
 			failOut($("#content"), "Sorry, could not find this document.");
 		}
