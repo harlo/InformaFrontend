@@ -101,8 +101,10 @@ jQuery(document).ready(function($) {
 			$("#" + div_id + "_check").change(function() {
 				if (this.checked) {
 					$('path.' + div_id).show();
+					$('g.y.axis.' + div_id).show();
 				} else {
 					$('path.' + div_id).hide();
+					$('g.y.axis.' + div_id).hide();
 				}
 			});
 			
@@ -155,7 +157,7 @@ jQuery(document).ready(function($) {
 			}
 
 			svg.append("g")
-				.attr("class", "y axis")
+				.attr("class", "y axis " + div_id)
 				.call(yAxis)
 				.append("text")
 				.attr("transform", "rotate(-90)")
