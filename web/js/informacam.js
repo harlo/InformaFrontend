@@ -1,3 +1,5 @@
+var annex_channel;
+
 function updateConf() {
 	var map_id = "harlo.ibn0kk8l";
 	var key = "23c00ae936704081ab019253c36a55b3";
@@ -94,6 +96,8 @@ function updateConf() {
 			}
 		]
 	};
+
+	annex_channel = new InformaCamNotifier();
 }
 
 function loadHeaderPopup(view, onSuccess) {

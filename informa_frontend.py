@@ -44,6 +44,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/lib/jquery.ui.menu.js',
 			'/web/js/lib/jquery.ui.autocomplete.js',
 			'/web/js/viz/uv_viz.js',
+			'/web/js/models/ic_notifier.js',
 			'/web/js/informacam.js'
 		])
 		
