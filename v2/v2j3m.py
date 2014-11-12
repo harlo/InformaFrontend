@@ -10,11 +10,11 @@ from collections import OrderedDict
 def getDocWrapper(self,param):
     doc = J3mCache.getWrapFromCache(param)
     if doc is None :
-        http_client = AsyncHTTPClient()
+        
         url = "%s%s%s" % (buildServerURL(),"/documents/?_id=" ,param)
         if DEBUG: print "SENDING REQUEST TO %s" % url
     
-        response = yield http_client.fetch(url)   
+        response = yield J3mCache.getHTTPAsync(url)   
         doc = response.body
         J3mCache.putWrapInCache(param,doc)
 
@@ -25,7 +25,7 @@ def getDocWrapper(self,param):
 def getJ3mDoc(self,param):
     j3mDoc = J3mCache.getJ3mFromCache(param)
     if j3mDoc is None :
-        http_client = AsyncHTTPClient()
+       
     
         handle = yield getDocWrapper(self,param)
         self.objectHandle = json_decode(handle)  
@@ -33,8 +33,8 @@ def getJ3mDoc(self,param):
                 
         url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
         if DEBUG: print "SENDING REQUEST TO %s" % url
-        self.j3mObject = yield http_client.fetch(url)
-        j3mResponse = yield http_client.fetch(url)
+        
+        j3mResponse = yield J3mCache.getHTTPAsync(url)
         
         j3mDoc = j3mResponse.body
         J3mCache.putJ3mInCache(param,j3mDoc)
@@ -54,10 +54,16 @@ def getTimeValues(self,j3mDoc,valueKey):
     
 
 class J3mCache:
-    
+    http_client = None
     cachedJ3m = OrderedDict()
     cachedWrap = OrderedDict()
     cacheMaxSize = 4 #TODO move to a conf file somewhere?
+    
+    @classmethod
+    def getHTTPAsync (cls, url):
+        if cls.http_client is None:
+            cls.http_client = AsyncHTTPClient()
+        return cls.http_client.fetch(url)  
     
     @classmethod
     def getJ3mFromCache (cls, key):
