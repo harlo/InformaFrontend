@@ -96,6 +96,17 @@ jQuery(document).ready(function($) {
 		},
 		render: function(model) {
 			var data = model.get("values");
+			var div_id = model.urlRoot.substring(1);
+			$("#" + div_id + "_check, label[for='" + div_id + "_check']").addClass("rendered");
+			$("#" + div_id + "_check").change(function() {
+				if (this.checked) {
+					$('path.' + div_id).show();
+					$('g.y.axis.' + div_id).show();
+				} else {
+					$('path.' + div_id).hide();
+					$('g.y.axis.' + div_id).hide();
+				}
+			});
 			
 			var margin = {top: 20, right: 20, bottom: 30, left: 50},
 			totalWidth = 960, totalHeight = 500,
@@ -123,7 +134,7 @@ jQuery(document).ready(function($) {
 				.scale(y)
 				.orient("left");
 
-			var svg = d3.select(this.el).append("svg")
+			var svg = d3.select(this.el).insert("svg", '#graph_controls')
 				.attr({width: totalWidth,
 				height:totalHeight,
 				viewBox: "0 0 " + totalWidth + " " + totalHeight})
@@ -146,7 +157,7 @@ jQuery(document).ready(function($) {
 			}
 
 			svg.append("g")
-				.attr("class", "y axis")
+				.attr("class", "y axis " + div_id)
 				.call(yAxis)
 				.append("text")
 				.attr("transform", "rotate(-90)")
@@ -163,7 +174,7 @@ jQuery(document).ready(function($) {
 					
 				svg.append("path")
 					.datum(data)
-					.attr("class", "line " + key)
+					.attr("class", "line " + div_id + " " + key)
 					.attr("d", line);
 			}, model);
 
