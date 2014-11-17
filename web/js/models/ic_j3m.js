@@ -93,10 +93,21 @@ jQuery(document).ready(function($) {
 			this.model.get('GPSBearing').bind('change', this.render, this);
 			this.model.get('Accelerometer').bind('change', this.render, this);
 			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
+			this.model.get('dateCreated').bind('change', this.render, this);
 		},
 		render: function(model) {
-			var data = model.get("values");
+			$c(model);
+//TODO: the problem is that the dateCreated needs to be rendered if and only if there's a graph, but it's an async call, so: if the SVG exists already, draw the line; if not, store the date to be rendered if there's any graph data
 			var div_id = model.urlRoot.substring(1);
+			if (div_id == 'j3mheader') {
+				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
+				if (this.$el.find('svg').length) {
+					this.renderDateCreated();
+				}
+				return;
+			}
+
+			var data = model.get("values");
 			$("#" + div_id + "_check, label[for='" + div_id + "_check']").addClass("rendered");
 			$("#" + div_id + "_check").change(function() {
 				if (this.checked) {
@@ -154,6 +165,7 @@ jQuery(document).ready(function($) {
 					.attr("class", "x axis")
 					.attr("transform", "translate(0," + height + ")")
 					.call(xAxis);
+				this.model.get("dateCreated").fetch();
 			}
 
 			svg.append("g")
@@ -181,6 +193,10 @@ jQuery(document).ready(function($) {
 			scaleGraphs();
 			
 			return this;
+		},
+		
+		renderDateCreated: function() {
+			$c('renderDateCreated');
 		},
 	});
 
@@ -246,6 +262,9 @@ jQuery(document).ready(function($) {
 						title: 'pressureHPAOrMBAR',
 						keys: ['pressureHPAOrMBAR', ],
 					}),
+					dateCreated: new app.InformaCamJ3MHeader({
+						id: app.docid,
+					}),
 				}),
 				el: '#ic_linechart_view_holder',
 			});	
@@ -256,6 +275,7 @@ jQuery(document).ready(function($) {
 			this.lineChartMultiView.model.get("GPSBearing").fetch();
 			this.lineChartMultiView.model.get("Accelerometer").fetch();
 			this.lineChartMultiView.model.get("pressureHPAOrMBAR").fetch();
+			
 
 
 
