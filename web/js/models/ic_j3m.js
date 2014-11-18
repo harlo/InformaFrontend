@@ -22,6 +22,24 @@ jQuery(document).ready(function($) {
 	});
 
 	/* BACKBONE VIEWS */
+	
+	app.progressNotifierView = Backbone.View.extend({
+		initialize: function(options) {
+			this.taskCount = 0;
+		},
+		render: function(message) {
+			if (message.doc_id != app.docid) {
+				return;
+			}
+			var status = message.status;
+			if (status == 200) {
+				var task_path = message.task_path;
+				this.taskCount++;
+				$c(task_path + " " + " " + status);
+				this.$el.html(this.taskCount);
+			}
+		}
+	});
 
 	app.InformaCamJ3MHeaderView = Backbone.View.extend({
 		el: $('#ic_j3mheader_view_holder'),
@@ -220,6 +238,11 @@ jQuery(document).ready(function($) {
 				header: 'GPS Coordinates',
 			});
 			
+			this.progressNotifierView = new app.progressNotifierView({
+				model: new InformaCamNotifier(),
+				el: $('#ic_progressNotifierViewHolder'),
+			});
+			
 
 			/* MULTI-VIEW LINE CHART */	
 					// http://stackoverflow.com/questions/7385629/backbone-js-complex-views-combining-multiple-models
@@ -293,6 +316,11 @@ jQuery(document).ready(function($) {
 				view.model.fetch();
 			}, this);
 			
+			
+			this.progressNotifierView.model.get('message_map').push(
+				_.bind(this.progressNotifierView.render, this.progressNotifierView)
+			);
+
 		},
 	});
 
@@ -308,12 +336,12 @@ think about these:
 http://localhost:8888/GPSAccuracy/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/Accelerometer/4c20d05a772723f1b5e97166ca1f3709/
 //acc_x, acc_y, acc_z
-http://localhost:8888/DocumentWrapper/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/DocumentWrapper/8a0daac95f6bb42ffc839dd23db29dec/
 http://localhost:8888/PitchRollAzimuth/f76f260fb500ac1a58e0c35c97d5361e/
 //pitch, roll, azimuth, plus all 3 corrected
 http://localhost:8888/VisibleWifiNetworks/4c20d05a772723f1b5e97166ca1f3709/
 
-http://localhost:8888/j3mheader/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/j3mheader/8a0daac95f6bb42ffc839dd23db29dec/
 
 
 http://localhost:8888/GPSAccuracy/f76f260fb500ac1a58e0c35c97d5361e/
