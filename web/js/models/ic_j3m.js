@@ -34,9 +34,12 @@ jQuery(document).ready(function($) {
 			}
 			if (this.taskCount == 0) {
 				this.$el.prepend('<h2>Task Progress</h2>');
+				this.$el.addClass("rendered");
+				$('#tasksTotal').html('??? (to come)');
 			}
 			var task_path = message.task_path;
 			this.taskCount++;
+			$('#tasksComplete').html(Math.round(this.taskCount / 2));
 			$c(task_path + " " + " " + status);
 			this.$el.append(task_path + '<br>');
 		}
@@ -50,6 +53,7 @@ jQuery(document).ready(function($) {
 			json.URL = document.URL;
 			json.genealogy.dateFormatted = moment(Number(json.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss")
 			html = Mustache.to_html(this.template, json);
+			this.$el.addClass("rendered");
 			this.$el.html(html);
 			$('#submission_permalink').click(function() {
 				this.select();
