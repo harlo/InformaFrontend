@@ -28,16 +28,17 @@ jQuery(document).ready(function($) {
 			this.taskCount = 0;
 		},
 		render: function(message) {
-			if (message.doc_id != app.docid) {
+			var status = message.status;
+			if (message.doc_id != app.docid || status != 200) {
 				return;
 			}
-			var status = message.status;
-			if (status == 200) {
-				var task_path = message.task_path;
-				this.taskCount++;
-				$c(task_path + " " + " " + status);
-				this.$el.html(this.taskCount);
+			if (this.taskCount == 0) {
+				this.$el.prepend('<h2>Task Progress</h2>');
 			}
+			var task_path = message.task_path;
+			this.taskCount++;
+			$c(task_path + " " + " " + status);
+			this.$el.append(task_path + '<br>');
 		}
 	});
 

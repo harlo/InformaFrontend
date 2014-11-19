@@ -8,6 +8,7 @@
 	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
 		function(file, message) {
 			// onSuccess
+//			console.log(message);
 			location.href = '/submission/' + message.data._id + '/';
 		},
 		function(file, message) {

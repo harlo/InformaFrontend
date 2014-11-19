@@ -26,9 +26,11 @@ jQuery(document).ready(function($) {
 		try {
 			updateConf();
 			app.docid = /submission\/([a-z0-9]{32})\//.exec(window.location)[1];
+
+			new app.InformaCamJ3MAppView;
+
 			//TMP: remove this after testing
 			doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
-			new app.InformaCamJ3MAppView;
 		} catch(err) {
 			console.warn(err);
 			console.warn("no updateConf()");
