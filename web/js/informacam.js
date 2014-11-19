@@ -122,7 +122,7 @@ function closeHeaderPopup() {
 				'media' : "screen"
 			});
 		
-		_.each(['bootstrap.min', 'informacam', 'visualsearch-datauri', 'visualsearch'],
+		_.each(['bootstrap.min', 'informacam', 'visualsearch-datauri', 'visualsearch', 'simple_upload'],
 			function(c) {
 				var css = $(css_stub).clone();
 				css.attr('href', "/web/css/" + c + ".css");
