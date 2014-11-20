@@ -1,45 +1,73 @@
 import tornado.web
+import time
 from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient
 from conf import  DEBUG, buildServerURL
 from operator import itemgetter
-from collections import OrderedDict
+from tornado.concurrent import Future
+from J3mCache import J3mCache
 
 @gen.coroutine
 def getDocWrapper(self,param):
     doc = J3mCache.getWrapFromCache(param)
     if doc is None :
-        http_client = AsyncHTTPClient()
+        
         url = "%s%s%s" % (buildServerURL(),"/documents/?_id=" ,param)
-        if DEBUG: print "SENDING REQUEST TO %s" % url
-    
-        response = yield http_client.fetch(url)   
-        doc = response.body
-        J3mCache.putWrapInCache(param,doc)
-
-    raise gen.Return(doc)     
+        if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
+        http_client = AsyncHTTPClient()
+        future = http_client.fetch(url) 
+        if DEBUG: print str(self) +"got future" 
+        J3mCache.putWrapInCache(param,future) 
+        if DEBUG: print str(self) +"put in cache"
+        response = yield future
+        J3mCache.putWrapInCache(param,response)
+        if DEBUG: print str(self) +"returning"
+        raise gen.Return(response.body)   
+    elif isinstance(doc, Future)  :
+        if DEBUG: print str(self) +"is future"
+        response = yield doc
+        J3mCache.putWrapInCache(param,response)
+        raise gen.Return(response.body) 
+    else :
+        if DEBUG: print str(self) +"got otherwise: " + str(doc)
+        raise gen.Return(doc.body)    
+        
+        
+   
     
 
 @gen.coroutine
 def getJ3mDoc(self,param):
     j3mDoc = J3mCache.getJ3mFromCache(param)
     if j3mDoc is None :
-        http_client = AsyncHTTPClient()
+       
     
         handle = yield getDocWrapper(self,param)
         self.objectHandle = json_decode(handle)  
         if DEBUG: print self.objectHandle['data']['j3m_id']
                 
         url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
-        if DEBUG: print "SENDING REQUEST TO %s" % url
-        self.j3mObject = yield http_client.fetch(url)
-        j3mResponse = yield http_client.fetch(url)
+        if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
         
-        j3mDoc = j3mResponse.body
-        J3mCache.putJ3mInCache(param,j3mDoc)
-
-    raise gen.Return(j3mDoc)
+        http_client = AsyncHTTPClient()
+        future = http_client.fetch(url) 
+        
+        if DEBUG: print str(self) + "got j3m future" 
+        J3mCache.putJ3mInCache(param,future) 
+        if DEBUG: print str(self) + "put j3m in cache"
+        response = yield future
+        if DEBUG: print str(self) + "returning j3m"
+        raise gen.Return(response.body)   
+    elif isinstance(j3mDoc, Future)  :
+        if DEBUG: print str(self) + "is j3mDoc future"
+        response = yield j3mDoc
+        J3mCache.putJ3mInCache(param,response)
+        raise gen.Return(response.body) 
+    else :
+        if DEBUG: print str(self) +"got j3mDoc otherwise"
+        raise gen.Return(j3mDoc.body)    
+        
     
 
 def getTimeValues(self,j3mDoc,valueKey):
@@ -53,41 +81,7 @@ def getTimeValues(self,j3mDoc,valueKey):
     return sorted(values, key=itemgetter('timestamp'))
     
 
-class J3mCache:
-    
-    cachedJ3m = OrderedDict()
-    cachedWrap = OrderedDict()
-    cacheMaxSize = 4 #TODO move to a conf file somewhere?
-    
-    @classmethod
-    def getJ3mFromCache (cls, key):
-        if DEBUG: print str(len(cls.cachedJ3m))
-        if key not in cls.cachedJ3m :
-            return None;
-        else:
-            return cls.cachedJ3m[key]
-            
-    @classmethod
-    def getWrapFromCache (cls, key):
-        if key not in cls.cachedWrap :
-            return None;
-        else:
-            return cls.cachedWrap[key]
-    
-        
-    @classmethod
-    def putJ3mInCache (cls, key, doc):
-        if DEBUG: print str(len(cls.cachedJ3m))
-        if len(cls.cachedJ3m) == cls.cacheMaxSize:
-            cls.cachedJ3m.popitem(last=False)
-        cls.cachedJ3m[key] = doc
-            
-    @classmethod
-    def putWrapInCache (cls, key, doc):
-        if len(cls.cachedWrap) == cls.cacheMaxSize:
-            cls.cachedWrap.popitem(last=False)
-        cls.cachedWrap[key] = doc
-    
+
    
     
 class J3MRetrieveHandler(tornado.web.RequestHandler):
