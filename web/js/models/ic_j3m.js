@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
 			json.URL = document.URL;
 			json.genealogy.dateFormatted = moment(Number(json.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss")
 			html = Mustache.to_html(this.template, json);
-			this.$el.addClass("rendered");
+			$('#ic_header_view_holder').addClass("rendered");
 			this.$el.html(html);
 			$('#submission_permalink').click(function() {
 				this.select();
