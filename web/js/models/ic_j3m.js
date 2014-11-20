@@ -7,6 +7,10 @@ jQuery(document).ready(function($) {
 		urlRoot: '/j3mheader',
 	});
 
+	app.InformaCamDocumentWrapper = Backbone.Model.extend({
+		urlRoot: '/DocumentWrapper',
+	});
+
 	app.InformaCamJ3MStripped = Backbone.Model.extend({
 		urlRoot: '/j3mretrieve',
 	});
@@ -51,13 +55,25 @@ jQuery(document).ready(function($) {
 		render: function() {
 			json = this.model.toJSON().data;
 			json.URL = document.URL;
-			json.genealogy.dateFormatted = moment(Number(json.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss")
+			json.genealogy.dateFormatted = moment(Number(json.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss");
 			html = Mustache.to_html(this.template, json);
 			$('#ic_header_view_holder').addClass("rendered");
 			this.$el.html(html);
 			$('#submission_permalink').click(function() {
 				this.select();
 			});
+			return this;
+		},
+	});
+
+	app.InformaCamDocumentWrapperView = Backbone.View.extend({
+		el: $('#ic_documentwrapper_view_holder'),
+		template: getTemplate("document_wrapper.html"),
+		render: function() {
+			json = this.model.toJSON().data;
+			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
+			html = Mustache.to_html(this.template, json);
+			this.$el.html(html);
 			return this;
 		},
 	});
@@ -228,8 +244,14 @@ jQuery(document).ready(function($) {
 	app.InformaCamJ3MAppView = Backbone.View.extend({
 		el: '#ic_submission_view_holder',
 		initialize: function() {
-			this.headerView = new app.InformaCamJ3MHeaderView({
+			this.J3MHeaderView = new app.InformaCamJ3MHeaderView({
 				model: new app.InformaCamJ3MHeader({
+					id: app.docid
+				})
+			});
+
+			this.documentWrapperView = new app.InformaCamDocumentWrapperView({
+				model: new app.InformaCamDocumentWrapper({
 					id: app.docid
 				})
 			});
@@ -312,7 +334,7 @@ jQuery(document).ready(function($) {
 
 			//LISTENERS
 			
-			views = [this.headerView, this.gps_coordsView, ];
+			views = [this.J3MHeaderView, this.documentWrapperView, this.gps_coordsView, ];
 			
 			_.each(views, function(view) {
 				this.listenTo(view.model, 'change', function() {
