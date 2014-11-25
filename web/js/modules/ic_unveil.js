@@ -15,6 +15,15 @@ function onAssetRequested(file_name) {
 		[".data", document_browser.get('data')._id, file_name].join('/'));
 }
 
+function initAnnexChannel() {
+	if(!annex_channel) {
+		return;
+	}
+
+	annex_channel.get('message_map').push(
+		_.bind(document_browser.updateTaskMessage, document_browser));
+}
+
 (function($) {
 	var content_sammy = $.sammy("#content", function() {
 		this.get(/\/unveil\/[a-z0-9]{32}\/#(info|assets|reindexer)/, function() {
@@ -40,6 +49,7 @@ function onAssetRequested(file_name) {
 		if(initDocumentBrowser()) {
 			content_sammy.run();
 			$("#content").prepend(getTemplate('default_task_update.html'));
+			initAnnexChannex();
 		} else {
 			failOut($("#content"), "Sorry, could not find this document.");
 		}

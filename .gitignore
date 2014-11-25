@@ -9,4 +9,5 @@ conf/*.config.yaml
 conf/informacam.*
 conf/*.secrets.json
 
-test.*lib/Frontend
+test.*
+lib/Frontend
