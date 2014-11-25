@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
 	});
 
 	app.InformaCamDocumentSource = Backbone.Model.extend({
-		url: '/documents/',
+//		url: '/documents/',
 	});
 
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
@@ -367,12 +367,12 @@ jQuery(document).ready(function($) {
 				_.bind(this.progressNotifierView.render, this.progressNotifierView)
 			);
 			
+
 			this.listenTo(this.documentSourceView.model, 'change', function() {
 				this.documentSourceView.$el.append(this.documentSourceView.render().el);
 			});
 			
-			this.documentSourceView.model.fetch({data: $.param({_id: app.docid}), type: 'POST'});
-
+			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
 		},
 	});
 
