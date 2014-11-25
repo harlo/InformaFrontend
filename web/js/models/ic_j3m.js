@@ -7,6 +7,10 @@ jQuery(document).ready(function($) {
 		urlRoot: '/j3mheader',
 	});
 
+	app.InformaCamDocumentSource = Backbone.Model.extend({
+		url: '/documents/',
+	});
+
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
 		urlRoot: '/DocumentWrapper',
 	});
@@ -62,6 +66,15 @@ jQuery(document).ready(function($) {
 			$('#submission_permalink').click(function() {
 				this.select();
 			});
+			return this;
+		},
+	});
+
+	app.InformaCamDocumentSourceView = Backbone.View.extend({
+		el: $('#ic_download_j3m'),
+		render: function() {
+			var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.model));
+			this.$el.html('<a href="data:' + data + '" download="data.json">download JSON</a>');
 			return this;
 		},
 	});
@@ -250,6 +263,12 @@ jQuery(document).ready(function($) {
 				})
 			});
 
+			this.documentSourceView = new app.InformaCamDocumentSourceView({
+				model: new app.InformaCamDocumentSource({
+					id: app.docid
+				})
+			});
+
 			this.documentWrapperView = new app.InformaCamDocumentWrapperView({
 				model: new app.InformaCamDocumentWrapper({
 					id: app.docid
@@ -347,6 +366,12 @@ jQuery(document).ready(function($) {
 			this.progressNotifierView.model.get('message_map').push(
 				_.bind(this.progressNotifierView.render, this.progressNotifierView)
 			);
+			
+			this.listenTo(this.documentSourceView.model, 'change', function() {
+				this.documentSourceView.$el.append(this.documentSourceView.render().el);
+			});
+			
+			this.documentSourceView.model.fetch({data: $.param({_id: app.docid}), type: 'POST'});
 
 		},
 	});
