@@ -146,12 +146,17 @@ jQuery(document).ready(function($) {
 			this.model.get('Accelerometer').bind('change', this.render, this);
 			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
 			this.model.get('dateCreated').bind('change', this.render, this);
+
+			this.margin = {top: 20, right: 20, bottom: 30, left: 50},
+			this.totalWidth = 960, this.totalHeight = 500,
+			this.width = this.totalWidth - this.margin.left - this.margin.right,
+			this.height = this.totalHeight - this.margin.top - this.margin.bottom;
 		},
 		render: function(model) {
 			$c(model);
-//TODO: the problem is that the dateCreated needs to be rendered if and only if there's a graph, but it's an async call, so: if the SVG exists already, draw the line; if not, store the date to be rendered if there's any graph data
 			var div_id = model.urlRoot.substring(1);
 			if (div_id == 'j3mheader') {
+				$c('j3mheader');
 				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
 				if (this.$el.find('svg').length) {
 					this.renderDateCreated();
@@ -171,10 +176,6 @@ jQuery(document).ready(function($) {
 				}
 			});
 			
-			var margin = {top: 20, right: 20, bottom: 30, left: 50},
-			totalWidth = 960, totalHeight = 500,
-			width = totalWidth - margin.left - margin.right,
-			height = totalHeight - margin.top - margin.bottom;
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
@@ -249,6 +250,14 @@ jQuery(document).ready(function($) {
 		
 		renderDateCreated: function() {
 			$c('renderDateCreated');
+			$c(d3.extent(this.allYVals));
+			var svg = d3.select(this.el).append("line")
+				.attr("x1", 5)
+				.attr("y1", 5)
+				.attr("x2", 50)
+				.attr("y2", 50)
+				.attr("stroke-width", 2)
+				.attr("stroke", "black");
 		},
 	});
 
