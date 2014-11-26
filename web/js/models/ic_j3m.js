@@ -151,6 +151,7 @@ jQuery(document).ready(function($) {
 			this.totalWidth = 960, this.totalHeight = 500,
 			this.width = this.totalWidth - this.margin.left - this.margin.right,
 			this.height = this.totalHeight - this.margin.top - this.margin.bottom;
+			this.xDomain = [];
 		},
 		render: function(model) {
 			$c(model);
@@ -184,10 +185,10 @@ jQuery(document).ready(function($) {
 			}, this);
 
 			var x = d3.time.scale()
-				.range([0, width]);
+				.range([0, this.width]);
 
 			var y = d3.scale.linear()
-				.range([height, 0]);
+				.range([this.height, 0]);
 
 			var xAxis = d3.svg.axis()
 				.scale(x)
@@ -199,13 +200,16 @@ jQuery(document).ready(function($) {
 				.orient("left");
 
 			var svg = d3.select(this.el).insert("svg", '#graph_controls')
-				.attr({width: totalWidth,
-				height:totalHeight,
-				viewBox: "0 0 " + totalWidth + " " + totalHeight})
+				.attr({width: this.totalWidth,
+				height:this.totalHeight,
+				viewBox: "0 0 " + this.totalWidth + " " + this.totalHeight})
 				.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+			xDomain = d3.extent(data, function(d) { return d.timestamp; });
+			x.domain(xDomain);
+			this.xDomain = d3.extent(this.xDomain.concat(xDomain));
+			$c(this.xDomain);
 		
 			if (d3.min(this.allYVals) < 0) {
 				y.domain(d3.extent(this.allYVals));
@@ -216,7 +220,7 @@ jQuery(document).ready(function($) {
 			if (this.$el.find('svg').length == 1) {
 				svg.append("g")
 					.attr("class", "x axis")
-					.attr("transform", "translate(0," + height + ")")
+					.attr("transform", "translate(0," + this.height + ")")
 					.call(xAxis);
 				this.model.get("dateCreated").fetch();
 			}
@@ -249,15 +253,23 @@ jQuery(document).ready(function($) {
 		},
 		
 		renderDateCreated: function() {
-			$c('renderDateCreated');
-			$c(d3.extent(this.allYVals));
-			var svg = d3.select(this.el).append("line")
-				.attr("x1", 5)
-				.attr("y1", 5)
-				.attr("x2", 50)
-				.attr("y2", 50)
+			var svg = d3.select(this.el).insert("svg", '#graph_controls')
+				.attr({width: this.totalWidth,
+				height:this.totalHeight,
+				viewBox: "0 0 " + this.totalWidth + " " + this.totalHeight})
+				.append("g")
+				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+				
+			x = (this.dateCreated - this.xDomain[0]) / (this.xDomain[1] - this.xDomain[0]) * this.width;
+			svg.append("line")
+				.attr("x1", x)
+				.attr("y1", 0)
+				.attr("x2", x)
+				.attr("y2", this.height)
 				.attr("stroke-width", 2)
-				.attr("stroke", "black");
+				.attr("stroke", "red");
+
+			scaleGraphs();
 		},
 	});
 
@@ -368,7 +380,7 @@ jQuery(document).ready(function($) {
 				this.listenTo(view.model, 'change', function() {
 					view.$el.append(view.render().el);
 				});
-				view.model.fetch();
+//				view.model.fetch();
 			}, this);
 			
 			
