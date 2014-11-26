@@ -1,5 +1,4 @@
 import tornado.web
-import time
 from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient
@@ -7,6 +6,23 @@ from conf import  DEBUG, buildServerURL
 from operator import itemgetter
 from tornado.concurrent import Future
 from J3mCache import J3mCache
+from xml.sax.saxutils import escape
+
+html_escape_table = {
+    '"': "&quot;",
+    "'": "&apos;"
+}
+def html_escape(text):
+    return escape(text, html_escape_table)
+
+def json_html_escape(obj):
+    for key, value in obj.iteritems():
+        try:
+            if len(value.keys()) > 0:
+                obj[key] = json_html_escape(value)
+        except Exception: 
+            obj[key] = html_escape(value)
+    return obj
 
 @gen.coroutine
 def getDocWrapper(self,param):
@@ -214,6 +230,29 @@ class GPSAccuracyHandler(tornado.web.RequestHandler):
             except Exception, e:
                 self.write('No Document found')  
                 print 'no Doc retrieved EXCEPTION! (GPSAccuracyHandler)', e
+                
+            self.finish()
+            self.flush()  
+              
+class AppendedUserDataHandler (tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                values=[]
+                try: 
+                    for element in j3mDoc['data']['data']['userAppendedData']: 
+                        for form in element['associatedForms']:
+                            values.append(json_html_escape(form))
+                except KeyError: pass
+                
+                self.write(json_encode(values))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION! (AppendedUserDataHandler)', e
                 
             self.finish()
             self.flush()    

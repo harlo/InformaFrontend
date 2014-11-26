@@ -29,6 +29,7 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/DocumentWrapper/(.*)", DocumentWrapperHandler),
 			(r"/PitchRollAzimuth/(.*)", PitchRollAzimuthHandler),
 			(r"/VisibleWifiNetworks/(.*)", VisibleWifiNetworksHandler),
+			(r"/AppendedUserData/(.*)", AppendedUserDataHandler),
 			(r"/j3mretrieve/(.*)", J3MRetrieveHandler)])
 		
 		self.default_on_loads.extend([
