@@ -79,6 +79,10 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/modules/uv_unveil.js',
 				'/web/js/modules/ic_unveil.js'
 			],
+			'landing' : [
+				'/web/js/lib/dropzone.js',
+				'/web/js/models/unveillance_dropzone.js'
+			],				
 			'simple' : [
 #				'/web/js/lib/filedrop-min.js',
 #				'/web/js/models/unveillance_filedrop.js']

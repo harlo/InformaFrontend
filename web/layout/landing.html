@@ -1,0 +1,52 @@
+<link rel="stylesheet" type="text/css" href="/web/css/tabs.css" />
+<article class="tabs">
+	<section id="tab1">
+	<h2><a href="#tab1">File</a></h2>
+	<span> Is it real? Will it float? Upload a media or a J3M metadata file to verify. <br/> 
+	Drag and drop on the panel below, or click for file selector dialogue. </span>
+	<div id="tab_content">
+		<div id="ic_import_dropzone_holder">
+		<input type="file" name="uv_import" />
+		<input type="hidden" name="x_token" value="" />
+	</div>
+
+<script type="text/javascript">
+	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
+		function(file, message) {
+			// onSuccess
+//			console.log(message);
+			location.href = '/submission/' + message.data._id + '/';
+		},
+		function(file, message) {
+			// onError
+			console.error(message);
+			messagetext = '';
+			if (typeof message !== null && typeof message === 'object') {
+				if (message.result == 403) {
+					messagetext = "It's not you, it's us. We're looking into the problem. Please try again later. (" + message.result + ")";
+					this.disable();
+				}
+			} else {
+				messagetext = message;
+			}
+			return file.previewElement.querySelector("[data-dz-errormessage]").textContent = messagetext;
+		});
+</script>
+		</div>
+	</section>
+	
+	<section id="tab2">
+		<h2><a href="#tab2">URL</a></h2>
+		<div id="tab_content">
+		tab 2 content
+		</div>
+	</section>
+	
+	<section id="tab3">
+		<h2><a href="#tab3">Search</a></h2>	
+		<div id="tab_content">
+	    tab 3 content
+	    </div>
+	</section>
+
+</article>
