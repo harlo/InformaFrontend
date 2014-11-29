@@ -259,3 +259,19 @@ div.ic_module {
 #ic_as_permalink {
 	width:80%;
 }
+
+#ic_pipe_builder, #uv_pipe_builder {
+	width:100%;
+}
+
+#ic_pipe_builder textarea, #uv_pipe_builder textarea {
+	width:98%;
+}
+
+#ic_document_viewer_panel table {
+	width:100%;
+}
+
+#ic_document_viewer_panel table tr {
+	vertical-align: top;
+}

@@ -1,3 +1,5 @@
+var annex_channel;
+
 function onConfLoaded() {
 	console.info("CONF LOADED...");
 }
@@ -16,10 +18,7 @@ function onAssetRequested(file_name) {
 }
 
 function initAnnexChannel() {
-	if(!annex_channel) {
-		return;
-	}
-
+	annex_channel = new InformaCamNotifier();
 	annex_channel.get('message_map').push(
 		_.bind(document_browser.updateTaskMessage, document_browser));
 }
@@ -49,7 +48,7 @@ function initAnnexChannel() {
 		if(initDocumentBrowser()) {
 			content_sammy.run();
 			$("#content").prepend(getTemplate('default_task_update.html'));
-			initAnnexChannex();
+			initAnnexChannel();
 		} else {
 			failOut($("#content"), "Sorry, could not find this document.");
 		}
