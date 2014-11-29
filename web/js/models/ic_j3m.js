@@ -15,6 +15,10 @@ jQuery(document).ready(function($) {
 		urlRoot: '/DocumentWrapper',
 	});
 
+	app.InformaCamAppendedUserData = Backbone.Model.extend({
+		urlRoot: '/AppendedUserData',
+	});
+
 	app.InformaCamJ3MStripped = Backbone.Model.extend({
 		urlRoot: '/j3mretrieve',
 	});
@@ -75,6 +79,14 @@ jQuery(document).ready(function($) {
 		render: function() {
 			var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.model));
 			this.$el.html('<a href="data:' + data + '" download="data.json">download JSON</a>');
+			return this;
+		},
+	});
+
+	app.InformaCamAppendedUserDataVIew = Backbone.View.extend({
+		el: $('#ic_appended_user_data'),
+		render: function() {
+			this.$el.html('<h3>Appended User Data</h3>' + JSON.stringify(this.model));
 			return this;
 		},
 	});
@@ -290,6 +302,12 @@ jQuery(document).ready(function($) {
 				})
 			});
 
+			this.appendedUserDataView = new app.InformaCamAppendedUserDataVIew({
+				model: new app.InformaCamAppendedUserData({
+					id: app.docid
+				})
+			});
+
 			this.documentWrapperView = new app.InformaCamDocumentWrapperView({
 				model: new app.InformaCamDocumentWrapper({
 					id: app.docid
@@ -380,7 +398,7 @@ jQuery(document).ready(function($) {
 				this.listenTo(view.model, 'change', function() {
 					view.$el.append(view.render().el);
 				});
-//				view.model.fetch();
+				view.model.fetch();
 			}, this);
 			
 			
@@ -393,7 +411,12 @@ jQuery(document).ready(function($) {
 				this.documentSourceView.$el.append(this.documentSourceView.render().el);
 			});
 			
+			this.listenTo(this.appendedUserDataView.model, 'change', function() {
+				this.appendedUserDataView.$el.append(this.appendedUserDataView.render().el);
+			});
+			
 			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
+			this.appendedUserDataView.model.fetch();
 		},
 	});
 
@@ -435,5 +458,9 @@ http://localhost:8888/lightMeter/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/pressureAltitude/4c20d05a772723f1b5e97166ca1f3709/
 
 http://localhost:8888/pressureHPAOrMBAR/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/AppendedUserData/a246fcc91b4fcf505376c3481f3eb3bb/
+http://localhost:8888/AppendedUserData/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/AppendedUserData/e81e0a914e1358591a44d03f338e5270/
 */
 
