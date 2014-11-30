@@ -97,6 +97,9 @@ jQuery(document).ready(function($) {
 		render: function() {
 			json = this.model.toJSON().data;
 			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
+			if (json.upload_attempts === undefined) {
+				json.upload_attempts = 1;
+			}
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
@@ -168,6 +171,7 @@ jQuery(document).ready(function($) {
 		render: function(model) {
 			$c(model);
 			var div_id = model.urlRoot.substring(1);
+			$c(div_id);
 			if (div_id == 'j3mheader') {
 				$c('j3mheader');
 				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
@@ -327,6 +331,8 @@ jQuery(document).ready(function($) {
 				model: new InformaCamNotifier(),
 				el: $('#ic_progressNotifierViewHolder'),
 			});
+			
+			$c(this.progressNotifierView.model);
 			
 
 			/* MULTI-VIEW LINE CHART */	
