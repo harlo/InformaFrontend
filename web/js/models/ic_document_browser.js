@@ -3,7 +3,13 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		Backbone.Model.apply(this, arguments);
 		this.set('group_tmpl', getTemplate("document_browser_group.html"));
 
-		if(!this.has('root_el')) { this.set('root_el', $('body')); }
+		if(!this.has('root_el')) {
+			this.set('root_el', $('body'));
+		}
+
+		if(!this.has('data')) {
+			return;
+		}
 
 		_.each(_.groupBy(this.get('data').documents, function(doc) { return doc.mime_type;}), 
 			function(group) {

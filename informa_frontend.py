@@ -78,6 +78,7 @@ class InformaFrontend(UnveillanceFrontend):
 			],
 			'unveil' : [
 				'/web/js/modules/uv_unveil.js',
+				'/web/js/models/unveillance_task_pipe.js',
 				'/web/js/modules/ic_unveil.js'
 			],
 			'landing' : [
