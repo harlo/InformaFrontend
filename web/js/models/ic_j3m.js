@@ -37,23 +37,25 @@ jQuery(document).ready(function($) {
 	
 	app.progressNotifierView = Backbone.View.extend({
 		initialize: function(options) {
-			this.taskCount = 0;
+			this.tasksCompleted = [];
 		},
 		render: function(message) {
 			var status = message.status;
 			if (message.doc_id != app.docid || status != 200) {
 				return;
 			}
-			if (this.taskCount == 0) {
+			if (this.tasksCompleted.length == 0) {
 				this.$el.prepend('<h2>Task Progress</h2>');
 				this.$el.addClass("rendered");
-				$('#tasksTotal').html('??? (to come)');
 			}
+			$('#tasksTotal').html(message.task_queue.length);
 			var task_path = message.task_path;
-			this.taskCount++;
-			$('#tasksComplete').html(Math.round(this.taskCount / 2));
-			$c(task_path + " " + " " + status);
-			this.$el.append(task_path + '<br>');
+			if (!_.contains(this.tasksCompleted, task_path)) {
+				this.tasksCompleted.push(task_path);
+				$('#tasksComplete').html(this.tasksCompleted.length);
+				$c(task_path + " " + " " + status);
+				this.$el.append(task_path + '<br>');
+			}
 		}
 	});
 
@@ -416,12 +418,12 @@ jQuery(document).ready(function($) {
 			this.listenTo(this.documentSourceView.model, 'change', function() {
 				this.documentSourceView.$el.append(this.documentSourceView.render().el);
 			});
+			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
 			
+
 			this.listenTo(this.appendedUserDataView.model, 'change', function() {
 				this.appendedUserDataView.$el.append(this.appendedUserDataView.render().el);
 			});
-			
-			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
 			this.appendedUserDataView.model.fetch();
 		},
 	});
