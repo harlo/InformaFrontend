@@ -10,3 +10,4 @@ conf/informacam.*
 conf/*.secrets.json
 
 test.*
+lib/Frontend

@@ -7,8 +7,16 @@ jQuery(document).ready(function($) {
 		urlRoot: '/j3mheader',
 	});
 
+	app.InformaCamDocumentSource = Backbone.Model.extend({
+//		url: '/documents/',
+	});
+
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
 		urlRoot: '/DocumentWrapper',
+	});
+
+	app.InformaCamAppendedUserData = Backbone.Model.extend({
+		urlRoot: '/AppendedUserData',
 	});
 
 	app.InformaCamJ3MStripped = Backbone.Model.extend({
@@ -29,23 +37,25 @@ jQuery(document).ready(function($) {
 	
 	app.progressNotifierView = Backbone.View.extend({
 		initialize: function(options) {
-			this.taskCount = 0;
+			this.tasksCompleted = [];
 		},
 		render: function(message) {
 			var status = message.status;
 			if (message.doc_id != app.docid || status != 200) {
 				return;
 			}
-			if (this.taskCount == 0) {
+			if (this.tasksCompleted.length == 0) {
 				this.$el.prepend('<h2>Task Progress</h2>');
 				this.$el.addClass("rendered");
-				$('#tasksTotal').html('??? (to come)');
 			}
+			$('#tasksTotal').html(message.task_queue.length);
 			var task_path = message.task_path;
-			this.taskCount++;
-			$('#tasksComplete').html(Math.round(this.taskCount / 2));
-			$c(task_path + " " + " " + status);
-			this.$el.append(task_path + '<br>');
+			if (!_.contains(this.tasksCompleted, task_path)) {
+				this.tasksCompleted.push(task_path);
+				$('#tasksComplete').html(this.tasksCompleted.length);
+				$c(task_path + " " + " " + status);
+				this.$el.append(task_path + '<br>');
+			}
 		}
 	});
 
@@ -66,12 +76,32 @@ jQuery(document).ready(function($) {
 		},
 	});
 
+	app.InformaCamDocumentSourceView = Backbone.View.extend({
+		el: $('#ic_download_j3m'),
+		render: function() {
+			var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.model));
+			this.$el.html('<a href="data:' + data + '" download="data.json">download JSON</a>');
+			return this;
+		},
+	});
+
+	app.InformaCamAppendedUserDataVIew = Backbone.View.extend({
+		el: $('#ic_appended_user_data'),
+		render: function() {
+			this.$el.html('<h3>Appended User Data</h3>' + JSON.stringify(this.model));
+			return this;
+		},
+	});
+
 	app.InformaCamDocumentWrapperView = Backbone.View.extend({
 		el: $('#ic_documentwrapper_view_holder'),
 		template: getTemplate("document_wrapper.html"),
 		render: function() {
 			json = this.model.toJSON().data;
 			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
+			if (json.upload_attempts === undefined) {
+				json.upload_attempts = 1;
+			}
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
@@ -133,12 +163,19 @@ jQuery(document).ready(function($) {
 			this.model.get('Accelerometer').bind('change', this.render, this);
 			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
 			this.model.get('dateCreated').bind('change', this.render, this);
+
+			this.margin = {top: 20, right: 20, bottom: 30, left: 50},
+			this.totalWidth = 960, this.totalHeight = 500,
+			this.width = this.totalWidth - this.margin.left - this.margin.right,
+			this.height = this.totalHeight - this.margin.top - this.margin.bottom;
+			this.xDomain = [];
 		},
 		render: function(model) {
 			$c(model);
-//TODO: the problem is that the dateCreated needs to be rendered if and only if there's a graph, but it's an async call, so: if the SVG exists already, draw the line; if not, store the date to be rendered if there's any graph data
 			var div_id = model.urlRoot.substring(1);
+			$c(div_id);
 			if (div_id == 'j3mheader') {
+				$c('j3mheader');
 				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
 				if (this.$el.find('svg').length) {
 					this.renderDateCreated();
@@ -158,10 +195,6 @@ jQuery(document).ready(function($) {
 				}
 			});
 			
-			var margin = {top: 20, right: 20, bottom: 30, left: 50},
-			totalWidth = 960, totalHeight = 500,
-			width = totalWidth - margin.left - margin.right,
-			height = totalHeight - margin.top - margin.bottom;
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
@@ -170,10 +203,10 @@ jQuery(document).ready(function($) {
 			}, this);
 
 			var x = d3.time.scale()
-				.range([0, width]);
+				.range([0, this.width]);
 
 			var y = d3.scale.linear()
-				.range([height, 0]);
+				.range([this.height, 0]);
 
 			var xAxis = d3.svg.axis()
 				.scale(x)
@@ -185,13 +218,16 @@ jQuery(document).ready(function($) {
 				.orient("left");
 
 			var svg = d3.select(this.el).insert("svg", '#graph_controls')
-				.attr({width: totalWidth,
-				height:totalHeight,
-				viewBox: "0 0 " + totalWidth + " " + totalHeight})
+				.attr({width: this.totalWidth,
+				height:this.totalHeight,
+				viewBox: "0 0 " + this.totalWidth + " " + this.totalHeight})
 				.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-			x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+			xDomain = d3.extent(data, function(d) { return d.timestamp; });
+			x.domain(xDomain);
+			this.xDomain = d3.extent(this.xDomain.concat(xDomain));
+			$c(this.xDomain);
 		
 			if (d3.min(this.allYVals) < 0) {
 				y.domain(d3.extent(this.allYVals));
@@ -202,7 +238,7 @@ jQuery(document).ready(function($) {
 			if (this.$el.find('svg').length == 1) {
 				svg.append("g")
 					.attr("class", "x axis")
-					.attr("transform", "translate(0," + height + ")")
+					.attr("transform", "translate(0," + this.height + ")")
 					.call(xAxis);
 				this.model.get("dateCreated").fetch();
 			}
@@ -235,7 +271,23 @@ jQuery(document).ready(function($) {
 		},
 		
 		renderDateCreated: function() {
-			$c('renderDateCreated');
+			var svg = d3.select(this.el).insert("svg", '#graph_controls')
+				.attr({width: this.totalWidth,
+				height:this.totalHeight,
+				viewBox: "0 0 " + this.totalWidth + " " + this.totalHeight})
+				.append("g")
+				.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+				
+			x = (this.dateCreated - this.xDomain[0]) / (this.xDomain[1] - this.xDomain[0]) * this.width;
+			svg.append("line")
+				.attr("x1", x)
+				.attr("y1", 0)
+				.attr("x2", x)
+				.attr("y2", this.height)
+				.attr("stroke-width", 2)
+				.attr("stroke", "red");
+
+			scaleGraphs();
 		},
 	});
 
@@ -246,6 +298,18 @@ jQuery(document).ready(function($) {
 		initialize: function() {
 			this.J3MHeaderView = new app.InformaCamJ3MHeaderView({
 				model: new app.InformaCamJ3MHeader({
+					id: app.docid
+				})
+			});
+
+			this.documentSourceView = new app.InformaCamDocumentSourceView({
+				model: new app.InformaCamDocumentSource({
+					id: app.docid
+				})
+			});
+
+			this.appendedUserDataView = new app.InformaCamAppendedUserDataVIew({
+				model: new app.InformaCamAppendedUserData({
 					id: app.docid
 				})
 			});
@@ -269,6 +333,8 @@ jQuery(document).ready(function($) {
 				model: new InformaCamNotifier(),
 				el: $('#ic_progressNotifierViewHolder'),
 			});
+			
+			$c(this.progressNotifierView.model);
 			
 
 			/* MULTI-VIEW LINE CHART */	
@@ -347,7 +413,18 @@ jQuery(document).ready(function($) {
 			this.progressNotifierView.model.get('message_map').push(
 				_.bind(this.progressNotifierView.render, this.progressNotifierView)
 			);
+			
 
+			this.listenTo(this.documentSourceView.model, 'change', function() {
+				this.documentSourceView.$el.append(this.documentSourceView.render().el);
+			});
+			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
+			
+
+			this.listenTo(this.appendedUserDataView.model, 'change', function() {
+				this.appendedUserDataView.$el.append(this.appendedUserDataView.render().el);
+			});
+			this.appendedUserDataView.model.fetch();
 		},
 	});
 
@@ -389,5 +466,9 @@ http://localhost:8888/lightMeter/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/pressureAltitude/4c20d05a772723f1b5e97166ca1f3709/
 
 http://localhost:8888/pressureHPAOrMBAR/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/AppendedUserData/a246fcc91b4fcf505376c3481f3eb3bb/
+http://localhost:8888/AppendedUserData/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/AppendedUserData/e81e0a914e1358591a44d03f338e5270/
 */
 

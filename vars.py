@@ -18,7 +18,7 @@ informacam_mime_types = {
 	'j3m' : "informacam/j3m",
 	'video' : "video/x-matroska",
 	'3gp' : "video/3gpp",
-	'log' : "informacam/log" 
+	'log' : "informacam/log"
 }
 
 informacam_mime_type_map = {
@@ -40,3 +40,20 @@ informacam_asset_tags = {
 MIME_TYPES.update(informacam_mime_types)
 MIME_TYPE_MAP.update(informacam_mime_type_map)
 ASSET_TAGS.update(informacam_asset_tags)
+MIME_TYPE_TASKS.update({
+	'image/jpeg' : [
+		"Image.preprocess_image.preprocessImage",
+		"Image.make_derivatives.makeDerivatives"
+	],
+	'video/x-matroska' : [
+		"Video.preprocess_video.preprocessVideo",
+		"Video.make_derivatives.makeDerivatives"
+	],
+	'informacam/log' : [
+		"Log.unpack_j3mlog.unpackJ3MLog"
+	],
+	'application/pgp' : [
+		"Source.init_source.initSource",
+		"PGP.import_key.importKey"
+	]
+})

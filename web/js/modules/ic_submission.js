@@ -30,7 +30,9 @@ jQuery(document).ready(function($) {
 			new app.InformaCamJ3MAppView;
 
 			//TMP: remove this after testing
-			doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
+			if (location.hostname == 'localhost') {
+				doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
+			}
 		} catch(err) {
 			console.warn(err);
 			console.warn("no updateConf()");
