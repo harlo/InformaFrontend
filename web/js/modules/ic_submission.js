@@ -2,25 +2,6 @@
 var app = app || {};//global Backbone
 
 jQuery(document).ready(function($) {
-/*
-	var source_sammy = $.sammy("#content", function() {
-		this.get(/submission\/([a-z0-9]{32})\//, function(context) {
-
-			submission = new InformaCamSubmission(_.extend({ root_el : $('#ic_submission_view_holder')},
-				doInnerAjax("documents", "post", { _id : this.params.splat[0] }, null, false)));
-
-			if(submission.get('result') != 200) {
-				failOut($(submission.get('root_el')));
-				return;
-			}
-
-			submission.unset('result');
-
-		});
-
-	});
-*/	
-	
 
 	$(function() {
 		try {
@@ -31,7 +12,7 @@ jQuery(document).ready(function($) {
 
 			//TMP: remove this after testing
 			if (location.hostname == 'localhost') {
-				doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
+//				doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
 			}
 		} catch(err) {
 			console.warn(err);
