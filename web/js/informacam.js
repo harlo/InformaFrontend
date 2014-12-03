@@ -134,3 +134,29 @@ function closeHeaderPopup() {
 		delete css;
 	})
 })(jQuery);
+
+
+
+function toHTML(d) {
+	var result = [];
+	result.push("<ul>");
+	for (var key in d) {
+		var line = [];
+
+		if (_.isArray(d[key]) || _.isObject(d[key])) {
+			line.push( "<li>" + key + " :</li>");
+			result.push(line.join(""));
+			result.push(toHTML(d[key]));
+
+		} else {
+			if (_.isArray(d)) {
+				line.push( "<li>" + d[key] + "</li>");
+			} else {
+				line.push( "<li>" + key + " : " + JSON.stringify(d[key]) + "</li>");
+			}
+			result.push(line.join(""));
+		}
+	}
+	result.push("</ul>");
+	return result.join('\n');
+}

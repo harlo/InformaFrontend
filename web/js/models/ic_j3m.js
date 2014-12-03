@@ -53,7 +53,6 @@ jQuery(document).ready(function($) {
 			if (!_.contains(this.tasksCompleted, task_path)) {
 				this.tasksCompleted.push(task_path);
 				$('#tasksComplete').html(this.tasksCompleted.length);
-				$c(task_path + " " + " " + status);
 				this.$el.append(task_path + '<br>');
 			}
 		}
@@ -88,7 +87,7 @@ jQuery(document).ready(function($) {
 	app.InformaCamAppendedUserDataVIew = Backbone.View.extend({
 		el: $('#ic_appended_user_data'),
 		render: function() {
-			this.$el.html('<h3>Appended User Data</h3>' + JSON.stringify(this.model));
+			this.$el.html('<h3>Appended User Data</h3>' + toHTML(this.model.attributes));
 			return this;
 		},
 	});
@@ -171,11 +170,8 @@ jQuery(document).ready(function($) {
 			this.xDomain = [];
 		},
 		render: function(model) {
-			$c(model);
 			var div_id = model.urlRoot.substring(1);
-			$c(div_id);
 			if (div_id == 'j3mheader') {
-				$c('j3mheader');
 				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
 				if (this.$el.find('svg').length) {
 					this.renderDateCreated();
@@ -227,7 +223,6 @@ jQuery(document).ready(function($) {
 			xDomain = d3.extent(data, function(d) { return d.timestamp; });
 			x.domain(xDomain);
 			this.xDomain = d3.extent(this.xDomain.concat(xDomain));
-			$c(this.xDomain);
 		
 			if (d3.min(this.allYVals) < 0) {
 				y.domain(d3.extent(this.allYVals));
@@ -334,7 +329,6 @@ jQuery(document).ready(function($) {
 				el: $('#ic_progressNotifierViewHolder'),
 			});
 			
-			$c(this.progressNotifierView.model);
 			
 
 			/* MULTI-VIEW LINE CHART */	
