@@ -176,8 +176,8 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
                 j3mDoc = json_decode(j3m)
                 vals = getTimeValues(self,j3mDoc,"gps_coords")
                 for element in vals:
-                    element['gps_lat'] = element['gps_coords'][0]
-                    element['gps_long'] = element['gps_coords'][1]
+                    element['gps_long'] = element['gps_coords'][0]
+                    element['gps_lat'] = element['gps_coords'][1]
                     del element['gps_coords']
                 self.write(json_encode(vals))
                 
