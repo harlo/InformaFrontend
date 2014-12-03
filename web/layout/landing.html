@@ -38,8 +38,18 @@
 	<section id="tab2">
 		<h2><a href="#tab2">URL</a></h2>
 		<div id="tab_content">
-		tab 2 content
+		Submit an online resource for verification by entering the URL bellow:
+		<br>
+		<form action="/SubmitViaURL/" enctype="multipart/form-data" method="post">
+		Url: <input type="text" name="url" id="url" size="50">
+		<input type="submit" value="Submit">
+		</form>
+		<fieldset>
+        <span class="errormessage"></span>
+    	</fieldset>
+		
 		</div>
+		
 	</section>
 	
 	<section id="tab3">
