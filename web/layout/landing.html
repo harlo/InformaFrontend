@@ -14,7 +14,8 @@
 	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
 		function(file, message) {
 			// onSuccess
-			path = message.data.mime_type.indexOf("application/pgp") > -1 ? "/source/" : "/submission/";
+			console.log(message);
+			path = message.data.mime_type !== undefined && message.data.mime_type.indexOf("application/pgp") > -1 ? "/source/" : "/submission/";
 			location.href = path + message.data._id + '/';
 		},
 		function(file, message) {

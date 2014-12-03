@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
 
 			//TMP: remove this after testing
 			if (location.hostname == 'localhost') {
-				doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
+//				doInnerAjax("reindex", "post", { _id : app.docid }, null, false);
 			}
 		} catch(err) {
 			console.warn(err);

@@ -1,3 +1,5 @@
+var app = app || {};//global Backbone
+
 function updateConf() {
 	var map_id = "harlo.ibn0kk8l";
 	var key = "23c00ae936704081ab019253c36a55b3";
@@ -159,4 +161,43 @@ function toHTML(d) {
 	}
 	result.push("</ul>");
 	return result.join('\n');
+}
+
+function onDownloadRequested(file_name, el) {
+	$(el).unbind("click");
+
+	var data = getFileContent(this,
+		[".data", app.docid, file_name].join('/'), null);
+
+	var is_valid = true;
+		
+	if(_.isNull(data)) {
+		is_valid = false;
+	} else {
+		try {
+			if(JSON.parse(data).result == 404) {
+				is_valid = false;
+			}
+		} catch(err) {}
+	}
+
+	if(!is_valid) {
+		alert("Could not download file");
+		return;
+	}
+
+	data = new Blob([data], { type : "application/octet-stream" });
+	$(el).attr({
+		'href' : window.URL.createObjectURL(data),
+		'download' : [app.docid, file_name].join('_')
+	});
+	
+	window.setTimeout(function() {
+		$(el).click();
+		$(el).removeAttr('href');
+		$(el).removeAttr('download');
+		$(el).click(function() {
+			onDownloadRequested(file_name, this);
+		});
+	}, 300);
 }
