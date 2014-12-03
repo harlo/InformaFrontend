@@ -15,6 +15,10 @@ jQuery(document).ready(function($) {
 		urlRoot: '/DocumentWrapper',
 	});
 
+	app.InformaCamAppendedUserData = Backbone.Model.extend({
+		urlRoot: '/AppendedUserData',
+	});
+
 	app.InformaCamJ3MStripped = Backbone.Model.extend({
 		urlRoot: '/j3mretrieve',
 	});
@@ -33,23 +37,25 @@ jQuery(document).ready(function($) {
 	
 	app.progressNotifierView = Backbone.View.extend({
 		initialize: function(options) {
-			this.taskCount = 0;
+			this.tasksCompleted = [];
 		},
 		render: function(message) {
 			var status = message.status;
 			if (message.doc_id != app.docid || status != 200) {
 				return;
 			}
-			if (this.taskCount == 0) {
+			if (this.tasksCompleted.length == 0) {
 				this.$el.prepend('<h2>Task Progress</h2>');
 				this.$el.addClass("rendered");
-				$('#tasksTotal').html('??? (to come)');
 			}
+			$('#tasksTotal').html(message.task_queue.length);
 			var task_path = message.task_path;
-			this.taskCount++;
-			$('#tasksComplete').html(Math.round(this.taskCount / 2));
-			$c(task_path + " " + " " + status);
-			this.$el.append(task_path + '<br>');
+			if (!_.contains(this.tasksCompleted, task_path)) {
+				this.tasksCompleted.push(task_path);
+				$('#tasksComplete').html(this.tasksCompleted.length);
+				$c(task_path + " " + " " + status);
+				this.$el.append(task_path + '<br>');
+			}
 		}
 	});
 
@@ -79,12 +85,23 @@ jQuery(document).ready(function($) {
 		},
 	});
 
+	app.InformaCamAppendedUserDataVIew = Backbone.View.extend({
+		el: $('#ic_appended_user_data'),
+		render: function() {
+			this.$el.html('<h3>Appended User Data</h3>' + JSON.stringify(this.model));
+			return this;
+		},
+	});
+
 	app.InformaCamDocumentWrapperView = Backbone.View.extend({
 		el: $('#ic_documentwrapper_view_holder'),
 		template: getTemplate("document_wrapper.html"),
 		render: function() {
 			json = this.model.toJSON().data;
 			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
+			if (json.upload_attempts === undefined) {
+				json.upload_attempts = 1;
+			}
 			html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
@@ -156,6 +173,7 @@ jQuery(document).ready(function($) {
 		render: function(model) {
 			$c(model);
 			var div_id = model.urlRoot.substring(1);
+			$c(div_id);
 			if (div_id == 'j3mheader') {
 				$c('j3mheader');
 				this.dateCreated = model.toJSON().data.genealogy.dateCreated;
@@ -290,6 +308,12 @@ jQuery(document).ready(function($) {
 				})
 			});
 
+			this.appendedUserDataView = new app.InformaCamAppendedUserDataVIew({
+				model: new app.InformaCamAppendedUserData({
+					id: app.docid
+				})
+			});
+
 			this.documentWrapperView = new app.InformaCamDocumentWrapperView({
 				model: new app.InformaCamDocumentWrapper({
 					id: app.docid
@@ -309,6 +333,8 @@ jQuery(document).ready(function($) {
 				model: new InformaCamNotifier(),
 				el: $('#ic_progressNotifierViewHolder'),
 			});
+			
+			$c(this.progressNotifierView.model);
 			
 
 			/* MULTI-VIEW LINE CHART */	
@@ -380,7 +406,7 @@ jQuery(document).ready(function($) {
 				this.listenTo(view.model, 'change', function() {
 					view.$el.append(view.render().el);
 				});
-//				view.model.fetch();
+				view.model.fetch();
 			}, this);
 			
 			
@@ -392,8 +418,13 @@ jQuery(document).ready(function($) {
 			this.listenTo(this.documentSourceView.model, 'change', function() {
 				this.documentSourceView.$el.append(this.documentSourceView.render().el);
 			});
-			
 			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
+			
+
+			this.listenTo(this.appendedUserDataView.model, 'change', function() {
+				this.appendedUserDataView.$el.append(this.appendedUserDataView.render().el);
+			});
+			this.appendedUserDataView.model.fetch();
 		},
 	});
 
@@ -435,5 +466,9 @@ http://localhost:8888/lightMeter/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/pressureAltitude/4c20d05a772723f1b5e97166ca1f3709/
 
 http://localhost:8888/pressureHPAOrMBAR/4c20d05a772723f1b5e97166ca1f3709/
+
+http://localhost:8888/AppendedUserData/a246fcc91b4fcf505376c3481f3eb3bb/
+http://localhost:8888/AppendedUserData/4c20d05a772723f1b5e97166ca1f3709/
+http://localhost:8888/AppendedUserData/e81e0a914e1358591a44d03f338e5270/
 */
 
