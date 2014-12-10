@@ -109,6 +109,9 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/models/ic_user.js',
 			'/web/js/models/ic_user_admin.js'
 		])
+
+		self.restricted_routes_by_status[0].extend([
+			'unveil', 'reindex', 'cluster'])
 		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
 			init_vars = json.loads(IV.read())['web']
