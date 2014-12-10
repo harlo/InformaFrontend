@@ -99,12 +99,23 @@ jQuery(document).ready(function($) {
 		el: $('#ic_documentwrapper_view_holder'),
 		template: getTemplate("document_wrapper.html"),
 		render: function() {
-			json = this.model.toJSON().data;
+			var json = this.model.toJSON().data;
 			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
 			if (json.upload_attempts === undefined) {
 				json.upload_attempts = 1;
 			}
-			html = Mustache.to_html(this.template, json);
+			if (json.j3m_verified === undefined) {
+				json.j3m_verified = 'unverified';
+			} else {
+				json.j3m_verified = json.j3m_verified ? 'passed (j3m data was signed, and the signature verified good)' : 'failed';
+			}
+			
+			if (json.media_verified === undefined) {
+				json.media_verified = 'unverified';
+			} else {
+				json.media_verified = json.media_verified ? 'passed (the pixelhash check matched j3m data signature)' : 'failed';
+			}
+			var html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
 		},
@@ -180,6 +191,10 @@ jQuery(document).ready(function($) {
 					this.renderDateCreated();
 				}
 				return;
+			}
+			
+			if (!$('#graph_select').length) {
+				$('<select multiple id="graph_select"><option value="foo">Doodoo</option></select>').appendTo(this.$el);
 			}
 
 			var data = model.get("values");
