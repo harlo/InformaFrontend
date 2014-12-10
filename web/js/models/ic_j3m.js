@@ -197,8 +197,9 @@ jQuery(document).ready(function($) {
 				$('<select multiple id="graph_select"></select>')
 				.appendTo('#graph_controls')
 				.change(function() {
-					$('g.y.axis, g path.line').hide();
+					$('g.y.axis, g path.line, g .label').hide();
 					_.each($(this).val(), function(line) {
+						$('text.label.' + line).show();
 						$('path.' + line).show();
 						$('g.y.axis.' + line).show();
 					});
@@ -275,6 +276,18 @@ jQuery(document).ready(function($) {
 					.datum(data)
 					.attr("class", "line " + div_id + " " + key)
 					.attr("d", line);
+					
+				var values = model.get("values");
+				
+				var labelX = x(values[values.length - 1]['timestamp']) + 5;
+				var labelY = y(values[values.length - 1][key]);
+					
+				svg.append("text")
+					.attr("transform", "translate(" + labelX + "," + labelY + ")")
+					.attr("dy", ".35em")
+					.attr("text-anchor", "start")
+					.attr("class", "label " + div_id + " " + key)
+					.text(key);
 			}, model);
 
 			scaleGraphs();
