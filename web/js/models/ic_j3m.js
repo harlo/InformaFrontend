@@ -1,5 +1,9 @@
 var app = app || {};//global Backbone
 
+var niceDataNames = {lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+
+var niceDatasetNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
 
@@ -208,7 +212,7 @@ jQuery(document).ready(function($) {
 
 			var data = model.get("values");
 			
-			$('<option value="' + div_id + '" selected>' + div_id + '</option>').appendTo('#graph_select');
+			$('<option value="' + div_id + '" selected>' + niceDatasetNames[div_id] + '</option>').appendTo('#graph_select');
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
@@ -249,12 +253,13 @@ jQuery(document).ready(function($) {
 			}
 
 			if (this.$el.find('svg').length == 1) {
-				svg.append("g")
-					.attr("class", "x axis")
-					.attr("transform", "translate(0," + this.height + ")")
-					.call(xAxis);
 				this.model.get("dateCreated").fetch();
 			}
+
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + this.height + ")")
+				.call(xAxis);
 
 			svg.append("g")
 				.attr("class", "y axis " + div_id)
@@ -276,18 +281,16 @@ jQuery(document).ready(function($) {
 					.datum(data)
 					.attr("class", "line " + div_id + " " + key)
 					.attr("d", line);
-					
-				var values = model.get("values");
-				
-				var labelX = x(values[values.length - 1]['timestamp']) + 5;
-				var labelY = y(values[values.length - 1][key]);
+									
+				var labelX = x(data[data.length - 1]['timestamp']) + 5;
+				var labelY = y(data[data.length - 1][key]);
 					
 				svg.append("text")
 					.attr("transform", "translate(" + labelX + "," + labelY + ")")
 					.attr("dy", ".35em")
 					.attr("text-anchor", "start")
 					.attr("class", "label " + div_id + " " + key)
-					.text(key);
+					.text(niceDataNames[key]);
 			}, model);
 
 			scaleGraphs();
