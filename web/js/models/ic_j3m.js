@@ -1,8 +1,6 @@
 var app = app || {};//global Backbone
 
-var niceDataNames = {lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
-
-var niceDatasetNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+var niceDataNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
 
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
@@ -212,7 +210,7 @@ jQuery(document).ready(function($) {
 
 			var data = model.get("values");
 			
-			$('<option value="' + div_id + '" selected>' + niceDatasetNames[div_id] + '</option>').appendTo('#graph_select');
+			$('<option value="' + div_id + '" selected>' + niceDataNames[div_id] + '</option>').appendTo('#graph_select');
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
