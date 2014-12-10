@@ -194,21 +194,20 @@ jQuery(document).ready(function($) {
 			}
 			
 			if (!$('#graph_select').length) {
-				$('<select multiple id="graph_select"><option value="foo">Doodoo</option></select>').appendTo(this.$el);
+				$('<select multiple id="graph_select"></select>')
+				.appendTo('#graph_controls')
+				.change(function() {
+					$('g.y.axis, g path.line').hide();
+					_.each($(this).val(), function(line) {
+						$('path.' + line).show();
+						$('g.y.axis.' + line).show();
+					});
+				});
 			}
 
 			var data = model.get("values");
-			$("#" + div_id + "_check, label[for='" + div_id + "_check']").addClass("rendered");
-			$("#" + div_id + "_check").change(function() {
-				if (this.checked) {
-					$('path.' + div_id).show();
-					$('g.y.axis.' + div_id).show();
-				} else {
-					$('path.' + div_id).hide();
-					$('g.y.axis.' + div_id).hide();
-				}
-			});
 			
+			$('<option value="' + div_id + '" selected>' + div_id + '</option>').appendTo('#graph_select');
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
