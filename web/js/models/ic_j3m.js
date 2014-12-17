@@ -2,6 +2,8 @@ var app = app || {};//global Backbone
 
 var niceDataNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
 
+var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
+
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
 
@@ -184,6 +186,7 @@ jQuery(document).ready(function($) {
 			this.width = this.totalWidth - this.margin.left - this.margin.right,
 			this.height = this.totalHeight - this.margin.top - this.margin.bottom;
 			this.xDomain = [];
+			this.graphsPlotted = 0;
 		},
 		render: function(model) {
 			var div_id = model.urlRoot.substring(1);
@@ -217,6 +220,8 @@ jQuery(document).ready(function($) {
 			_.each(model.get("keys"), function(key) {
 				this.allYVals = this.allYVals.concat(_.pluck(data, key));
 			}, this);
+			
+			this.graphsPlotted++;
 
 			var x = d3.time.scale()
 				.range([0, this.width]);
@@ -261,14 +266,16 @@ jQuery(document).ready(function($) {
 
 			svg.append("g")
 				.attr("class", "y axis " + div_id)
+				.attr("transform", "translate(" + (-50 * (this.graphsPlotted - 1)) + ",0)")
 				.call(yAxis)
 				.append("text")
-				.attr("transform", "rotate(-90)")
+				.attr("class", "y label " + div_id)
+				.attr("text-anchor", "end")
 				.attr("y", 6)
-				.attr("dy", ".71em")
-				.style("text-anchor", "end")
-				.text(this.yLabel);
-
+				.attr("dy", "-2em")
+				.attr("transform", "rotate(-90)")
+				.text(niceDataUnits[div_id]);
+			
 			_.each(model.get("keys"), function(key) {
 				var line = d3.svg.line()
 					.interpolate("basis")
