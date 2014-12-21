@@ -84,8 +84,8 @@ class InformaFrontend(UnveillanceFrontend):
 			],
 			'landing' : [
 				'/web/js/lib/dropzone.js',
+				'/web/js/models/ic2_search.js',
 				'/web/js/models/unveillance_dropzone.js',
-				'/web/js/models/ic_search.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic2_search.js'
 			],				
