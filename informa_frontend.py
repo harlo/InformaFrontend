@@ -25,6 +25,7 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/GPSBearing/(.*)", GPSBearingHandler),
 			(r"/GPSCoords/(.*)", GPSCoordsHandler),
 			(r"/GPSAccuracy/(.*)", GPSAccuracyHandler),
+			(r"/GPSData/(.*)", GPSDataHandler),
 			(r"/Accelerometer/(.*)", AccelerometerHandler),
 			(r"/DocumentWrapper/(.*)", DocumentWrapperHandler),
 			(r"/PitchRollAzimuth/(.*)", PitchRollAzimuthHandler),

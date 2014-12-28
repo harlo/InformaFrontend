@@ -58,14 +58,20 @@ def getJ3mDoc(self,param):
         
     
 
-def getTimeValues(self,j3mDoc,valueKey):
+def getTimeValues(self,j3mDoc,*valueKey):
     sensors = j3mDoc['data']['data']['sensorCapture']
     values=[]
     for element in sensors: 
-        try: 
-            value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
+        value = {"timestamp":element['timestamp']}
+        found = 0
+        for val in valueKey: 
+            try: 
+                value[val] = element['sensorPlayback'][val]
+                found = 1
+                
+            except KeyError: pass
+        if found == 1 :
             values.insert(int(element['timestamp']),value)
-        except KeyError: pass
     return sorted(values, key=itemgetter('timestamp'))
     
 
@@ -204,6 +210,29 @@ class GPSAccuracyHandler(tornado.web.RequestHandler):
             self.finish()
             self.flush()  
               
+              
+class GPSDataHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                vals = getTimeValues(self,j3mDoc,"gps_coords","gps_accuracy","gps_bearing")
+                for element in vals:
+                    element['gps_long'] = element['gps_coords'][0]
+                    element['gps_lat'] = element['gps_coords'][1]
+                    del element['gps_coords']
+                    
+                self.write(json_encode(vals))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION! (GPSDataHandler)', e
+                
+            self.finish()
+            self.flush()  
+            
 class AppendedUserDataHandler (tornado.web.RequestHandler):
     
         @gen.coroutine
