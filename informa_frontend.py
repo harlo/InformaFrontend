@@ -25,11 +25,13 @@ class InformaFrontend(UnveillanceFrontend):
 			(r"/GPSBearing/(.*)", GPSBearingHandler),
 			(r"/GPSCoords/(.*)", GPSCoordsHandler),
 			(r"/GPSAccuracy/(.*)", GPSAccuracyHandler),
+			(r"/GPSData/(.*)", GPSDataHandler),
 			(r"/Accelerometer/(.*)", AccelerometerHandler),
 			(r"/DocumentWrapper/(.*)", DocumentWrapperHandler),
 			(r"/PitchRollAzimuth/(.*)", PitchRollAzimuthHandler),
 			(r"/VisibleWifiNetworks/(.*)", VisibleWifiNetworksHandler),
 			(r"/AppendedUserData/(.*)", AppendedUserDataHandler),
+			(r"/SubmitViaURL/(.*)", SubmitViaURLHandler),
 			(r"/j3mretrieve/(.*)", J3MRetrieveHandler)])
 		
 		self.default_on_loads.extend([
@@ -83,7 +85,10 @@ class InformaFrontend(UnveillanceFrontend):
 			],
 			'landing' : [
 				'/web/js/lib/dropzone.js',
-				'/web/js/models/unveillance_dropzone.js'
+				'/web/js/models/ic2_search.js',
+				'/web/js/models/unveillance_dropzone.js',
+				'/web/js/models/ic_document_browser.js',
+				'/web/js/modules/ic2_search.js'
 			],				
 			'simple' : [
 #				'/web/js/lib/filedrop-min.js',

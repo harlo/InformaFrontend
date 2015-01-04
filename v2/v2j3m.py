@@ -1,44 +1,26 @@
 import tornado.web
 from tornado import gen
 from tornado.escape import json_decode, json_encode
-from tornado.httpclient import AsyncHTTPClient
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from conf import  DEBUG, buildServerURL
 from operator import itemgetter
 from tornado.concurrent import Future
 from J3mCache import J3mCache
-from xml.sax.saxutils import escape
-
-html_escape_table = {
-    '"': "&quot;",
-    "'": "&apos;"
-}
-def html_escape(text):
-    return escape(text, html_escape_table)
-
-def json_html_escape(obj):
-    for key, value in obj.iteritems():
-        try:
-            if len(value.keys()) > 0:
-                obj[key] = json_html_escape(value)
-        except Exception: 
-            obj[key] = html_escape(value)
-    return obj
+from j3m_util import json_html_escape, encode_multipart_formdata
+import urllib
+from fileinput import filename
 
 @gen.coroutine
 def getDocWrapper(self,param):
     doc = J3mCache.getWrapFromCache(param)
     if doc is None :
-        
         url = "%s%s%s" % (buildServerURL(),"/documents/?_id=" ,param)
         if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
         http_client = AsyncHTTPClient()
         future = http_client.fetch(url) 
-        if DEBUG: print str(self) +"got future" 
         J3mCache.putWrapInCache(param,future) 
-        if DEBUG: print str(self) +"put in cache"
         response = yield future
         J3mCache.putWrapInCache(param,response)
-        if DEBUG: print str(self) +"returning"
         raise gen.Return(response.body)   
     elif isinstance(doc, Future)  :
         if DEBUG: print str(self) +"is future"
@@ -48,32 +30,22 @@ def getDocWrapper(self,param):
     else :
         if DEBUG: print str(self) +"got otherwise: " + str(doc)
         raise gen.Return(doc.body)    
-        
-        
-   
+
     
 
 @gen.coroutine
 def getJ3mDoc(self,param):
     j3mDoc = J3mCache.getJ3mFromCache(param)
     if j3mDoc is None :
-       
-    
         handle = yield getDocWrapper(self,param)
         self.objectHandle = json_decode(handle)  
-        if DEBUG: print self.objectHandle['data']['j3m_id']
-                
         url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
         if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
         
         http_client = AsyncHTTPClient()
         future = http_client.fetch(url) 
-        
-        if DEBUG: print str(self) + "got j3m future" 
         J3mCache.putJ3mInCache(param,future) 
-        if DEBUG: print str(self) + "put j3m in cache"
         response = yield future
-        if DEBUG: print str(self) + "returning j3m"
         raise gen.Return(response.body)   
     elif isinstance(j3mDoc, Future)  :
         if DEBUG: print str(self) + "is j3mDoc future"
@@ -86,19 +58,23 @@ def getJ3mDoc(self,param):
         
     
 
-def getTimeValues(self,j3mDoc,valueKey):
+def getTimeValues(self,j3mDoc,*valueKey):
     sensors = j3mDoc['data']['data']['sensorCapture']
     values=[]
     for element in sensors: 
-        try: 
-            value = {valueKey: element['sensorPlayback'][valueKey],"timestamp":element['timestamp']}
+        value = {"timestamp":element['timestamp']}
+        found = 0
+        for val in valueKey: 
+            try: 
+                value[val] = element['sensorPlayback'][val]
+                found = 1
+                
+            except KeyError: pass
+        if found == 1 :
             values.insert(int(element['timestamp']),value)
-        except KeyError: pass
     return sorted(values, key=itemgetter('timestamp'))
     
 
-
-   
     
 class J3MRetrieveHandler(tornado.web.RequestHandler):
     
@@ -206,8 +182,8 @@ class GPSCoordsHandler(tornado.web.RequestHandler):
                 j3mDoc = json_decode(j3m)
                 vals = getTimeValues(self,j3mDoc,"gps_coords")
                 for element in vals:
-                    element['gps_lat'] = element['gps_coords'][0]
-                    element['gps_long'] = element['gps_coords'][1]
+                    element['gps_long'] = element['gps_coords'][0]
+                    element['gps_lat'] = element['gps_coords'][1]
                     del element['gps_coords']
                 self.write(json_encode(vals))
                 
@@ -234,6 +210,29 @@ class GPSAccuracyHandler(tornado.web.RequestHandler):
             self.finish()
             self.flush()  
               
+              
+class GPSDataHandler(tornado.web.RequestHandler):
+    
+        @gen.coroutine
+        def get(self,param):
+            try:
+                j3m = yield getJ3mDoc(self,param)
+                j3mDoc = json_decode(j3m)
+                vals = getTimeValues(self,j3mDoc,"gps_coords","gps_accuracy","gps_bearing")
+                for element in vals:
+                    element['gps_long'] = element['gps_coords'][0]
+                    element['gps_lat'] = element['gps_coords'][1]
+                    del element['gps_coords']
+                    
+                self.write(json_encode(vals))
+                
+            except Exception, e:
+                self.write('No Document found')  
+                print 'no Doc retrieved EXCEPTION! (GPSDataHandler)', e
+                
+            self.finish()
+            self.flush()  
+            
 class AppendedUserDataHandler (tornado.web.RequestHandler):
     
         @gen.coroutine
@@ -294,6 +293,37 @@ class DocumentWrapperHandler (tornado.web.RequestHandler):
         self.finish()
         self.flush()   
 
+class SubmitViaURLHandler (tornado.web.RequestHandler):
+    @gen.coroutine
+    def post(self,param):
+        targetURL = self.get_argument('url')
+        if DEBUG: print "target URL: " + targetURL
+        try:
+            serverURL= self.request.protocol + '://' + self.request.host
+            http_client = AsyncHTTPClient()
+            sub = yield http_client.fetch(targetURL, validate_cert=False)
+            sub_filename = targetURL[targetURL.rfind('/'):]
+            sub_filename = "fornow" #TODO - the URL doesn;t have to end with a filename, is it worth keeping?
+            files = []
+            #files.append(("uv_import", sub_filename, sub.body))
+            files.append((sub_filename, sub_filename, sub.body))
+            
+            content_type, body = encode_multipart_formdata([], files)
+            headers = {"Content-Type": content_type, 'content-length': str(len(body))}
+            request = HTTPRequest(serverURL + "/import/", "POST", headers=headers, body=body, validate_cert=False)
+
+            response = yield http_client.fetch(request)
+            doc = json_decode(response.body)
+            if DEBUG: print doc['data']['_id']
+            self.redirect("/submission/"+doc['data']['_id'] + "/")
+             
+        except Exception, e:
+            print 'Failed to upload from URL (DocumentWrapperHandler)', e  
+            self.write("Failed to upload from '" + targetURL + "'")  
+
+            self.finish()
+            self.flush()         
+            
 class AccelerometerHandler(tornado.web.RequestHandler):
     
         @gen.coroutine
