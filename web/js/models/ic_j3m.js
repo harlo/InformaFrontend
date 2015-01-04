@@ -1,5 +1,9 @@
 var app = app || {};//global Backbone
 
+var niceDataNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+
+var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
+
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
 
@@ -99,12 +103,23 @@ jQuery(document).ready(function($) {
 		el: $('#ic_documentwrapper_view_holder'),
 		template: getTemplate("document_wrapper.html"),
 		render: function() {
-			json = this.model.toJSON().data;
+			var json = this.model.toJSON().data;
 			json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
 			if (json.upload_attempts === undefined) {
 				json.upload_attempts = 1;
 			}
-			html = Mustache.to_html(this.template, json);
+			if (json.j3m_verified === undefined) {
+				json.j3m_verified = 'unverified';
+			} else {
+				json.j3m_verified = json.j3m_verified ? 'passed (j3m data was signed, and the signature verified good)' : 'failed';
+			}
+			
+			if (json.media_verified === undefined) {
+				json.media_verified = 'unverified';
+			} else {
+				json.media_verified = json.media_verified ? 'passed (the pixelhash check matched j3m data signature)' : 'failed';
+			}
+			var html = Mustache.to_html(this.template, json);
 			this.$el.html(html);
 			return this;
 		},
@@ -171,6 +186,7 @@ jQuery(document).ready(function($) {
 			this.width = this.totalWidth - this.margin.left - this.margin.right,
 			this.height = this.totalHeight - this.margin.top - this.margin.bottom;
 			this.xDomain = [];
+			this.graphsPlotted = 0;
 		},
 		render: function(model) {
 			var div_id = model.urlRoot.substring(1);
@@ -181,25 +197,31 @@ jQuery(document).ready(function($) {
 				}
 				return;
 			}
+			
+			if (!$('#graph_select').length) {
+				$('<select multiple id="graph_select"></select>')
+				.appendTo('#graph_controls')
+				.change(function() {
+					$('g.y.axis, g path.line, g .label').hide();
+					_.each($(this).val(), function(line) {
+						$('text.label.' + line).show();
+						$('path.' + line).show();
+						$('g.y.axis.' + line).show();
+					});
+				});
+			}
 
 			var data = model.get("values");
-			$("#" + div_id + "_check, label[for='" + div_id + "_check']").addClass("rendered");
-			$("#" + div_id + "_check").change(function() {
-				if (this.checked) {
-					$('path.' + div_id).show();
-					$('g.y.axis.' + div_id).show();
-				} else {
-					$('path.' + div_id).hide();
-					$('g.y.axis.' + div_id).hide();
-				}
-			});
 			
+			$('<option value="' + div_id + '" selected>' + niceDataNames[div_id] + '</option>').appendTo('#graph_select');
 
 			//lump all Y vals into one array for determining domain
 			this.allYVals = [];
 			_.each(model.get("keys"), function(key) {
 				this.allYVals = this.allYVals.concat(_.pluck(data, key));
 			}, this);
+			
+			this.graphsPlotted++;
 
 			var x = d3.time.scale()
 				.range([0, this.width]);
@@ -234,23 +256,26 @@ jQuery(document).ready(function($) {
 			}
 
 			if (this.$el.find('svg').length == 1) {
-				svg.append("g")
-					.attr("class", "x axis")
-					.attr("transform", "translate(0," + this.height + ")")
-					.call(xAxis);
 				this.model.get("dateCreated").fetch();
 			}
 
 			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + this.height + ")")
+				.call(xAxis);
+
+			svg.append("g")
 				.attr("class", "y axis " + div_id)
+				.attr("transform", "translate(" + (-50 * (this.graphsPlotted - 1)) + ",0)")
 				.call(yAxis)
 				.append("text")
-				.attr("transform", "rotate(-90)")
+				.attr("class", "y label " + div_id)
+				.attr("text-anchor", "end")
 				.attr("y", 6)
-				.attr("dy", ".71em")
-				.style("text-anchor", "end")
-				.text(this.yLabel);
-
+				.attr("dy", "-2em")
+				.attr("transform", "rotate(-90)")
+				.text(niceDataUnits[div_id]);
+			
 			_.each(model.get("keys"), function(key) {
 				var line = d3.svg.line()
 					.interpolate("basis")
@@ -261,6 +286,16 @@ jQuery(document).ready(function($) {
 					.datum(data)
 					.attr("class", "line " + div_id + " " + key)
 					.attr("d", line);
+									
+				var labelX = x(data[data.length - 1]['timestamp']) + 5;
+				var labelY = y(data[data.length - 1][key]);
+					
+				svg.append("text")
+					.attr("transform", "translate(" + labelX + "," + labelY + ")")
+					.attr("dy", ".35em")
+					.attr("text-anchor", "start")
+					.attr("class", "label " + div_id + " " + key)
+					.text(niceDataNames[key]);
 			}, model);
 
 			scaleGraphs();
