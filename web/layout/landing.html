@@ -18,7 +18,6 @@
 		<div id="tab_content">
 			<div id="ic_import_dropzone_holder">
 			<input type="file" name="uv_import" />
-			<input type="hidden" name="x_token" value="" />
 			</div>
 			<script type="text/javascript">
 				discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
@@ -47,7 +46,7 @@
     </div><!--/end .file-->
     
     <div id="url" class="block">
-    
+    	<!-- this should use our doInnerAjax api -->
         <div id="tab_content">
 			Submit an online resource for verification by entering the URL bellow:
 			<br>
