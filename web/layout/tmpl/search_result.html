@@ -1,6 +1,7 @@
 <h4>{{ count }} document(s) found:</h4>
+<div id="ic_export_holder"></div>
 <ul>
 	{{ #documents }}
-	<li><a href="/{{ doc_stub }}/{{ _id }}/">{{ file_name }}</a></li>
+	<li><input type="checkbox" id="batch_{{ _id}}" /><a href="/{{ doc_stub }}/{{ _id }}/">{{ file_name }}</a></li>
 	{{ /documents }}
 </ul>
