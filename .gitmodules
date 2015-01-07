@@ -1,3 +1,0 @@
-[submodule "lib/Frontend"]
-	path = lib/Frontend
-	url = git@github.com:harlo/UnveillanceInterface.git
