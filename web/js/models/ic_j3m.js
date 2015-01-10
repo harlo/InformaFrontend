@@ -135,7 +135,7 @@ jQuery(document).ready(function($) {
 			this.json = {values: this.model.get("values")};
 			this.loadMap('mapOverview', [this.json.values[0]], 4);
 			this.loadMap('mapZoom', this.json.values, 19);
-
+			$c(this.json);
 			return this;
 		},
 		
@@ -147,26 +147,38 @@ jQuery(document).ready(function($) {
 				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 			}).addTo(this.maps[mapID]);
 			
-			if (values.length > 1) {
+			if (values.length > 1) {//small map
 				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
 				L.polyline(latlngs, {color: 'red', weight:2}).addTo(this.maps[mapID]);
 				var myIcon = L.icon({
-					iconUrl: '/web/images/ic_map_icon.png',
-					iconRetinaUrl: '/web/images/ic_map_icon.png',
+					iconUrl: '/web/images/ic_map_icon_bearing.png',
+					iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
 					iconSize: [5, 5]
         		});
 			} else {
 				var myIcon = L.icon({
-					iconUrl: '/web/images/ic_map_icon.png',
-					iconRetinaUrl: '/web/images/ic_map_icon.png',
+					iconUrl: '/web/images/ic_map_icon_bearing.png',
+					iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
 					iconSize: [18, 18]
         		});
 			}
-
+//TODO: make new layers for accuracy and bearing http://stackoverflow.com/questions/12848812/layer-ordering-in-leaflet-js			
 			_.each(values, function(latlong) {
 				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
-				L.marker([latlong.gps_lat,latlong.gps_long]).setIcon(myIcon).addTo(this.maps[mapID])
+				L.rotatedMarker([latlong.gps_lat,latlong.gps_long], {angle: Math.random() * 360})
+				.setIcon(myIcon)
+				.addTo(this.maps[mapID])
 				.bindPopup(timestamp);
+				
+				if (mapID == 'mapZoom') {
+					if (latlong.gps_accuracy) {
+						radius = 36 / latlong.gps_accuracy;
+						opacity = .7 / radius;
+						$c(radius + " " + opacity);
+						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]);
+						$c(latlong.gps_accuracy);
+					}
+				}
 			}, this);
 		},
 	});
@@ -355,7 +367,8 @@ jQuery(document).ready(function($) {
 
 			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
 				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSCoords',
+//					urlRoot: '/GPSCoords',
+					urlRoot: '/GPSData',
 					id: app.docid
 				}),
 				el: '#ic_gps_coords_view_holder',
@@ -467,8 +480,40 @@ jQuery(document).ready(function($) {
 	
 });
 
+
+
+L.RotatedMarker = L.Marker.extend({
+    options: {
+        angle: 0
+    },
+
+    _setPos: function (pos) {
+        L.Marker.prototype._setPos.call(this, pos);
+        
+        if (L.DomUtil.TRANSFORM) {
+            // use the CSS transform rule if available
+            this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
+        } else if(L.Browser.ie) {
+            // fallback for IE6, IE7, IE8
+            var rad = this.options.angle * (Math.PI / 180),
+                costheta = Math.cos(rad),
+                sintheta = Math.sin(rad);
+            this._icon.style.filter += ' progid:DXImageTransform.Microsoft.Matrix(sizingMethod=\'auto expand\', M11=' + 
+                costheta + ', M12=' + (-sintheta) + ', M21=' + sintheta + ', M22=' + costheta + ')';                
+        }
+    }
+});
+
+L.rotatedMarker = function (pos, options) {
+    return new L.RotatedMarker(pos, options);
+};
+
 /*
 think about these:
+
+Has bearing as well as accuracy
+http://localhost:8888/GPSData/4c20d05a772723f1b5e97166ca1f3709/
+
 
 http://localhost:8888/GPSAccuracy/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/Accelerometer/4c20d05a772723f1b5e97166ca1f3709/
