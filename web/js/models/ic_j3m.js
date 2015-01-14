@@ -129,44 +129,79 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 			this.maps = [];
 			this.header = options.header;
+
+			this.overviewIcon = L.icon({
+				iconUrl: '/web/images/ic_map_icon.png',
+				iconRetinaUrl: '/web/images/ic_map_icon.png',
+				iconSize: [18, 18]
+			});
+			
+			this.zoomIcon = L.icon({
+				iconUrl: '/web/images/ic_map_icon.png',
+				iconRetinaUrl: '/web/images/ic_map_icon.png',
+				iconSize: [7, 7]
+			});
+			
+			this.zoomBearingIcon = L.icon({
+				iconUrl: '/web/images/ic_map_icon_bearing.png',
+				iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
+				iconSize: [7, 7]
+			});
 		},
 		render: function() {
 			this.$el.prepend('<h2>' + this.header + '</h2>');
 			this.json = {values: this.model.get("values")};
 			this.loadMap('mapOverview', [this.json.values[0]], 4);
 			this.loadMap('mapZoom', this.json.values, 19);
-
+			$c(this.json);
 			return this;
 		},
 		
 		loadMap: function(mapID, values, zoom) {
 			$('#' + mapID).addClass("rendered");
 			this.maps[mapID] = L.map(mapID).setView([values[0].gps_lat, values[0].gps_long], zoom);
+			
+			//create map tile layer
 			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
 				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 			}).addTo(this.maps[mapID]);
 			
-			if (values.length > 1) {
+			if (mapID == 'mapZoom') {
 				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
-				L.polyline(latlngs, {color: 'red', weight:2}).addTo(this.maps[mapID]);
-				var myIcon = L.icon({
-					iconUrl: '/web/images/ic_map_icon.png',
-					iconRetinaUrl: '/web/images/ic_map_icon.png',
-					iconSize: [5, 5]
-        		});
-			} else {
-				var myIcon = L.icon({
-					iconUrl: '/web/images/ic_map_icon.png',
-					iconRetinaUrl: '/web/images/ic_map_icon.png',
-					iconSize: [18, 18]
-        		});
+				L.polyline(latlngs, {color: 'red', weight:2, opacity:1.0 }).addTo(this.maps[mapID]);
 			}
 
+			
 			_.each(values, function(latlong) {
 				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
-				L.marker([latlong.gps_lat,latlong.gps_long]).setIcon(myIcon).addTo(this.maps[mapID])
+				
+				var angle = 0;
+				if (mapID == 'mapZoom') {
+					if (latlong.gps_bearing === undefined) {
+						var icon = this.zoomIcon;
+					} else {
+						var icon = this.zoomBearingIcon;
+						angle = latlong.gps_bearing;	
+					}
+				} else {
+					var icon = this.overviewIcon;
+				}
+			
+				L.rotatedMarker([latlong.gps_lat,latlong.gps_long], {angle: angle, opacity:1.0})
+				.setIcon(icon)
+				.addTo(this.maps[mapID])
 				.bindPopup(timestamp);
+		
+				if (mapID == 'mapZoom') {
+					if (latlong.gps_accuracy) {
+						radius = 36 / latlong.gps_accuracy;
+						opacity = .7 / radius;
+
+						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]).bringToBack();
+
+					}
+				}
 			}, this);
 		},
 	});
@@ -355,7 +390,7 @@ jQuery(document).ready(function($) {
 
 			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
 				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSCoords',
+					urlRoot: '/GPSData',
 					id: app.docid
 				}),
 				el: '#ic_gps_coords_view_holder',
@@ -467,8 +502,40 @@ jQuery(document).ready(function($) {
 	
 });
 
+
+
+L.RotatedMarker = L.Marker.extend({
+    options: {
+        angle: 0
+    },
+
+    _setPos: function (pos) {
+        L.Marker.prototype._setPos.call(this, pos);
+        
+        if (L.DomUtil.TRANSFORM) {
+            // use the CSS transform rule if available
+            this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
+        } else if(L.Browser.ie) {
+            // fallback for IE6, IE7, IE8
+            var rad = this.options.angle * (Math.PI / 180),
+                costheta = Math.cos(rad),
+                sintheta = Math.sin(rad);
+            this._icon.style.filter += ' progid:DXImageTransform.Microsoft.Matrix(sizingMethod=\'auto expand\', M11=' + 
+                costheta + ', M12=' + (-sintheta) + ', M21=' + sintheta + ', M22=' + costheta + ')';                
+        }
+    }
+});
+
+L.rotatedMarker = function (pos, options) {
+    return new L.RotatedMarker(pos, options);
+};
+
 /*
 think about these:
+
+Has bearing as well as accuracy
+http://localhost:8888/GPSData/4c20d05a772723f1b5e97166ca1f3709/
+
 
 http://localhost:8888/GPSAccuracy/4c20d05a772723f1b5e97166ca1f3709/
 http://localhost:8888/Accelerometer/4c20d05a772723f1b5e97166ca1f3709/
