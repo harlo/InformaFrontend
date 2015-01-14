@@ -1,8 +1,8 @@
 var app = app || {};//global Backbone
 
-var niceDataNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+var niceDataNames = {lightMeter: 'Light Meter', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter',  acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
 
-var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
+var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
 
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
@@ -210,8 +210,8 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 			this.model.get('pressureAltitude').bind('change', this.render, this);
 			this.model.get('lightMeter').bind('change', this.render, this);
-			this.model.get('GPSAccuracy').bind('change', this.render, this);
-			this.model.get('GPSBearing').bind('change', this.render, this);
+//			this.model.get('GPSAccuracy').bind('change', this.render, this);
+//			this.model.get('GPSBearing').bind('change', this.render, this);
 			this.model.get('Accelerometer').bind('change', this.render, this);
 			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
 			this.model.get('dateCreated').bind('change', this.render, this);
@@ -421,6 +421,7 @@ jQuery(document).ready(function($) {
 						title: 'Light Meter',
 						keys: ['lightMeterValue'],
 					}),
+/*
 					GPSAccuracy: new app.InformaCamJ3MTimeStampedData({
 						urlRoot: '/GPSAccuracy',
 						id: app.docid,
@@ -433,6 +434,7 @@ jQuery(document).ready(function($) {
 						title: 'GPS Bearing',
 						keys: ['gps_bearing'],
 					}),
+*/
 					Accelerometer: new app.InformaCamJ3MTimeStampedData({
 						urlRoot: '/Accelerometer',
 						id: app.docid,
@@ -454,8 +456,8 @@ jQuery(document).ready(function($) {
 
 			this.lineChartMultiView.model.get("pressureAltitude").fetch();
 			this.lineChartMultiView.model.get("lightMeter").fetch();
-			this.lineChartMultiView.model.get("GPSAccuracy").fetch();
-			this.lineChartMultiView.model.get("GPSBearing").fetch();
+//			this.lineChartMultiView.model.get("GPSAccuracy").fetch();
+//			this.lineChartMultiView.model.get("GPSBearing").fetch();
 			this.lineChartMultiView.model.get("Accelerometer").fetch();
 			this.lineChartMultiView.model.get("pressureHPAOrMBAR").fetch();
 			
