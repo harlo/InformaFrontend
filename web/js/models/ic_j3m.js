@@ -145,7 +145,7 @@ jQuery(document).ready(function($) {
 			this.zoomBearingIcon = L.icon({
 				iconUrl: '/web/images/ic_map_icon_bearing.png',
 				iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
-				iconSize: [7, 7]
+				iconSize: [6, 8]
 			});
 		},
 		render: function() {
@@ -197,6 +197,7 @@ jQuery(document).ready(function($) {
 					if (latlong.gps_accuracy) {
 						radius = 36 / latlong.gps_accuracy;
 						opacity = .7 / radius;
+						$c(radius + " " + opacity);
 
 						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]).bringToBack();
 
