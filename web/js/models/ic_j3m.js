@@ -129,6 +129,37 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 			this.maps = [];
 			this.header = options.header;
+			this.MyCustomLayer = L.Class.extend({
+
+				initialize: function (latlng) {
+					// save position of the layer or any options from the constructor
+					this._latlng = latlng;
+				},
+
+				onAdd: function (map) {
+					this._map = map;
+
+					// create a DOM element and put it into one of the map panes
+					this._el = L.DomUtil.create('div', 'my-custom-layer leaflet-zoom-hide');
+					map.getPanes().overlayPane.appendChild(this._el);
+
+					// add a viewreset event listener for updating layer's position, do the latter
+					map.on('viewreset', this._reset, this);
+					this._reset();
+				},
+
+				onRemove: function (map) {
+					// remove layer's DOM elements and listeners
+					map.getPanes().overlayPane.removeChild(this._el);
+					map.off('viewreset', this._reset, this);
+				},
+
+				_reset: function () {
+					// update layer's position
+					var pos = this._map.latLngToLayerPoint(this._latlng);
+					L.DomUtil.setPosition(this._el, pos);
+				}
+			});
 		},
 		render: function() {
 			this.$el.prepend('<h2>' + this.header + '</h2>');
@@ -142,18 +173,33 @@ jQuery(document).ready(function($) {
 		loadMap: function(mapID, values, zoom) {
 			$('#' + mapID).addClass("rendered");
 			this.maps[mapID] = L.map(mapID).setView([values[0].gps_lat, values[0].gps_long], zoom);
+			
+			//create map tile layer
 			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
 				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 			}).addTo(this.maps[mapID]);
 			
-			if (values.length > 1) {//small map
+			
+//TODO: make new layers for accuracy and bearing http://stackoverflow.com/questions/12848812/layer-ordering-in-leaflet-js			
+			if (mapID == 'mapZoom') {
+				this.maps[mapID].addLayer(new this.MyCustomLayer([values[0].gps_lat, values[0].gps_long]));
+
+				$c(this.maps[mapID].getPanes());
+				//create bearing layer http://stackoverflow.com/a/18967523
+/*
+				var topPane = L.DomUtil.create('div', 'leaflet-top-pane', this.maps[mapID].getPanes().mapPane);
+				var topLayer = L.mapbox.tileLayer('bobbysud.map-3inxc2p4').addTo(this.maps[mapID]); 
+				topPane.appendChild(topLayer.getContainer());
+				topLayer.setZIndex(7); 
+*/
 				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
-				L.polyline(latlngs, {color: 'red', weight:2}).addTo(this.maps[mapID]);
+				L.polyline(latlngs, {color: 'red', weight:2, opacity:1.0 }).addTo(this.maps[mapID]);
+				
 				var myIcon = L.icon({
 					iconUrl: '/web/images/ic_map_icon_bearing.png',
 					iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
-					iconSize: [5, 5]
+					iconSize: [7, 7]
         		});
 			} else {
 				var myIcon = L.icon({
@@ -162,20 +208,20 @@ jQuery(document).ready(function($) {
 					iconSize: [18, 18]
         		});
 			}
-//TODO: make new layers for accuracy and bearing http://stackoverflow.com/questions/12848812/layer-ordering-in-leaflet-js			
 			_.each(values, function(latlong) {
 				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
+				/*
 				L.rotatedMarker([latlong.gps_lat,latlong.gps_long], {angle: Math.random() * 360})
 				.setIcon(myIcon)
 				.addTo(this.maps[mapID])
 				.bindPopup(timestamp);
-				
+	*/			
 				if (mapID == 'mapZoom') {
 					if (latlong.gps_accuracy) {
 						radius = 36 / latlong.gps_accuracy;
 						opacity = .7 / radius;
 						$c(radius + " " + opacity);
-						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]);
+						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]).bringToBack();
 						$c(latlong.gps_accuracy);
 					}
 				}
