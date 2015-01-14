@@ -186,13 +186,6 @@ jQuery(document).ready(function($) {
 				this.maps[mapID].addLayer(new this.MyCustomLayer([values[0].gps_lat, values[0].gps_long]));
 
 				$c(this.maps[mapID].getPanes());
-				//create bearing layer http://stackoverflow.com/a/18967523
-/*
-				var topPane = L.DomUtil.create('div', 'leaflet-top-pane', this.maps[mapID].getPanes().mapPane);
-				var topLayer = L.mapbox.tileLayer('bobbysud.map-3inxc2p4').addTo(this.maps[mapID]); 
-				topPane.appendChild(topLayer.getContainer());
-				topLayer.setZIndex(7); 
-*/
 				latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
 				L.polyline(latlngs, {color: 'red', weight:2, opacity:1.0 }).addTo(this.maps[mapID]);
 				
@@ -210,12 +203,12 @@ jQuery(document).ready(function($) {
 			}
 			_.each(values, function(latlong) {
 				timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
-				/*
+
 				L.rotatedMarker([latlong.gps_lat,latlong.gps_long], {angle: Math.random() * 360})
 				.setIcon(myIcon)
 				.addTo(this.maps[mapID])
 				.bindPopup(timestamp);
-	*/			
+		
 				if (mapID == 'mapZoom') {
 					if (latlong.gps_accuracy) {
 						radius = 36 / latlong.gps_accuracy;
