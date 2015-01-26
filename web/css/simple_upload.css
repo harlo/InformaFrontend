@@ -5,8 +5,10 @@
 	right:0 !important;
 	bottom:0 !important;
 */
-	width:100% !important;
-	height:100% !important;
+	width:698px !important;
+	height:298px !important;
+	position:absolute;
+	z-index:100;
 }
 
 
@@ -42,16 +44,12 @@
 	position:absolute;
 }
 
-#ic_upload_instructions {
-	height:33px;
+.ic_upload_instructions {
 	text-align:center;
-	margin:auto;
+	margin-top:102px;
 	position:absolute;
-	top:0;
 	left:0;
-	bottom:0;
 	right:0;
-	z-index:99;
 }
 
 .dz-details img {

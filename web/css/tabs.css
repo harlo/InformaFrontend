@@ -90,19 +90,26 @@ div.tab_content {
   	border-radius: 5px;
 }
 
+.ic_upload_instructions {
+	display:none;
+}
+
+#ic_upload_instructions_desktop {
+	display:block;
+}
 
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen 
 and (min-device-width : 320px) 
 and (max-device-width : 480px) {
-/* Styles */
-	div.tab_content {
-		border:10px solid #9FB6CD;
-		overflow: scroll;
-		border-radius: 5px;
-	}
-	
 	#drag_drop_notice {
 		display:none;
+	}
+	
+	#ic_upload_instructions_desktop {
+		display:none;
+	}
+	#ic_upload_instructions_smartphone {
+		display:block;
 	}
 }
