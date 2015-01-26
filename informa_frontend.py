@@ -90,6 +90,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/unveillance_dropzone.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic2_search.js',
+				'/web/js/modules/ic_landing.js',
 				'/web/css/tabs.css'
 			],				
 			'simple' : [
