@@ -1,6 +1,6 @@
 
 
-div#tab_content {
+div.tab_content {
 	height: 300px;
     width: 700px;
     border:1px solid #9FB6CD;
@@ -75,17 +75,34 @@ div#tab_content {
   background: #f0f0f0;
   color: #555;
 }
-#tab_content input, button, select, textarea, span {
+.tab_content input, button, select, textarea, span {
   	margin: 0.5em;
 }
 
-#tab_content a.uv_button {
+.tab_content a.uv_button {
   	margin-top: 100em;
   	box-shadow: 0 3px 3px rgba(0,0,0,0.5);
 }
-#tab_content #uv_import_dropzone {
+.tab_content #uv_import_dropzone {
   	border-radius: 5px;
 }
-#tab_content #ic_search_holder {
+.tab_content #ic_search_holder {
   	border-radius: 5px;
+}
+
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 480px) {
+/* Styles */
+	div.tab_content {
+		border:10px solid #9FB6CD;
+		overflow: scroll;
+		border-radius: 5px;
+	}
+	
+	#drag_drop_notice {
+		display:none;
+	}
 }

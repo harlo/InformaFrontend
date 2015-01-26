@@ -62,7 +62,8 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_j3m.js',
 				'/web/js/models/ic_image.js',
 				'/web/js/models/ic_submission.js',
-				'/web/js/modules/ic_submission.js'],
+				'/web/js/modules/ic_submission.js',
+				'/web/css/ic_viz.css'],
 			'source' : [
 				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_source.js',
@@ -89,6 +90,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/unveillance_dropzone.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic2_search.js',
+				'/web/js/modules/ic_landing.js',
 				'/web/css/tabs.css'
 			],				
 			'simple' : [

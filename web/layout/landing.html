@@ -7,43 +7,19 @@
     </ul>
     
     <div id="file" class="block active">
-    
-        <span> Is it real? Will it float? Upload a media or a J3M metadata file to verify. <br/> 
-			Drag and drop on the panel below, or click for file selector dialogue. 
+        <span> Is it real? Will it float? Upload a media or a J3M metadata file to verify. <br> 
+			<span id="drag_drop_notice">Drag and drop on the panel below, or click for file selector dialogue.</span>
 		</span>
-		<div id="tab_content">
+		<div class="tab_content">
 			<div id="ic_import_dropzone_holder">
 			<input type="file" name="uv_import" />
 			</div>
-			<script type="text/javascript">
-				discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
-					function(file, message) {
-						// onSuccess
-						console.log(message);
-						path = message.data.mime_type !== undefined && message.data.mime_type.indexOf("application/pgp") > -1 ? "/source/" : "/submission/";
-						location.href = path + message.data._id + '/';
-					},
-					function(file, message) {
-						// onError
-						console.error(message);
-						messagetext = '';
-						if (typeof message !== null && typeof message === 'object') {
-							if (message.result == 403) {
-								messagetext = "It's not you, it's us. We're looking into the problem. Please try again later. (" + message.result + ")";
-								this.disable();
-							}
-						} else {
-							messagetext = message;
-						}
-						return file.previewElement.querySelector("[data-dz-errormessage]").textContent = messagetext;
-					});
-			</script>
 		</div>
     </div><!--/end .file-->
     
     <div id="url" class="block">
     	<!-- this should use our doInnerAjax api -->
-        <div id="tab_content">
+        <div class="tab_content">
 			Submit an online resource for verification by entering the URL bellow:
 			<br>
 			<form action="/SubmitViaURL/" enctype="multipart/form-data" method="post">
@@ -53,37 +29,13 @@
 			<fieldset>
 	        <span class="errormessage"></span>
 	    	</fieldset>
-		
 		</div>
-        
-        
     </div><!--/end .search-->
     
     <div id="search" class="block clearfix">
-        
-        <div id="tab_content">
+        <div class="tab_content">
 	    	<div id="search_content"></div>
 	    </div>
-        
     </div><!--/end .archive-->
     
 </div><!--/end #tabs-->
-
-<script type="text/javascript">
-jQuery( '#tabs' ).find( '.controls' ).find( 'a' ).click( function( e ){
-        
-    e.preventDefault();
-    
-    var el = jQuery( this ); 
-    
-    jQuery( '#tabs' ).find( '.controls' ).find( 'li' ).removeClass( 'active' );
-    el.parent( 'li' ).addClass( 'active' );
-    
-    jQuery( '#tabs' ).find( 'div' ).removeClass( 'active' );
-    jQuery( '#tabs' ).find( el.attr( 'href' ) ).addClass( 'active' );
-
-    jQuery('#ic_search_button')
-    	.before($($("input[name='_xsrf']")[0]).clone());
-    
-} );
-</script>

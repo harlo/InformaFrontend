@@ -1,18 +1,14 @@
 var app = app || {};//global Backbone
 
-var niceDataNames = {lightMeter: 'Light Meter', GPSAccuracy: 'GPS Accuracy', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+var niceDataNames = {lightMeter: 'Light Meter', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter',  acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
 
-var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', gps_accuracy: 'GPS Accuracy', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
+var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
 
 jQuery(document).ready(function($) {
 	/* BACKBONE MODELS */
 
 	app.InformaCamJ3MHeader = Backbone.Model.extend({
 		urlRoot: '/j3mheader',
-	});
-
-	app.InformaCamDocumentSource = Backbone.Model.extend({
-//		url: '/documents/',
 	});
 
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
@@ -39,7 +35,7 @@ jQuery(document).ready(function($) {
 
 	/* BACKBONE VIEWS */
 	
-	app.progressNotifierView = Backbone.View.extend({
+	app.InformaCamProgressNotifierView = Backbone.View.extend({
 		initialize: function(options) {
 			this.tasksCompleted = [];
 		},
@@ -145,7 +141,7 @@ jQuery(document).ready(function($) {
 			this.zoomBearingIcon = L.icon({
 				iconUrl: '/web/images/ic_map_icon_bearing.png',
 				iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
-				iconSize: [7, 7]
+				iconSize: [6, 8]
 			});
 		},
 		render: function() {
@@ -197,6 +193,7 @@ jQuery(document).ready(function($) {
 					if (latlong.gps_accuracy) {
 						radius = 36 / latlong.gps_accuracy;
 						opacity = .7 / radius;
+						$c(radius + " " + opacity);
 
 						L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]).bringToBack();
 
@@ -210,8 +207,6 @@ jQuery(document).ready(function($) {
 		initialize: function(options) {
 			this.model.get('pressureAltitude').bind('change', this.render, this);
 			this.model.get('lightMeter').bind('change', this.render, this);
-			this.model.get('GPSAccuracy').bind('change', this.render, this);
-			this.model.get('GPSBearing').bind('change', this.render, this);
 			this.model.get('Accelerometer').bind('change', this.render, this);
 			this.model.get('pressureHPAOrMBAR').bind('change', this.render, this);
 			this.model.get('dateCreated').bind('change', this.render, this);
@@ -371,7 +366,7 @@ jQuery(document).ready(function($) {
 			});
 
 			this.documentSourceView = new app.InformaCamDocumentSourceView({
-				model: new app.InformaCamDocumentSource({
+				model: new Backbone.Model({
 					id: app.docid
 				})
 			});
@@ -397,7 +392,7 @@ jQuery(document).ready(function($) {
 				header: 'GPS Coordinates',
 			});
 			
-			this.progressNotifierView = new app.progressNotifierView({
+			this.InformaCamProgressNotifierView = new app.InformaCamProgressNotifierView({
 				model: new InformaCamNotifier(),
 				el: $('#ic_progressNotifierViewHolder'),
 			});
@@ -421,18 +416,6 @@ jQuery(document).ready(function($) {
 						title: 'Light Meter',
 						keys: ['lightMeterValue'],
 					}),
-					GPSAccuracy: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/GPSAccuracy',
-						id: app.docid,
-						title: 'GPS Accuracy',
-						keys: ['gps_accuracy'],
-					}),
-					GPSBearing: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/GPSBearing',
-						id: app.docid,
-						title: 'GPS Bearing',
-						keys: ['gps_bearing'],
-					}),
 					Accelerometer: new app.InformaCamJ3MTimeStampedData({
 						urlRoot: '/Accelerometer',
 						id: app.docid,
@@ -454,8 +437,6 @@ jQuery(document).ready(function($) {
 
 			this.lineChartMultiView.model.get("pressureAltitude").fetch();
 			this.lineChartMultiView.model.get("lightMeter").fetch();
-			this.lineChartMultiView.model.get("GPSAccuracy").fetch();
-			this.lineChartMultiView.model.get("GPSBearing").fetch();
 			this.lineChartMultiView.model.get("Accelerometer").fetch();
 			this.lineChartMultiView.model.get("pressureHPAOrMBAR").fetch();
 			
@@ -477,14 +458,15 @@ jQuery(document).ready(function($) {
 			}, this);
 			
 			
-			this.progressNotifierView.model.get('message_map').push(
-				_.bind(this.progressNotifierView.render, this.progressNotifierView)
+			this.InformaCamProgressNotifierView.model.get('message_map').push(
+				_.bind(this.InformaCamProgressNotifierView.render, this.InformaCamProgressNotifierView)
 			);
 			
 
 			this.listenTo(this.documentSourceView.model, 'change', function() {
 				this.documentSourceView.$el.append(this.documentSourceView.render().el);
 			});
+
 			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
 			
 
