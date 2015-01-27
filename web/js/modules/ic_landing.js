@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
 	} );
 	
 	
-	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
+	discoverICDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
 		function(file, message) {
 			// onSuccess
 			console.log(message);

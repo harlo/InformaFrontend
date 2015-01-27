@@ -85,17 +85,16 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/modules/ic_unveil.js'
 			],
 			'landing' : [
+				'/web/css/tabs.css',
 				'/web/js/lib/dropzone.js',
 				'/web/js/models/ic2_search.js',
 				'/web/js/models/unveillance_dropzone.js',
+				'/web/js/models/ic_dropzone.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/modules/ic2_search.js',
-				'/web/js/modules/ic_landing.js',
-				'/web/css/tabs.css'
+				'/web/js/modules/ic_landing.js'
 			],				
 			'simple' : [
-#				'/web/js/lib/filedrop-min.js',
-#				'/web/js/models/unveillance_filedrop.js']
 				'/web/js/lib/dropzone.js',
 				'/web/js/models/unveillance_dropzone.js']
 		})
