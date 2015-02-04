@@ -200,6 +200,8 @@ jQuery(document).ready(function($) {
 					}
 				}
 			}, this);
+			//workaround for Leaflet.js rendering bug on WebKit, where layers aren't aligned
+			this.maps[mapID].panBy([1, 0]);
 		},
 	});
 	
