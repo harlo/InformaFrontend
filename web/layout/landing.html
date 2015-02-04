@@ -7,8 +7,7 @@
     </ul>
     
     <div id="file" class="block active">
-        <span>Is it real? Will it float? Upload a media or a J3M metadata file to verify.</span>
-		<div class="tab_content">
+        <div class="tab_content">
 			<h2 id="ic_upload_instructions_desktop" class="ic_upload_instructions">Drop an image, video, or j3m log<br>or click here to upload</h2>
 			<h2 id="ic_upload_instructions_smartphone" class="ic_upload_instructions">Tap here to upload an image or video</h2>
 			<div id="ic_import_dropzone_holder">
@@ -18,14 +17,13 @@
     </div><!--/end .file-->
     
     <div id="url" class="block">
-    	<!-- this should use our doInnerAjax api -->
         <div class="tab_content">
-			Submit an online resource for verification by entering the URL bellow:
-			<br>
-			<form action="/SubmitViaURL/" enctype="multipart/form-data" method="post">
-			Url: <input class="ui-menu" type="text" name="url" id="url" size="50">
-			<input class="uv_button" id="ic_search_button" type="submit" value="Submit">
-			</form>
+        	<h2 id="ic_upload_instructions_desktop" class="ic_upload_instructions">Submit an online resource for verification</h2>
+			<h2 id="ic_upload_instructions_smartphone" class="ic_upload_instructions">Submit an online resource for verification</h2>
+			
+			<input class="ui-menu" type="text" name="url" id="ic_search_url" size="50" placeholder="http://www.example.com/image.png">
+			<a class="uv_button" id="ic_url_search_button">Submit URL</a>
+			
 			<fieldset>
 	        <span class="errormessage"></span>
 	    	</fieldset>
@@ -36,6 +34,6 @@
         <div class="tab_content">
 	    	<div id="search_content"></div>
 	    </div>
-    </div><!--/end .archive-->
+    </div><!--/end .search-->
     
 </div><!--/end #tabs-->

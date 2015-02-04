@@ -2,6 +2,7 @@ import tornado.web
 from tornado import gen
 from tornado.escape import json_decode, json_encode
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httputil import HTTPHeaders
 from conf import  DEBUG, buildServerURL
 from operator import itemgetter
 from tornado.concurrent import Future
@@ -305,18 +306,19 @@ class SubmitViaURLHandler (tornado.web.RequestHandler):
             sub_filename = targetURL[targetURL.rfind('/'):]
             sub_filename = "fornow" #TODO - the URL doesn;t have to end with a filename, is it worth keeping?
             files = []
-            #files.append(("uv_import", sub_filename, sub.body))
             files.append((sub_filename, sub_filename, sub.body))
             
-            content_type, body = encode_multipart_formdata([], files)
-            headers = {"Content-Type": content_type, 'content-length': str(len(body))}
+            fields = []
+            fields.append(("_xsrf" , self.xsrf_token))
+            content_type, body = encode_multipart_formdata(fields, files)
+
+            headers = HTTPHeaders({"Content-Type": content_type, 'content-length': str(len(body))})
+            headers.add("Cookie", "_xsrf=" + self.xsrf_token)
+            
             request = HTTPRequest(serverURL + "/import/", "POST", headers=headers, body=body, validate_cert=False)
 
             response = yield http_client.fetch(request)
-            doc = json_decode(response.body)
-            if DEBUG: print doc['data']['_id']
-            self.redirect("/submission/"+doc['data']['_id'] + "/")
-             
+            self.write(response.body)
         except Exception, e:
             print 'Failed to upload from URL (DocumentWrapperHandler)', e  
             self.write("Failed to upload from '" + targetURL + "'")  
