@@ -27,7 +27,7 @@ app.InformaCamJ3MAppView = Backbone.View.extend({
 			})
 		});
 
-		this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
+		this.timeseriesMapView = new app.InformaCamJ3MTimeseriesMapView({
 			model: new app.InformaCamJ3MTimeStampedData({
 				urlRoot: '/GPSData',
 				id: app.docid
@@ -39,8 +39,7 @@ app.InformaCamJ3MAppView = Backbone.View.extend({
 		this.InformaCamProgressNotifierView = new app.InformaCamProgressNotifierView({
 			model: new InformaCamNotifier(),
 			el: '#ic_progressNotifierViewHolder',
-		});
-		
+		});		
 		
 
 		/* MULTI-VIEW LINE CHART */	
@@ -90,9 +89,25 @@ app.InformaCamJ3MAppView = Backbone.View.extend({
 		/* END MULTI-VIEW LINE CHART */	
 
 
+		/* TSV DOWNLOAD */	
+		this.TSVDownloadView = new app.InformaCamTSVDownloadView({
+			model: new Backbone.Model({
+				header: new Backbone.Model({
+					J3MHeader: this.J3MHeaderView.model,
+					documentSource: this.documentSourceView.model,
+					appendedUserData: this.appendedUserDataView.model,
+					documentWrapper: this.documentWrapperView.model,
+				}),
+				timestamped: new Backbone.Model({
+					accelerometer: this.lineChartMultiView.model.get('Accelerometer'),
+				}),
+			})
+		});
+		/* END TSV DOWNLOAD */	
+
 		//LISTENERS
 		
-		views = [this.J3MHeaderView, this.documentWrapperView, this.gps_coordsView, ];
+		views = [this.J3MHeaderView, this.documentWrapperView, this.timeseriesMapView, ];
 		
 		_.each(views, function(view) {
 			this.listenTo(view.model, 'change', function() {
