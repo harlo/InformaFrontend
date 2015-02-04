@@ -1,32 +1,83 @@
-var InformaCamTimeseriesMap = UnveillanceViz.extend({
-	constructor: function() {
-		UnveillanceViz.prototype.constructor.apply(this, arguments);
-		if(this.invalid) { return; }
-		
-		$(this.svg[0]).remove();
-		delete this.svg;
-		
-		$(this.root_el).css({
-			'width' : this.dims.width,
-			'height' : '60%'
+var app = app || {};//global Backbone
+
+app.InformaCamJ3MTimeseriesMapView = Backbone.View.extend({
+	initialize: function(options) {
+		this.maps = [];
+		this.header = options.header;
+
+		this.overviewIcon = L.icon({
+			iconUrl: '/web/images/ic_map_icon.png',
+			iconRetinaUrl: '/web/images/ic_map_icon.png',
+			iconSize: [18, 18]
 		});
 		
-		this.map = L.map($(this.root_el).attr('id')).setView([
-			this.get('data')[0].sensorPlayback.gps_coords[1].toFixed(3),
-			this.get('data')[0].sensorPlayback.gps_coords[0].toFixed(3)
-		], 8);
+		this.zoomIcon = L.icon({
+			iconUrl: '/web/images/ic_map_icon.png',
+			iconRetinaUrl: '/web/images/ic_map_icon.png',
+			iconSize: [7, 7]
+		});
 		
-		L.tileLayer(
-			UV.CM_API.AUTH_STR,
-			{ maxZoom: UV.CM_API.MAX_ZOOM, attribution: UV.CM_API.ATTRIBUTION}
-		).addTo(this.map);
+		this.zoomBearingIcon = L.icon({
+			iconUrl: '/web/images/ic_map_icon_bearing.png',
+			iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
+			iconSize: [6, 8]
+		});
+	},
+	render: function() {
+		this.$el.prepend('<h2>' + this.header + '</h2>');
+		this.json = {values: this.model.get("values")};
+		this.loadMap('mapOverview', [this.json.values[0]], 4);
+		this.loadMap('mapZoom', this.json.values, 19);
+		return this;
+	},
+	
+	loadMap: function(mapID, values, zoom) {
+		$('#' + mapID).addClass("rendered");
+		this.maps[mapID] = L.map(mapID).setView([values[0].gps_lat, values[0].gps_long], zoom);
 		
-		_.each(this.get('data'), function(loc) {
-			var marker = L.marker([
-				loc.sensorPlayback.gps_coords[1].toFixed(3),
-				loc.sensorPlayback.gps_coords[0].toFixed(3)
-			]);
-			marker.addTo(this.map);
+		//create map tile layer
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		}).addTo(this.maps[mapID]);
+		
+		if (mapID == 'mapZoom') {
+			latlngs = _.map(values, function(latlong){ return [latlong.gps_lat,latlong.gps_long]; });
+			L.polyline(latlngs, {color: 'red', weight:2, opacity:1.0 }).addTo(this.maps[mapID]);
+		}
+
+		
+		_.each(values, function(latlong) {
+			timestamp = moment(Number(latlong.timestamp)).format("MM/DD/YYYY HH:mm:ss");
+			
+			var angle = 0;
+			if (mapID == 'mapZoom') {
+				if (latlong.gps_bearing === undefined) {
+					var icon = this.zoomIcon;
+				} else {
+					var icon = this.zoomBearingIcon;
+					angle = latlong.gps_bearing;	
+				}
+			} else {
+				var icon = this.overviewIcon;
+			}
+		
+			L.rotatedMarker([latlong.gps_lat,latlong.gps_long], {angle: angle, opacity:1.0})
+			.setIcon(icon)
+			.addTo(this.maps[mapID])
+			.bindPopup(timestamp);
+	
+			if (mapID == 'mapZoom') {
+				if (latlong.gps_accuracy) {
+					radius = 36 / latlong.gps_accuracy;
+					opacity = .7 / radius;
+
+					L.circle([latlong.gps_lat,latlong.gps_long], radius, {stroke:false, fillOpacity: opacity}).addTo(this.maps[mapID]).bringToBack();
+
+				}
+			}
 		}, this);
-	}
+		//workaround for Leaflet.js rendering bug on WebKit, where layers aren't aligned
+		this.maps[mapID].panBy([1, 0]);
+	},
 });
