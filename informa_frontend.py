@@ -59,6 +59,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_document_source.js',
 				'/web/js/viz/ic_document_wrapper.js',
 				'/web/js/viz/ic_appended_userdata.js',
+				'/web/js/viz/ic_main.js',
 				'/web/js/viz/ic_j3m_header.js',
 #				'/web/js/viz/ic_timeseries_graph.js',
 #				'/web/js/viz/ic_timeseries_chart.js',
@@ -66,8 +67,8 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/viz/ic_linechart_multiview.js',
 				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_j3m.js',
-				'/web/js/models/ic_image.js',
-				'/web/js/models/ic_submission.js',
+#				'/web/js/models/ic_image.js',
+#				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/css/ic_viz.css'],
 			'source' : [
