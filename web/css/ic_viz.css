@@ -1,10 +1,10 @@
-#ic_progressNotifierViewHolder, #ic_header_view_holder {
+#ic_progressNotifierViewHolder, #ic_header_view_holder, #ic_tsv_download_view_holder {
 	display:none;
 	width:95%;
 	margin:0 auto;
 }
 
-#ic_progressNotifierViewHolder.rendered, #ic_header_view_holder.rendered {
+#ic_progressNotifierViewHolder.rendered, #ic_header_view_holder.rendered, #ic_tsv_download_view_holder.rendered {
 	display:block;
 }
 
