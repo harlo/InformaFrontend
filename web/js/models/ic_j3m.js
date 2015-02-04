@@ -105,15 +105,15 @@ jQuery(document).ready(function($) {
 				json.upload_attempts = 1;
 			}
 			if (json.j3m_verified === undefined) {
-				json.j3m_verified = 'unverified';
+				json.j3m_verified = '<span class="verify_unknown">unverified</span>';
 			} else {
-				json.j3m_verified = json.j3m_verified ? 'passed (j3m data was signed, and the signature verified good)' : 'failed';
+				json.j3m_verified = json.j3m_verified ? '<span class="verify_passed">passed (j3m data was signed, and the signature verified good)</span>' : '<span class="verify_failed">failed</span>';
 			}
 			
 			if (json.media_verified === undefined) {
-				json.media_verified = 'unverified';
+				json.media_verified = '<span class="verify_unknown">unverified';
 			} else {
-				json.media_verified = json.media_verified ? 'passed (the pixelhash check matched j3m data signature)' : 'failed';
+				json.media_verified = json.media_verified ? '<span class="verify_passed">passed (the pixelhash check matched j3m data signature)</span>' : '<span class="verify_failed">failed</span>';
 			}
 			var html = Mustache.to_html(this.template, json);
 			this.$el.html(html);

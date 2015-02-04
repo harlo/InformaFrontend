@@ -17,6 +17,18 @@
 	max-width:540px;
 }
 
+#ic_documentwrapper_view_holder span.verify_unknown {
+	color:#555;
+}
+
+#ic_documentwrapper_view_holder span.verify_passed {
+	color:#0D0;
+}
+
+#ic_documentwrapper_view_holder span.verify_failed {
+	color:#D00;
+}
+
 /*GRAPH*/
 .graph_holder {
 	width:45%;
