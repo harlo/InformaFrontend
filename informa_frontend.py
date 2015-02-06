@@ -144,9 +144,9 @@ class InformaFrontend(UnveillanceFrontend):
 		Custom page load extras
 	"""
 
-	def get_browser_from_user_agent(self, handler):
+	def get_browser_from_user_agent(self, request):
 		try:
-			user_agent = ua_parse(handler.request.headers['User-Agent']).browser
+			user_agent = ua_parse(request.headers['User-Agent']).browser
 			return ("%s_%s" % (user_agent.family, user_agent.version_string)).lower().replace(" ", "_").replace(".", "_")
 
 		except Exception as e:
