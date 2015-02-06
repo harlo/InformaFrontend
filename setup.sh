@@ -21,6 +21,8 @@ cd $THIS_DIR/lib/Frontend/web
 ln -s $THIS_DIR/web/ extras
 
 cd $THIS_DIR
+pip install -r requirements.txt
+
 chmod 0400 conf/informacam.init.json
 chmod 0400 lib/Frontend/conf/unveillance.secrets.json
 chmod 0400 lib/Frontend/conf/local.config.yaml

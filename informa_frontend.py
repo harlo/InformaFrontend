@@ -1,6 +1,7 @@
 import os, json, re, tornado.web, requests
 from sys import exit, argv
 from time import sleep
+from user_agents import parse as ua_parse
 
 from lib.Frontend.unveillance_frontend import UnveillanceFrontend
 from lib.Frontend.lib.Core.vars import Result
@@ -54,14 +55,11 @@ class InformaFrontend(UnveillanceFrontend):
 		self.on_loads.update({
 			'submission' : [
 				'/leaflet/leaflet.js',
-#				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_progress_notifer.js',
 				'/web/js/viz/ic_document_source.js',
 				'/web/js/viz/ic_document_wrapper.js',
 				'/web/js/viz/ic_appended_userdata.js',
 				'/web/js/viz/ic_j3m_header.js',
-#				'/web/js/viz/ic_timeseries_graph.js',
-#				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/viz/ic_linechart_multiview.js',
 				'/web/js/models/unveillance_document.js',
@@ -125,6 +123,10 @@ class InformaFrontend(UnveillanceFrontend):
 
 		self.restricted_routes_by_status[0].extend([
 			'unveil', 'reindex', 'cluster'])
+
+		self.get_page_load_extras.update({
+			'body_classes' : self.get_browser_from_user_agent
+			})
 		
 		with open(os.path.join(INFORMA_CONF_ROOT, "informacam.init.json"), 'rb') as IV:
 			init_vars = json.loads(IV.read())['web']
@@ -137,7 +139,23 @@ class InformaFrontend(UnveillanceFrontend):
 		self.MODULE_FOOTER = self.INDEX_FOOTER
 
 		self.WEB_TITLE = WEB_TITLE
-	
+
+	"""
+		Custom page load extras
+	"""
+
+	def get_browser_from_user_agent(self, handler):
+		try:
+			user_agent = ua_parse(handler.request.headers['User-Agent']).browser
+			return ("%s_%s" % (user_agent.family, user_agent.version_string)).lower().replace(" ", "_").replace(".", "_")
+
+		except Exception as e:
+			if DEBUG:
+				print e, type(e)
+				print "could not get User-Agent"
+
+		return ""
+
 	"""
 		Custom handlers
 	"""
