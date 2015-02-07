@@ -86,6 +86,8 @@ class InformaFrontend(UnveillanceFrontend):
 			'search' :[
 				'/web/js/models/ic_search.js',
 				'/web/js/models/ic_document_browser.js',
+				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_tsv_export.js',
 				'/web/js/modules/ic_search.js'
 			],
 			'unveil' : [
