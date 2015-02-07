@@ -55,22 +55,16 @@ class InformaFrontend(UnveillanceFrontend):
 		self.on_loads.update({
 			'submission' : [
 				'/leaflet/leaflet.js',
-<<<<<<< HEAD
 #				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_main.js',
-=======
->>>>>>> upstream/master
 				'/web/js/viz/ic_progress_notifer.js',
 				'/web/js/viz/ic_document_source.js',
 				'/web/js/viz/ic_document_wrapper.js',
 				'/web/js/viz/ic_appended_userdata.js',
 				'/web/js/viz/ic_j3m_header.js',
-<<<<<<< HEAD
 				'/web/js/viz/ic_tsv_download.js',
 #				'/web/js/viz/ic_timeseries_graph.js',
 #				'/web/js/viz/ic_timeseries_chart.js',
-=======
->>>>>>> upstream/master
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/viz/ic_linechart_multiview.js',
 				'/web/js/models/unveillance_document.js',
