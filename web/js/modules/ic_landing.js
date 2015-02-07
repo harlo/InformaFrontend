@@ -16,6 +16,29 @@ jQuery(document).ready(function($) {
 	
 	} );
 	
+	$("#ic_url_search_button").click(function() {
+			//alert($("#ic_search_url").val());
+			return doInnerAjax("SubmitViaURL", "post", {
+			url : $("#ic_search_url").val() }, function(message){
+				console.log(message);
+			
+				try {
+					json = JSON.parse(message.responseText);
+				} catch(err) {
+					alert("Could not upload file from URL!");
+					return;
+				}
+			
+				if(json.result == 200) {
+					path = json.data.mime_type !== undefined && json.data.mime_type.indexOf("application/pgp") > -1 ? "/source/" : "/submission/";
+					location.href = path + json.data._id + '/';
+				} else {
+					alert("Could not upload file from URL!");
+				}
+			
+			});
+		});
+	
 	
 	discoverICDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
 		function(file, message) {
@@ -40,3 +63,4 @@ jQuery(document).ready(function($) {
 		});
 
 });
+

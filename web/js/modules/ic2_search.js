@@ -14,6 +14,8 @@ function loadSearchResult(search_result) {
 	
 	$("#ic_search_results_holder").
 		append(Mustache.to_html(getTemplate("search_result.html"), search_result));
+
+	$("#ic_export_holder").append(getTemplate("export.html"));
 }
 
 function onConfLoaded() {
