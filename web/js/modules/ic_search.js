@@ -31,6 +31,14 @@ function onConfLoaded() {
 		if(window.location.search == "") { return; }
 
 		loadSearchResult(search.perform(window.location.search));
+		
+		$('#ic_search_results_holder input[type=checkbox]').change(function() {
+			if ($(this).is(':checked')) {
+				$c($(this));
+			} else {
+			}
+		});
+
 	}, 100);
 }
 
