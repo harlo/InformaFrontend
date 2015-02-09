@@ -112,6 +112,18 @@ when row model changes, rowView alerts collectionView to update rendering
 			documentWrapper: new app.InformaCamDocumentWrapper,
 			J3MHeader: new app.InformaCamJ3MHeader,
 		},
+		parseMe: function() {
+			data = {};
+			json = this.model.documentWrapper.toJSON().data;
+			$c(json);
+			data.dateAddedFormatted = json.dateAddedFormatted;
+			data.upload_attempts = json.upload_attempts;
+			data.j3m_verified = json.j3m_verified;
+			data.media_verified = json.media_verified;
+			json = this.model.J3MHeader.toJSON().data;
+			$c(json);
+			return data;
+		}
 	});
 	
 	var TableView = Backbone.View.extend({
@@ -150,6 +162,7 @@ when row model changes, rowView alerts collectionView to update rendering
 			this.parentView = options.parentView;
 		},
 		render: function () {
+			$c(this.model.parseMe());
 			var json = this.model.model.documentWrapper.toJSON().data;
 			this.$el.html('<td>' + json.date_added + '</td>');
 			return this;

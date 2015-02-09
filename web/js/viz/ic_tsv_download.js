@@ -30,9 +30,6 @@ app.InformaCamTSVDownloadView = Backbone.View.extend({
 		if (_.contains(this.dataSetsKeys, div_id)) {
 		
 			var headers = _.find(this.dataSetsHeader, function(d){ return _.keys(d)[0] == div_id; })[div_id];
-			if (div_id == 'DocumentWrapper') {
-				json.dateAddedFormatted =  moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
-			}
 
 			_.each(headers, function(d) {
 				cellIndex = $('#header_tsv th#tsv_' + d).index();

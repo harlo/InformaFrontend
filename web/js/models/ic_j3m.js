@@ -7,6 +7,13 @@ jQuery(document).ready(function($) {
 
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
 		urlRoot: '/DocumentWrapper',
+		parse: function(response) {
+			response.data.dateAddedFormatted = moment(Number(response.data.date_added)).format("MM/DD/YYYY HH:mm:ss");;
+			if (response.data.upload_attempts === undefined) {
+				response.data.upload_attempts = 1;
+			}
+			return response;
+		}
 	});
 
 	app.InformaCamAppendedUserData = Backbone.Model.extend({

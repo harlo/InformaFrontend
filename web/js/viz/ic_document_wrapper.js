@@ -5,10 +5,6 @@ app.InformaCamDocumentWrapperView = Backbone.View.extend({
 	template: getTemplate("document_wrapper.html"),
 	render: function() {
 		var json = this.model.toJSON().data;
-		json.dateAddedFormatted = moment(Number(json.date_added)).format("MM/DD/YYYY HH:mm:ss");
-		if (json.upload_attempts === undefined) {
-			json.upload_attempts = 1;
-		}
 		if (json.j3m_verified === undefined) {
 			json.j3m_verified = '<span class="verify_unknown">unverified</span>';
 		} else {
