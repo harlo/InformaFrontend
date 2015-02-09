@@ -87,50 +87,52 @@ jQuery(document).ready(function($) {
 	});
 	
 	var TableView = Backbone.View.extend({
-		el: "#ic_search_results_holder",  //the view should be decoupled from the DOM, but for this example this will do.
-		//collection:  This will be passed in during initialization
-		initialize: function () {
+		el: "#ic_tsv",
+		collection: new Datasets(),
+		initialize: function() {
 			this.views = [];
-			this.listenTo(this.collection, "add", function(model, collection, options) {
-				$c('add');
-				$c(model);
+			this.listenTo(this.collection, "add", function(model) {
 				this.views.push(new TableRowView({ model: model, parentView: this }));
+			});
+			this.listenTo(this.collection, "remove", function(model) {
+				this.views = _.without(this.views, _.findWhere(this.views, {model: model}));
+				this.render();
 			});
 		},
 		render: function() {
-			$c('TableView render');
-			_.each(this.views, function(view) {
-				view.render();
-			}, this);
+			this.$el.html('');
+			if (this.views.length) {
+				var table = $('<table>');
+				table.append('<thead><tr><th>Date</th></tr></thead>');
+				this.$el.append(table);
+				_.each(this.views, function(view) {
+					row = view.render();
+					table.append(row.$el);
+				}, this);
+			}
 		},
 	});
 
 	var TableRowView = Backbone.View.extend({
 		//el: since we're setting the tagName, we don't need set the el
-		tagName: "div",
-        className: "tableRow",
+		tagName: "tr",
 		initialize: function (options) {
 			this.model.on("change", this.modelChanged, this);
 			this.parentView = options.parentView;
-			$c(options.parentView);
 		},
 		render: function () {
-			var outputHtml = this.model.toJSON().data;
-			$c(outputHtml.j3m_id);
-			this.$el.html(outputHtml.date_added);
+			var json = this.model.toJSON().data;
+			this.$el.html('<td>' + json.date_added + '</td>');
 			return this;
 		},
 		modelChanged: function (model, changes) {
-		//	$c(model);
-			var json = model.toJSON().data;
-			console.log("modelChanged: " + json.date_added);
 			this.parentView.render();
 		},
 	});
 	
-	var dataset = new Datasets();
-	var tableView = new TableView({ collection: dataset });
+	var tableView = new TableView();
 	var newRow = new app.InformaCamDocumentWrapper({id: '385a36afc6c868b1b4f9144339622602'});
-	dataset.add(newRow);
+	tableView.collection.add(newRow);
 	newRow.fetch();	
+//	dataset.remove(newRow);
 });
