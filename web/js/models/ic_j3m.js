@@ -3,6 +3,10 @@ var app = app || {};//global Backbone
 jQuery(document).ready(function($) {
 	app.InformaCamJ3MHeader = Backbone.Model.extend({
 		urlRoot: '/j3mheader',
+		parse: function(response) {
+			response.data.dateCreatedFormatted = moment(Number(response.data.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss");
+			return response;
+		},
 	});
 
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({

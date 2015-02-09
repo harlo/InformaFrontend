@@ -88,23 +88,6 @@ app.InformaCamJ3MAppView = Backbone.View.extend({
 
 		/* END MULTI-VIEW LINE CHART */	
 
-
-		/* TSV DOWNLOAD */	
-		this.TSVDownloadView = new app.InformaCamTSVDownloadView({
-			model: new Backbone.Model({
-				header: new Backbone.Model({
-					J3MHeader: this.J3MHeaderView.model,
-					documentSource: this.documentSourceView.model,
-					appendedUserData: this.appendedUserDataView.model,
-					documentWrapper: this.documentWrapperView.model,
-				}),
-				timestamped: new Backbone.Model({
-					accelerometer: this.lineChartMultiView.model.get('Accelerometer'),
-				}),
-			})
-		});
-		/* END TSV DOWNLOAD */	
-
 		//LISTENERS
 		
 		views = [this.J3MHeaderView, this.documentWrapperView, this.timeseriesMapView, ];

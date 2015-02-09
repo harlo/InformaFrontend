@@ -1,3 +1,4 @@
+var app = app || {};//global Backbone
 var search;
 
 function loadSearchResult(search_result) {
@@ -33,9 +34,11 @@ function onConfLoaded() {
 		loadSearchResult(search.perform(window.location.search));
 		
 		$('#ic_search_results_holder input[type=checkbox]').change(function() {
+			var hash = $(this).attr('data-hash');
 			if ($(this).is(':checked')) {
-				$c($(this));
+				app.tableView.collection.add(new app.HeaderDataSet({model_id: hash}));
 			} else {
+				app.tableView.collection.remove(app.tableView.collection.where({model_id: hash}));
 			}
 		});
 
