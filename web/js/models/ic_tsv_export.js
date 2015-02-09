@@ -2,7 +2,7 @@ var app = app || {};//global Backbone
 
 jQuery(document).ready(function($) {
 
-//http://stackoverflow.com/questions/6535948/nested-models-in-backbone-js-how-to-approach
+//http://stackoverflow.com/questions/6535948/nested-model-in-backbone-js-how-to-approach
 
 	app.TSVHeaderDataRow = Backbone.Model.extend({
 		initialize: function(options) {
@@ -81,9 +81,37 @@ jQuery(document).ready(function($) {
 	
 	
 //TAKE 2
-//https://bardevblog.wordpress.com/2012/12/13/re-learning-backbone-js-nested-views/
+/*
+adding a row to collection triggers adding rowView to collectionView
+when row model changes, rowView alerts collectionView to update rendering
+*/
 	var Datasets = Backbone.Collection.extend({
-		model: app.InformaCamDocumentWrapper
+		model: HeaderDataSet
+	});
+	
+	var HeaderDataSet = Backbone.Model.extend({
+		initialize: function(options) {
+			this.id = options.id;
+			this.modelCount = 0;
+
+			_.each(this.model, function(model) {
+				model.set('id', this.id);
+				model.fetch();
+				
+				//fire change event when all nested models have loaded
+				this.listenTo(model, 'change', function() {
+					this.modelCount++;
+					if (this.modelCount == _.size(this.model)) {
+						this.trigger('change');
+					}
+				});
+			}, this);
+
+		},
+		model: {
+			documentWrapper: new app.InformaCamDocumentWrapper,
+			J3MHeader: new app.InformaCamJ3MHeader,
+		},
 	});
 	
 	var TableView = Backbone.View.extend({
@@ -92,6 +120,8 @@ jQuery(document).ready(function($) {
 		initialize: function() {
 			this.views = [];
 			this.listenTo(this.collection, "add", function(model) {
+				$c('add');
+				$c(model.model.documentWrapper);
 				this.views.push(new TableRowView({ model: model, parentView: this }));
 			});
 			this.listenTo(this.collection, "remove", function(model) {
@@ -114,14 +144,13 @@ jQuery(document).ready(function($) {
 	});
 
 	var TableRowView = Backbone.View.extend({
-		//el: since we're setting the tagName, we don't need set the el
 		tagName: "tr",
 		initialize: function (options) {
 			this.model.on("change", this.modelChanged, this);
 			this.parentView = options.parentView;
 		},
 		render: function () {
-			var json = this.model.toJSON().data;
+			var json = this.model.model.documentWrapper.toJSON().data;
 			this.$el.html('<td>' + json.date_added + '</td>');
 			return this;
 		},
@@ -131,8 +160,7 @@ jQuery(document).ready(function($) {
 	});
 	
 	var tableView = new TableView();
-	var newRow = new app.InformaCamDocumentWrapper({id: '385a36afc6c868b1b4f9144339622602'});
+	
+	var newRow = new HeaderDataSet({id: '385a36afc6c868b1b4f9144339622602'});
 	tableView.collection.add(newRow);
-	newRow.fetch();	
-//	dataset.remove(newRow);
 });
