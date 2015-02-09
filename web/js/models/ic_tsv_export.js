@@ -12,16 +12,11 @@ when row model changes, rowView alerts collectionView to update rendering
 		model: app.HeaderDataSet,
 	});
 	
-	app.HeaderDataSet = Backbone.Model.extend({
+	app.DataSet = Backbone.Model.extend({
 		initialize: function(options) {
 			this.model_id = options.model_id;
 			this.modelCount = 0;
 			
-			this.models = {
-				documentWrapper: new app.InformaCamDocumentWrapper(this.model_id),
-				J3MHeader: new app.InformaCamJ3MHeader(this.model_id),
-			};
-
 			_.each(this.models, function(model) {
 				model.set('id', this.get('model_id'));
 				model.fetch();
@@ -39,6 +34,16 @@ when row model changes, rowView alerts collectionView to update rendering
 			}, this);
 
 		},
+	});
+	
+	app.HeaderDataSet = app.DataSet.extend({
+		initialize: function(options) {
+			this.models = {
+				documentWrapper: new app.InformaCamDocumentWrapper(),
+				J3MHeader: new app.InformaCamJ3MHeader(),
+			};
+			app.DataSet.prototype.initialize.apply(this, arguments);
+		},
 		parseMe: function() {
 			data = {};
 			json = this.models.documentWrapper.toJSON().data;
@@ -54,10 +59,8 @@ when row model changes, rowView alerts collectionView to update rendering
 	});
 	
 	app.TableView = Backbone.View.extend({
-		el: "#ic_tsv",
-		collection: new app.Datasets(),
-		template: getTemplate("tsv_headerdata_table.html"),
-		initialize: function() {
+		initialize: function(options) {
+			this.template = getTemplate(options.template);
 			this.views = [];
 			this.listenTo(this.collection, "add", function(model) {
 				this.views.push(new app.TableRowView({ model: model, parentView: this }));
@@ -95,5 +98,5 @@ when row model changes, rowView alerts collectionView to update rendering
 		},
 	});
 	
-	app.tableView = new app.TableView();
+	app.tableView = new app.TableView({collection: new app.Datasets(), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
 });
