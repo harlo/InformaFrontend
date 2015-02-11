@@ -8,9 +8,7 @@ jQuery(document).ready(function($) {
 adding a row to collection triggers adding rowView to collectionView
 when row model changes, rowView alerts collectionView to update rendering
 */
-	app.Datasets = Backbone.Collection.extend({
-		model: app.HeaderDataSet,
-	});
+	app.Datasets = Backbone.Collection.extend();
 	
 	app.DataSet = Backbone.Model.extend({
 		initialize: function(options) {
@@ -58,6 +56,21 @@ when row model changes, rowView alerts collectionView to update rendering
 		}
 	});
 	
+	app.TimestampDataSet = app.DataSet.extend({
+		initialize: function(options) {
+			this.models = {
+				J3MTimeStampedData: new app.InformaCamJ3MTimeStampedData({
+					urlRoot: '/GPSData',
+				}),
+			};
+			app.DataSet.prototype.initialize.apply(this, arguments);
+		},
+		parseMe: function() {
+			data = this.models.J3MTimeStampedData.get("values");
+			return data;
+		}
+	});
+	
 	app.TableView = Backbone.View.extend({
 		initialize: function(options) {
 			this.template = getTemplate(options.template);
@@ -98,5 +111,9 @@ when row model changes, rowView alerts collectionView to update rendering
 		},
 	});
 	
-	app.tableView = new app.TableView({collection: new app.Datasets(), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
+//maybe this? https://gist.github.com/geddski/1610397
+	
+//	app.tsvHeaderTableView = new app.TableView({collection: new app.Datasets({model: app.HeaderDataSet}), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
+	
+	app.tsvTimestampTableView = new app.TableView({collection: new app.Datasets({model: app.TimestampDataSet}), el: "#ic_tsv_timestampdata", template: "tsv_timestampdata_table.html"});
 });

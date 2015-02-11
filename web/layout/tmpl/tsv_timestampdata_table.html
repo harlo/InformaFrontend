@@ -1,0 +1,24 @@
+<table class="tsv_export">
+	<thead>
+		<tr>
+			<th>Time</th>
+			<th>Accuracy</th>
+			<th>Bearing</th>
+			<th>Latitude</th>
+			<th>Longitude</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{ #. }}
+	{{ #. }}
+		<tr>
+			<td>{{timestamp}}</td>
+			<td>{{gps_accuracy}}</td>
+			<td>{{gps_bearing}}</td>
+			<td>{{gps_lat}}</td>
+			<td>{{gps_long}}</td>
+		</tr>
+	{{ /. }}
+	{{ /. }}
+	</tbody>
+</table>
