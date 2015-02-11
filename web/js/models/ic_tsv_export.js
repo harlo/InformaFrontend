@@ -8,6 +8,8 @@ jQuery(document).ready(function($) {
 adding a row to collection triggers adding rowView to collectionView
 when row model changes, rowView alerts collectionView to update rendering
 */
+	app.TimestampDatasets = Backbone.Collection.extend();
+	
 	app.Datasets = Backbone.Collection.extend();
 	
 	app.DataSet = Backbone.Model.extend({
@@ -84,16 +86,22 @@ when row model changes, rowView alerts collectionView to update rendering
 			});
 		},
 		render: function() {
-			this.$el.html('');
-			if (this.views.length) {
-				var json = [];
-				_.each(this.views, function(view) {
-					if (view.model.get('ready')) {
-						json.push(view.render());
-					}
-				}, this);
-				html = Mustache.to_html(this.template, json);
-				this.$el.html(html);
+			$c(this.$el.attr('id'));
+			if (this.$el.attr('id') == 'ic_tsv_timestampdata') {
+				app.timestampTablesView.render();
+			} else {
+				if (this.views.length) {
+					var json = [];
+					_.each(this.views, function(view) {
+						if (view.model.get('ready')) {
+							json.push(view.render());
+						}
+					}, this);
+					html = Mustache.to_html(this.template, json);
+					this.$el.html(html);
+				} else {
+					this.$el.html('');
+				}
 			}
 		},
 	});
@@ -111,9 +119,32 @@ when row model changes, rowView alerts collectionView to update rendering
 		},
 	});
 	
+	app.TimestampTablesView = Backbone.View.extend({
+		initialize: function (options) {
+			this.views = [];
+			this.listenTo(this.collection, "add", function(model) {
+				$c('add');
+				$c(model);
+//				this.views.push(new app.TableView({ model: model, parentView: this }));
+			});
+		},
+		render: function () {
+			$c('TimestampTablesView render!');
+			$c(this.collection);
+		},
+	});
+	
+	
+	
 //maybe this? https://gist.github.com/geddski/1610397
 	
-//	app.tsvHeaderTableView = new app.TableView({collection: new app.Datasets({model: app.HeaderDataSet}), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
+	app.tsvHeaderTableView = new app.TableView({collection: new app.Datasets({model: app.HeaderDataSet}), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
 	
-	app.tsvTimestampTableView = new app.TableView({collection: new app.Datasets({model: app.TimestampDataSet}), el: "#ic_tsv_timestampdata", template: "tsv_timestampdata_table.html"});
+	app.timestampDatasets = new app.TimestampDatasets();
+	app.timestampDatasets.on("add", function() {
+		$c('change!!!!');
+	}, this);
+	
+	app.timestampTablesView = new app.TimestampTablesView({collection: app.timestampDatasets});
+
 });

@@ -16,6 +16,21 @@ jQuery(document).ready(function($) {
 			if (response.data.upload_attempts === undefined) {
 				response.data.upload_attempts = 1;
 			}
+			if (response.data.j3m_verified === undefined) {
+				response.data.j3m_verified = 'unverified';
+			} else if (response.data.j3m_verified === true) {
+				response.data.j3m_verified = 'passed';
+			} else {
+				response.data.j3m_verified = 'failed';
+			}
+
+			if (response.data.media_verified === undefined) {
+				response.data.media_verified = 'unverified';
+			} else if (response.data.media_verified === true) {
+				response.data.media_verified = 'passed';
+			} else {
+				response.data.media_verified = 'failed';
+			}
 			return response;
 		}
 	});

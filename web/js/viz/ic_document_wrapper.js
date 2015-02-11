@@ -5,17 +5,32 @@ app.InformaCamDocumentWrapperView = Backbone.View.extend({
 	template: getTemplate("document_wrapper.html"),
 	render: function() {
 		var json = this.model.toJSON().data;
-		if (json.j3m_verified === undefined) {
-			json.j3m_verified = '<span class="verify_unknown">unverified</span>';
-		} else {
-			json.j3m_verified = json.j3m_verified ? '<span class="verify_passed">passed (j3m data was signed, and the signature verified good)</span>' : '<span class="verify_failed">failed</span>';
+		switch (json.j3m_verified) {
+			case 'passed':
+				json.j3m_verified = '<span class="verify_passed">passed (j3m data was signed, and the signature verified good)</span>';
+			break;
+			case 'failed':
+				json.j3m_verified = '<span class="verify_failed">failed</span>';
+			break;
+			case 'unverified':
+			default:
+				json.j3m_verified = '<span class="verify_unknown">unverified</span>';
+			break;
 		}
-		
-		if (json.media_verified === undefined) {
-			json.media_verified = '<span class="verify_unknown">unverified';
-		} else {
-			json.media_verified = json.media_verified ? '<span class="verify_passed">passed (the pixelhash check matched j3m data signature)</span>' : '<span class="verify_failed">failed</span>';
+
+		switch (json.media_verified) {
+			case 'passed':
+				json.media_verified = '<span class="verify_passed">passed (the pixelhash check matched j3m data signature)</span>';
+			break;
+			case 'failed':
+				json.media_verified = '<span class="verify_failed">failed</span>';
+			break;
+			case 'unverified':
+			default:
+				json.media_verified = '<span class="verify_unknown">unverified</span>';
+			break;
 		}
+
 		var html = Mustache.to_html(this.template, json);
 		this.$el.html(html);
 		return this;

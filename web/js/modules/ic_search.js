@@ -36,8 +36,19 @@ function onConfLoaded() {
 		$('#ic_search_results_holder input[type=checkbox]').change(function() {
 			var hash = $(this).attr('data-hash');
 			if ($(this).is(':checked')) {
-//				app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
-				app.tsvTimestampTableView.collection.add(new app.TimestampDataSet({model_id: '4c20d05a772723f1b5e97166ca1f3709'}));
+				app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
+
+				app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
+
+/*
+					tsvTimestampTableView = new app.TableView({collection: new app.Datasets({model: app.TimestampDataSet}), el: "#ic_tsv_timestampdata", template: "tsv_timestampdata_table.html"});
+
+				tsvTimestampTableView.collection.add(new app.TimestampDataSet({model_id: hash}));
+				
+				app.timestampDatasets.add(tsvTimestampTableView);
+				$c('timestampDatasets');
+				$c(app.timestampDatasets);
+*/
 			} else {
 				app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
 			}
