@@ -49,9 +49,9 @@ jQuery(document).ready(function($) {
 		},
 		parse: function(response) {
 			this.set({values: response}, {silent: true});
-			//it'd be nice if we could format timestamp here
-			$c('parse!');
-			$c(response);
+			_.each(response, function(r) {
+				r.timestampFormatted = moment(Number(r.timestamp)).format("MM/DD/YYYY HH:mm:ss");;
+			});
 			return response;
 		},
 	});	
