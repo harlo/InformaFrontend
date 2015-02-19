@@ -191,5 +191,68 @@ when row model changes, rowView alerts collectionView to update rendering
 			app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
 			app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
 	};
+	
+	//http://jsfiddle.net/terryyounghk/KPEGU/
+	app.exportTableToCSV = function() {
+		$(this).unbind("click");
+		var $rows = $('table.tsv_export:nth-child(1)').find('tr:has(td)'),
+
+			// Temporary delimiter characters unlikely to be typed by keyboard
+			// This is to avoid accidentally splitting the actual contents
+			tmpColDelim = String.fromCharCode(11), // vertical tab character
+			tmpRowDelim = String.fromCharCode(0), // null character
+
+			// actual delimiter characters for CSV format
+			colDelim = '","',
+			rowDelim = '"\r\n"',
+
+			// Grab text from table into CSV formatted string
+			csv = '"' + $rows.map(function (i, row) {
+				var $row = $(row),
+					$cols = $row.find('td');
+
+				return $cols.map(function (j, col) {
+					var $col = $(col),
+						text = $col.text();
+
+					return text.replace('"', '""'); // escape double quotes
+
+				}).get().join(tmpColDelim);
+
+			}).get().join(tmpRowDelim)
+				.split(tmpRowDelim).join(rowDelim)
+				.split(tmpColDelim).join(colDelim) + '"',
+
+			// Data URI
+			csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+			
+			$c(csv);
+
+		$(this)
+			.attr({
+			'download': 'filename',
+				'href': csvData,
+		});
+
+		window.setTimeout(function() {
+			$(this).click();
+			$(this).removeAttr('href');
+			$(this).removeAttr('download');
+			$(this).click(function() {
+				app.exportTableToCSV.apply(this);
+			}.bind($(this)));
+		}, 300);
+
+    };
+
+    // This must be a hyperlink
+    $(".export").on('click', function (event) {
+        // CSV
+		  app.exportTableToCSV.apply(this);
+        // IF CSV, don't do event.preventDefault() or return false
+        // We actually need this to be a typical hyperlink
+    });
+
+
 
 });
