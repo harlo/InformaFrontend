@@ -40,17 +40,9 @@ function onConfLoaded() {
 
 				app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
 
-/*
-					tsvTimestampTableView = new app.TableView({collection: new app.Datasets({model: app.TimestampDataSet}), el: "#ic_tsv_timestampdata", template: "tsv_timestampdata_table.html"});
-
-				tsvTimestampTableView.collection.add(new app.TimestampDataSet({model_id: hash}));
-				
-				app.timestampDatasets.add(tsvTimestampTableView);
-				$c('timestampDatasets');
-				$c(app.timestampDatasets);
-*/
 			} else {
 				app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
+				app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
 			}
 		});
 
