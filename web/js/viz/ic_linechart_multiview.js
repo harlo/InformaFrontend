@@ -16,6 +16,10 @@ app.InformaCamLineChartMultiView = Backbone.View.extend({
 		this.graphsPlotted = 0;
 	},
 	render: function(model) {
+		var niceDataNames = {lightMeter: 'Light Meter', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter',  acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
+
+		var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
+
 		var div_id = model.urlRoot.substring(1);
 		if (div_id == 'j3mheader') {
 			this.dateCreated = model.toJSON().data.genealogy.dateCreated;

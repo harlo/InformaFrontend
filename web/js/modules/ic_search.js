@@ -1,3 +1,4 @@
+var app = app || {};//global Backbone
 var search;
 
 function loadSearchResult(search_result) {
@@ -31,6 +32,16 @@ function onConfLoaded() {
 		if(window.location.search == "") { return; }
 
 		loadSearchResult(search.perform(window.location.search));
+		
+		$('#ic_search_results_holder input[type=checkbox]').change(function() {
+			var hash = $(this).attr('data-hash');
+			if ($(this).is(':checked')) {
+				app.addDatasetToTSV(hash);
+			} else {
+				app.removeDatasetFromTSV(hash);
+			}
+		});
+
 	}, 100);
 }
 

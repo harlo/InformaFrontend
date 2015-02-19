@@ -1,10 +1,10 @@
-#ic_progressNotifierViewHolder, #ic_header_view_holder {
+#ic_progressNotifierViewHolder, #ic_header_view_holder, #ic_tsv_download_view_holder {
 	display:none;
 	width:95%;
 	margin:0 auto;
 }
 
-#ic_progressNotifierViewHolder.rendered, #ic_header_view_holder.rendered {
+#ic_progressNotifierViewHolder.rendered, #ic_header_view_holder.rendered, #ic_tsv_download_view_holder.rendered {
 	display:block;
 }
 
@@ -172,6 +172,20 @@ g .label {
 
 #ic_appended_user_data ul {
 	margin-left:16px;
+}
+
+/*TSV PREVIEW*/
+#export_tsv {
+	cursor:pointer;
+}
+
+.tsv_export {
+	width:90%;
+	margin:0 auto;
+}
+
+.tsv_export td, .tsv_export th {
+	padding:0 10px;
 }
 
 @media print {

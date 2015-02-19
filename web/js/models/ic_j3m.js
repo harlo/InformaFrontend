@@ -1,18 +1,38 @@
 var app = app || {};//global Backbone
 
-var niceDataNames = {lightMeter: 'Light Meter', Accelerometer: 'Accelerometer', lightMeterValue: 'Light Meter',  acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'Pressure Altitude', pressureHPAOrMBAR: 'Pressure HPA or MBAR'};
-
-var niceDataUnits = {lightMeter: 'lux', Accelerometer: 'meters/second^2', lightMeterValue: 'lux', acc_x: 'Accelerometer X', acc_y: 'Accelerometer Y', acc_z: 'Accelerometer Z', pressureAltitude: 'meters', pressureHPAOrMBAR: 'millibars'};
-
 jQuery(document).ready(function($) {
-	/* BACKBONE MODELS */
-
 	app.InformaCamJ3MHeader = Backbone.Model.extend({
 		urlRoot: '/j3mheader',
+		parse: function(response) {
+			response.data.dateCreatedFormatted = moment(Number(response.data.genealogy.dateCreated)).format("MM/DD/YYYY HH:mm:ss");
+			return response;
+		},
 	});
 
 	app.InformaCamDocumentWrapper = Backbone.Model.extend({
 		urlRoot: '/DocumentWrapper',
+		parse: function(response) {
+			response.data.dateAddedFormatted = moment(Number(response.data.date_added)).format("MM/DD/YYYY HH:mm:ss");;
+			if (response.data.upload_attempts === undefined) {
+				response.data.upload_attempts = 1;
+			}
+			if (response.data.j3m_verified === undefined) {
+				response.data.j3m_verified = 'unverified';
+			} else if (response.data.j3m_verified === true) {
+				response.data.j3m_verified = 'passed';
+			} else {
+				response.data.j3m_verified = 'failed';
+			}
+
+			if (response.data.media_verified === undefined) {
+				response.data.media_verified = 'unverified';
+			} else if (response.data.media_verified === true) {
+				response.data.media_verified = 'passed';
+			} else {
+				response.data.media_verified = 'failed';
+			}
+			return response;
+		}
 	});
 
 	app.InformaCamAppendedUserData = Backbone.Model.extend({
@@ -29,168 +49,18 @@ jQuery(document).ready(function($) {
 		},
 		parse: function(response) {
 			this.set({values: response}, {silent: true});
+			_.each(response, function(r) {
+				r.timestampFormatted = moment(Number(r.timestamp)).format("MM/DD/YYYY HH:mm:ss");;
+			});
 			return response;
 		},
-	});
-
-	/* BACKBONE VIEWS */
-
-
-	app.InformaCamJ3MAppView = Backbone.View.extend({
-		el: '#ic_submission_view_holder',
-		initialize: function() {
-			this.J3MHeaderView = new app.InformaCamJ3MHeaderView({
-				model: new app.InformaCamJ3MHeader({
-					id: app.docid
-				})
-			});
-
-			this.documentSourceView = new app.InformaCamDocumentSourceView({
-				model: new Backbone.Model({
-					id: app.docid
-				})
-			});
-
-			this.appendedUserDataView = new app.InformaCamAppendedUserDataView({
-				model: new app.InformaCamAppendedUserData({
-					id: app.docid
-				})
-			});
-
-			this.documentWrapperView = new app.InformaCamDocumentWrapperView({
-				model: new app.InformaCamDocumentWrapper({
-					id: app.docid
-				})
-			});
-
-			this.gps_coordsView = new app.InformaCamJ3MTimeseriesMapView({
-				model: new app.InformaCamJ3MTimeStampedData({
-					urlRoot: '/GPSData',
-					id: app.docid
-				}),
-				el: '#ic_gps_coords_view_holder',
-				header: 'GPS Coordinates',
-			});
-			
-			this.InformaCamProgressNotifierView = new app.InformaCamProgressNotifierView({
-				model: new InformaCamNotifier(),
-				el: '#ic_progressNotifierViewHolder',
-			});
-			
-			
-
-			/* MULTI-VIEW LINE CHART */	
-					// http://stackoverflow.com/questions/7385629/backbone-js-complex-views-combining-multiple-models
-					// http://stackoverflow.com/questions/7734559/backbone-js-passing-2-models-to-1-view
-			this.lineChartMultiView = new app.InformaCamLineChartMultiView({
-				model: new Backbone.Model({
-					pressureAltitude: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/pressureAltitude',
-						id: app.docid,
-						title: 'Pressure Altitude',
-						keys: ['pressureAltitude'],
-					}),
-					lightMeter: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/lightMeter',
-						id: app.docid,
-						title: 'Light Meter',
-						keys: ['lightMeterValue'],
-					}),
-					Accelerometer: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/Accelerometer',
-						id: app.docid,
-						title: 'Accelerometer',
-						keys: ['acc_x', 'acc_y', 'acc_z', ],
-					}),
-					pressureHPAOrMBAR: new app.InformaCamJ3MTimeStampedData({
-						urlRoot: '/pressureHPAOrMBAR',
-						id: app.docid,
-						title: 'pressureHPAOrMBAR',
-						keys: ['pressureHPAOrMBAR', ],
-					}),
-					dateCreated: new app.InformaCamJ3MHeader({
-						id: app.docid,
-					}),
-				}),
-				el: '#ic_linechart_view_holder',
-			});	
-
-			this.lineChartMultiView.model.get("pressureAltitude").fetch();
-			this.lineChartMultiView.model.get("lightMeter").fetch();
-			this.lineChartMultiView.model.get("Accelerometer").fetch();
-			this.lineChartMultiView.model.get("pressureHPAOrMBAR").fetch();
-			
-
-
-
-			/* END MULTI-VIEW LINE CHART */	
-
-
-			//LISTENERS
-			
-			views = [this.J3MHeaderView, this.documentWrapperView, this.gps_coordsView, ];
-			
-			_.each(views, function(view) {
-				this.listenTo(view.model, 'change', function() {
-					view.$el.append(view.render().el);
-				});
-				view.model.fetch();
-			}, this);
-			
-			
-			this.InformaCamProgressNotifierView.model.get('message_map').push(
-				_.bind(this.InformaCamProgressNotifierView.render, this.InformaCamProgressNotifierView)
-			);
-			
-
-			this.listenTo(this.documentSourceView.model, 'change', function() {
-				this.documentSourceView.$el.append(this.documentSourceView.render().el);
-			});
-
-			this.documentSourceView.model.fetch({url: '/files/.data/' + app.docid + '/j3m.json'});
-			
-
-			this.listenTo(this.appendedUserDataView.model, 'change', function() {
-				this.appendedUserDataView.$el.append(this.appendedUserDataView.render().el);
-			});
-			this.appendedUserDataView.model.fetch();
-		},
-	});
-
-
-	function $c(foo) {
-		console.log(foo);
-	}
-	
+	});	
 });
 
+function $c(foo) {
+	console.log(foo);
+}
 
-
-L.RotatedMarker = L.Marker.extend({
-    options: {
-        angle: 0
-    },
-
-    _setPos: function (pos) {
-        L.Marker.prototype._setPos.call(this, pos);
-        
-        if (L.DomUtil.TRANSFORM) {
-            // use the CSS transform rule if available
-            this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
-        } else if(L.Browser.ie) {
-            // fallback for IE6, IE7, IE8
-            var rad = this.options.angle * (Math.PI / 180),
-                costheta = Math.cos(rad),
-                sintheta = Math.sin(rad);
-            this._icon.style.filter += ' progid:DXImageTransform.Microsoft.Matrix(sizingMethod=\'auto expand\', M11=' + 
-                costheta + ', M12=' + (-sintheta) + ', M21=' + sintheta + ', M22=' + costheta + ')';                
-        }
-    }
-});
-
-L.rotatedMarker = function (pos, options) {
-    return new L.RotatedMarker(pos, options);
-};
 
 /*
 think about these:

@@ -1,0 +1,24 @@
+<table class="tsv_export">
+	<thead>
+		<tr>
+			<th>J3M ID</th>
+			<th>Date Created</th>
+			<th>Date Added</th>
+			<th>J3M Verified</th>
+			<th>Media Verified</th>
+			<th>Upload Attempts</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{ #. }}
+		<tr>
+			<td>{{j3m_id}}</td>
+			<td>{{dateCreatedFormatted}}</td>
+			<td>{{dateAddedFormatted}}</td>
+			<td>{{j3m_verified}}</td>
+			<td>{{media_verified}}</td>
+			<td>{{upload_attempts}}</td>
+		</tr>
+	{{ /. }}
+	</tbody>
+</table>

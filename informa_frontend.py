@@ -55,23 +55,30 @@ class InformaFrontend(UnveillanceFrontend):
 		self.on_loads.update({
 			'submission' : [
 				'/leaflet/leaflet.js',
+#				'/web/js/viz/uv_indented_tree.js',
+				'/web/js/viz/ic_main.js',
 				'/web/js/viz/ic_progress_notifer.js',
 				'/web/js/viz/ic_document_source.js',
 				'/web/js/viz/ic_document_wrapper.js',
 				'/web/js/viz/ic_appended_userdata.js',
 				'/web/js/viz/ic_j3m_header.js',
+#				'/web/js/viz/ic_timeseries_graph.js',
+#				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/viz/ic_linechart_multiview.js',
 				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_j3m.js',
-				'/web/js/models/ic_image.js',
-				'/web/js/models/ic_submission.js',
+#				'/web/js/models/ic_image.js',
+#				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js',
-				'/web/css/ic_viz.css'],
+				'/web/js/models/ic_tsv_export.js',
+				'/web/css/ic_viz.css'
+			],
 			'source' : [
 				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_source.js',
-				'/web/js/modules/ic_source.js'],
+				'/web/js/modules/ic_source.js'
+			],
 			'main' : [
 				'/web/js/lib/dropzone.js',
 				'/web/js/models/ic_search.js',
@@ -81,7 +88,10 @@ class InformaFrontend(UnveillanceFrontend):
 			'search' :[
 				'/web/js/models/ic_search.js',
 				'/web/js/models/ic_document_browser.js',
-				'/web/js/modules/ic_search.js'
+				'/web/js/models/ic_j3m.js',
+				'/web/js/models/ic_tsv_export.js',
+				'/web/js/modules/ic_search.js',
+				'/web/css/ic_viz.css'
 			],
 			'unveil' : [
 				'/web/js/modules/uv_unveil.js',
@@ -100,7 +110,8 @@ class InformaFrontend(UnveillanceFrontend):
 			],				
 			'simple' : [
 				'/web/js/lib/dropzone.js',
-				'/web/js/models/unveillance_dropzone.js']
+				'/web/js/models/unveillance_dropzone.js'
+			]
 		})
 		
 		self.on_loads_by_status[1].extend([
