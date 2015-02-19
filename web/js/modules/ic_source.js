@@ -2,7 +2,7 @@ var source;
 
 (function($) {
 	var source_sammy = $.sammy("#content", function() {
-		this.get(/source\/([a-z0-9]{32})\//, function(context) {
+		this.get(new RegExp("/source/([a-z0-9]{" + UV.SHA1_INDEX + "})/"), function(context) {
 
 			source = new InformaCamSource(_.extend({ root_el : $('#ic_source_view_holder')},
 				doInnerAjax("documents", "post", { _id : this.params.splat[0] }, null, false)));

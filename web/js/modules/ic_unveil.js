@@ -25,7 +25,7 @@ function initAnnexChannel() {
 
 (function($) {
 	var content_sammy = $.sammy("#content", function() {
-		this.get(/\/unveil\/[a-z0-9]{32}\/#(info|assets|reindexer)/, function() {
+		this.get(new RegExp("/unveil/[a-z0-9]{" + UV.SHA1_INDEX + "}/#(info|assets|reindexer)"), function() {
 			document_browser.setInPanel(this.params.splat[0], $("#ic_document_viewer_panel"));
 		});
 	});
