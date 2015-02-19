@@ -36,13 +36,9 @@ function onConfLoaded() {
 		$('#ic_search_results_holder input[type=checkbox]').change(function() {
 			var hash = $(this).attr('data-hash');
 			if ($(this).is(':checked')) {
-				app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
-
-				app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
-
+				app.addDatasetToTSV(hash);
 			} else {
-				app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
-				app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
+				app.removeDatasetFromTSV(hash);
 			}
 		});
 

@@ -96,6 +96,7 @@ when row model changes, rowView alerts collectionView to update rendering
 							json.push(view.render());
 						}
 					}, this);
+					$('#ic_tsv_download_view_holder').addClass("rendered");
 					html = Mustache.to_html(this.template, json);
 					this.$el.html(html);
 				} else {
@@ -140,6 +141,7 @@ when row model changes, rowView alerts collectionView to update rendering
 		render: function () {
 			var html = '';
 			if (this.views.length) {
+				$('#ic_tsv_download_view_holder').addClass("rendered");
 				_.each(this.views, function(views) {
 					_.each(views.views, function(view) {
 						if (view.model.get('ready')) {
@@ -165,5 +167,29 @@ when row model changes, rowView alerts collectionView to update rendering
 	app.tsvHeaderTableView = new app.TableView({collection: new app.Datasets({model: app.HeaderDataSet}), el: "#ic_tsv_headerdata", template: "tsv_headerdata_table.html"});
 	
 	app.timestampTablesView = new app.TimestampTablesView({collection: new app.TimestampDatasets()});
+	
+	$('#export_tsv').click(function() {
+		if ($('#ic_tsv_download_view_holder').hasClass("rendered")) {
+			$('#ic_tsv_download_view_holder').removeClass("rendered");
+		} else {
+			if (!app.addDatasetToTSV(app.docid)) {
+				$('#ic_tsv_download_view_holder').addClass("rendered");
+			}
+		}
+	});
+	
+	app.addDatasetToTSV = function(hash) {
+		if (app.tsvHeaderTableView.collection.findWhere({model_id: hash})) {
+			return false;
+		}
+		app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
+
+		app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
+	};
+
+	app.removeDatasetFromTSV = function(hash) {
+			app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
+			app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
+	};
 
 });

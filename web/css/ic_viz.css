@@ -175,6 +175,10 @@ g .label {
 }
 
 /*TSV PREVIEW*/
+#export_tsv {
+	cursor:pointer;
+}
+
 .tsv_export {
 	width:90%;
 	margin:0 auto;
