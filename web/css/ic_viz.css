@@ -188,6 +188,10 @@ g .label {
 	padding:0 10px;
 }
 
+#ic_submission_view_holder #ic_tsv_timestampdata h4 {
+	display:none;
+}
+
 @media print {
 	#ic_linechart_view_holder svg {
 		position:static;
