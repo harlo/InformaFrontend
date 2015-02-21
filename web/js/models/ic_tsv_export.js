@@ -100,6 +100,7 @@ when row model changes, rowView alerts collectionView to update rendering
 					html = Mustache.to_html(this.template, json);
 					this.$el.html(html);
 				} else {
+					$('#export_link').html('');
 					this.$el.html('');
 				}
 			}
@@ -154,6 +155,10 @@ when row model changes, rowView alerts collectionView to update rendering
 						this.$el.html(html);
 					}, this);
 				}, this);
+				$('#export_link').html('<a class="export">download</a>');
+				$(".export").on('click', function (event) {
+					  app.exportTableToCSV.apply(this);
+				});
 			} else {
 				this.$el.html(html);
 			}
@@ -185,6 +190,7 @@ when row model changes, rowView alerts collectionView to update rendering
 		app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
 
 		app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
+		$('#export_link').html('LOADING');
 	};
 
 	app.removeDatasetFromTSV = function(hash) {
@@ -244,9 +250,6 @@ when row model changes, rowView alerts collectionView to update rendering
 
     };
 
-    $(".export").on('click', function (event) {
-		  app.exportTableToCSV.apply(this);
-    });
 
 
 
