@@ -188,45 +188,44 @@ when row model changes, rowView alerts collectionView to update rendering
 	};
 
 	app.removeDatasetFromTSV = function(hash) {
-			app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
-			app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
+		app.tsvHeaderTableView.collection.remove(app.tsvHeaderTableView.collection.where({model_id: hash}));
+		app.timestampTablesView.collection.remove(app.timestampTablesView.collection.where({model_id: hash}));
 	};
 	
 	//http://jsfiddle.net/terryyounghk/KPEGU/
 	app.exportTableToCSV = function() {
 		$(this).unbind("click");
-		var $rows = $('table.tsv_export:nth-child(1)').find('tr:has(td)'),
+		var zip = new JSZip();
 
-			// Temporary delimiter characters unlikely to be typed by keyboard
-			// This is to avoid accidentally splitting the actual contents
-			tmpColDelim = String.fromCharCode(11), // vertical tab character
-			tmpRowDelim = String.fromCharCode(0), // null character
+		_.each($('table.tsv_export'), function(table) {
+			var rows = $(table).find('tr:has(td)'),
 
-			// actual delimiter characters for CSV format
-			colDelim = '","',
-			rowDelim = '"\r\n"',
+			colDelim = '\t',
+			rowDelim = '\r\n',
 
 			// Grab text from table into CSV formatted string
-			csv = '"' + $rows.map(function (i, row) {
+			csv = rows.map(function (i, row) {
 				var $row = $(row),
-					$cols = $row.find('td');
+					cols = $row.find('td');
 
-				return $cols.map(function (j, col) {
-					var $col = $(col),
-						text = $col.text();
+				return cols.map(function (j, col) {
 
-					return text.replace('"', '""'); // escape double quotes
+					return $(col).text();
 
-				}).get().join(tmpColDelim);
+				}).get().join(colDelim);
 
-			}).get().join(tmpRowDelim)
-				.split(tmpRowDelim).join(rowDelim)
-				.split(tmpColDelim).join(colDelim) + '"',
+			}).get().join(rowDelim);
+				
+			if (hash = $(table).attr('data-id')) {
+				var filename = "timestamp_data_" + hash + ".tsv";
+			} else {
+				var filename = "header_data.tsv";
+			}
 
-			// Data URI
-			csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+			zip.file("TSV/" + filename, csv);
+		});
+		csvData = "data:application/zip;base64," + zip.generate({type:"base64"});
 			
-			$c(csv);
 
 		$(this)
 			.attr({
@@ -245,12 +244,8 @@ when row model changes, rowView alerts collectionView to update rendering
 
     };
 
-    // This must be a hyperlink
     $(".export").on('click', function (event) {
-        // CSV
 		  app.exportTableToCSV.apply(this);
-        // IF CSV, don't do event.preventDefault() or return false
-        // We actually need this to be a typical hyperlink
     });
 
 
