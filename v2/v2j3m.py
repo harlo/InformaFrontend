@@ -41,7 +41,8 @@ def getJ3mDoc(self,param):
         handle = yield getDocWrapper(self,param)
         self.objectHandle = json_decode(handle)  
         url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
-        if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
+        if DEBUG:
+            print str(self) +"SENDING REQUEST TO %s" % url
         
         http_client = AsyncHTTPClient()
         future = http_client.fetch(url) 
