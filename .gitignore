@@ -2,7 +2,7 @@
 .Trash-1000
 *.pyc
 
-uv_env/
+.venv/
 .users/
 .gpg/
 
