@@ -54,9 +54,7 @@ def getJ3mDoc(self,param):
         raise gen.Return(response.body) 
     else :
         if DEBUG: print str(self) +"got j3mDoc otherwise"
-        raise gen.Return(j3mDoc.body)    
-        
-    
+        raise gen.Return(j3mDoc.body)  
 
 def getTimeValues(self,j3mDoc,*valueKey):
     sensors = j3mDoc['data']['data']['sensorCapture']

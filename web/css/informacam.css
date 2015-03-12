@@ -71,6 +71,43 @@ ul {
 	padding-right:1em;
 }
 
+#content #ic_main_dropzone_holder {
+	background-color: #faa511;
+}
+
+#content #ic_main_search_holder {
+	background-color: #f0f0f0;
+}
+
+#content #ic_header_options_holder table {
+	width:100%;
+}
+
+#content #ic_header_options_holder table tr td {
+	height:8em;
+}
+
+#content #ic_main_logo {
+	width:100%;
+	height:5em;
+	background-color: #0E025E;
+	color:#f0f0f0;
+	margin:0;
+	padding:0.05em 0;
+}
+
+#uv_import_dropzone.ic_dz_main {
+	width:100% !important;
+	height:100% !important;
+	top:0;
+	left:0;
+	border:1px solid #ccc;
+	background-image: url('/web/images/uv_drag_and_drop.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+}
+
 #ic_home_sub_list {
 	width:100%;
 	height:auto;
@@ -152,9 +189,7 @@ ul {
 #ic_search_holder {
 	width:99%;
 	min-height:5em;
-	margin:0.5em;
-	padding:10px;
-	border:1px solid #000;
+	margin:0 0.5em;
 }
 
 .ic_j3m_info_viz {
@@ -220,6 +255,26 @@ div.ic_module {
 	float:right;
 	right:0;
 	top:4em;
+}
+
+#ic_document_browser img.ic_display_image_thumb {
+	width:8em;
+	border:1px solid #ccc;
+	padding:0.5em;
+	margin:0.5em;	
+}
+
+#ic_document_browser li.ic_list_header ul {
+	margin:0;
+	padding:0;
+	float:left;
+	width:100%;
+}
+
+#ic_document_browser li.ic_list_header ul li {
+	padding:1em;
+	float:left;
+	width:auto;
 }
 
 #ic_viewer_panel, #ic_document_panel {

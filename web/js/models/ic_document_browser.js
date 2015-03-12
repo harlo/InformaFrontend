@@ -55,6 +55,7 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 			}, this);
 
 		this.showPreview();
+		translate($(this.get('root_el')));
 	},
 	showPreview: function() {
 		_.each($("[id^=ic_doc_list]").children('li'), function(li) {

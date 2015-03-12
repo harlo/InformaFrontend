@@ -18,14 +18,36 @@ function onConfLoaded() {
 
 		documents.unset('result');
 
-		$("#content")
-			.prepend(getTemplate("search.html", null, "/web/layout/views/module/"));
+		$("#ic_main_search_holder")
+			.html(getTemplate("search.html", null, "/web/layout/views/module/"));
 
 		search = new InformaCamSearch({
 			search_el : $("#ic_visual_search_holder"),
 			advanced_el : $("#ic_extended_search_holder"),
 			result_el : $("#ic_search_view_holder")
 		});
+
+		discoverDropzones({url : "/import/", extra_classes : ["ic_dz_main"]}, "#ic_main_dropzone_holder",
+			function(file, message) {
+				// onSuccess
+				console.log(message);
+				path = message.data.mime_type !== undefined && message.data.mime_type.indexOf("application/pgp") > -1 ? "/source/" : "/submission/";
+				location.href = path + message.data._id + '/';
+			},
+			function(file, message) {
+				// onError
+				console.error(message);
+				messagetext = '';
+				if (typeof message !== null && typeof message === 'object') {
+					if (message.result == 403) {
+						messagetext = "It's not you, it's us. We're looking into the problem. Please try again later. (" + message.result + ")";
+						this.disable();
+					}
+				} else {
+					messagetext = message;
+				}
+				return file.previewElement.querySelector("[data-dz-errormessage]").textContent = messagetext;
+			});
 	} catch(err) {
 		console.error(err);
 		failOut();
