@@ -30,9 +30,7 @@ def getDocWrapper(self,param):
         raise gen.Return(response.body) 
     else :
         if DEBUG: print str(self) +"got otherwise: " + str(doc)
-        raise gen.Return(doc.body)    
-
-    
+        raise gen.Return(doc.body)   
 
 @gen.coroutine
 def getJ3mDoc(self,param):
