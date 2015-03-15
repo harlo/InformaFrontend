@@ -274,7 +274,8 @@ div.ic_module {
 #ic_document_browser li.ic_list_header ul li {
 	padding:1em;
 	float:left;
-	width:auto;
+	width:12em;
+	height:20em;
 }
 
 #ic_viewer_panel, #ic_document_panel {

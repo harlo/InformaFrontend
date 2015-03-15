@@ -4,11 +4,18 @@ function failOut() {
 	$("#ic_content_header").html("Sorry.  No documents found.");
 }
 
+function onGenericImportFail() {
+	alert("Could not upload document.");
+}
+
 function onDropzoneSuccess(file, message) {
 	console.log(message);
 	
-	if(message.data) { 
+	if(message.data && message.data.uploaded) {
 		documents.resolveInport(message.data);
+		$("div.dz-preview").hide();
+	} else {
+		onGenericImportFail();
 	}
 }
 

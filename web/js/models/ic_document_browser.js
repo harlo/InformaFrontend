@@ -2,8 +2,11 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 	constructor: function() {
 		Backbone.Model.apply(this, arguments);
 		this.set('group_tmpl', getTemplate("document_browser_group.html"));
+		this.set('progress_holder_tmpl', getTemplate("progress_holder.html"))
+
 		this.set('preview_tmpls', {});
 		this.set('imports_in_progress', []);
+		this.set('finished_statuses', [410]);
 
 		if(!this.has('root_el')) {
 			this.set('root_el', $('body'));
@@ -56,7 +59,6 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 			}, this);
 
 		this.showPreview();
-		translate($(this.get('root_el')));
 	},
 	showPreview: function() {
 		_.each($("[id^=ic_doc_list]").children('li'), function(li) {
@@ -70,26 +72,56 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 				return;
 			}
 
-			if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video], doc.mime_type)) {
-				var display_thumb = _.find(doc.assets, function(a) { return _.contains(a.tags, UV.ASSET_TAGS.THUMB); });
-				if(_.isObject(display_thumb) && !(_.isUndefined(display_thumb.file_name))) {
-					doc.display_thumb = "/" + ["files", doc.base_path, display_thumb.file_name].join('/');
-				}
-			}
-
-			$(li).find('a').html(Mustache.to_html(this.get('preview_tmpls')[doc.mime_type], doc));
+			this.setPreview(doc, li);
 		}, this);
 	},
-	onImportProgress: function(message) {
-		console.info(message);
-		
+	setPreview: function(doc, li) {
+		if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video], doc.mime_type)) {
+			var display_thumb = _.find(doc.assets, function(a) { return _.contains(a.tags, UV.ASSET_TAGS.THUMB); });
+			if(_.isObject(display_thumb) && !(_.isUndefined(display_thumb.file_name))) {
+				doc.display_thumb = "/" + ["files", doc.base_path, display_thumb.file_name].join('/');
+			}
+		}
 
-		// get id
-		// check if in 'imports in progress'
-		// if not, set up the ui for it
-		// push messages and assets according to status
+		$(li).find('a').html(Mustache.to_html(this.get('preview_tmpls')[doc.mime_type], doc));
+		translate($(li));
 	},
-	resolveInport: function(new_doc) {
-		console.info(new_doc);
+	onImportProgress: function(message) {
+		if(!message.doc_id) {
+			return;
+		}
+
+		if(_.contains(this.get('imports_in_progress'), message.doc_id)) {
+			var doc = doInnerAjax("documents", "post", { _id : message.doc_id }, null, false);
+
+			if(_.isUndefined(doc) || doc.result != 200) {
+				return;
+			}
+
+			doc = doc.data;
+			var progress_holder = $("#ic_progress_holder_" + doc._id);
+			
+			if($(progress_holder).length == 0) {
+				progress_holder = Mustache.to_html(this.get('progress_holder_tmpl'), {
+					_id : doc._id
+				});
+
+				var group = $("#ic_doc_list_" + MD5(String(doc.mime_type)));				
+				$(group).prepend(progress_holder);
+			}
+
+			$($(progress_holder).find('span.status_label')[0]).html(message.task_path);
+			$($(progress_holder).find('span.status_bar')[0]).html(_.indexOf(message.task_queue, message.task_path) + " / " + message.task_queue.length);
+
+			if(_.contains(this.get('finished_statuses'), message.status)) {
+				this.set('imports_in_progress', _.without(this.get('imports_in_progress'), doc._id));
+				this.setPreview(doc, $(progress_holder).parents('li')[0]);
+			}
+		}
+	},
+	resolveInport: function(new_doc) {		
+		if(!_.contains(this.get('imports_in_progress'), new_doc._id)) {
+			this.get('imports_in_progress').push(new_doc._id);
+		}
 	}
 })
