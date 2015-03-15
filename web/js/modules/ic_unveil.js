@@ -47,7 +47,6 @@ function initAnnexChannel() {
 
 		if(initDocumentBrowser()) {
 			content_sammy.run();
-			$("#content").prepend(getTemplate('default_task_update.html'));
 			initAnnexChannel();
 		} else {
 			failOut($("#content"), "Sorry, could not find this document.");

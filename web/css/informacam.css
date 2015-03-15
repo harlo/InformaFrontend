@@ -311,12 +311,41 @@ div.ic_module {
 	cursor:pointer;
 }
 
+#ic_document_viewer_holder ul {
+	width:100%;
+	padding:0.75em 0.5em;
+	margin:0;
+	height:3em;
+	background-color:#faa511;
+}
+
+#ic_document_viewer_holder ul li {
+	float:left;
+	margin:0 0.5em 0 0;
+}
+
+#ic_document_viewer_panel {
+	width:98%;
+	margin:0.5em;
+}
+
 #ic_as_permalink {
 	width:80%;
 }
 
 #ic_pipe_builder, #uv_pipe_builder {
 	width:100%;
+}
+
+#uv_reindex_task_list_holder {
+	height:16em;
+	border:1px solid #0e025e;
+}
+
+#uv_reindex_list li div.uv_task_li {
+	padding:0.5em;
+	margin:0.25em;
+	border:1px solid #0e025e;
 }
 
 #ic_pipe_builder textarea, #uv_pipe_builder textarea {
@@ -330,7 +359,6 @@ div.ic_module {
 #ic_document_viewer_panel table tr {
 	vertical-align: top;
 }
-
 
 .uv_viz path.uv_it_link {
 	stroke: #ccc;
