@@ -48,6 +48,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/lib/jquery.ui.menu.js',
 			'/web/js/lib/jquery.ui.autocomplete.js',
 			'/web/js/viz/uv_viz.js',
+			'/web/js/models/unveillance_notifier.js',
 			'/web/js/models/ic_notifier.js',
 			'/web/js/informacam.js'
 		])
@@ -55,21 +56,16 @@ class InformaFrontend(UnveillanceFrontend):
 		self.on_loads.update({
 			'submission' : [
 				'/leaflet/leaflet.js',
-#				'/web/js/viz/uv_indented_tree.js',
 				'/web/js/viz/ic_main.js',
 				'/web/js/viz/ic_progress_notifer.js',
 				'/web/js/viz/ic_document_source.js',
 				'/web/js/viz/ic_document_wrapper.js',
 				'/web/js/viz/ic_appended_userdata.js',
 				'/web/js/viz/ic_j3m_header.js',
-#				'/web/js/viz/ic_timeseries_graph.js',
-#				'/web/js/viz/ic_timeseries_chart.js',
 				'/web/js/viz/ic_timeseries_map.js',
 				'/web/js/viz/ic_linechart_multiview.js',
 				'/web/js/models/unveillance_document.js',
 				'/web/js/models/ic_j3m.js',
-#				'/web/js/models/ic_image.js',
-#				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js',
 				'/web/js/models/ic_tsv_export.js',
 				'/web/css/ic_viz.css'
@@ -209,11 +205,8 @@ if __name__ == "__main__":
 	
 	if len(argv) != 2: exit("Usage: informa_frontend.py [-start, -stop, -restart]")
 	
-	if argv[1] == "-start" or argv[1] == "-firstuse":
-		informa_frontend.startup()
-	elif argv[1] == "-stop":
+	if argv[1] in ["-stop", "-restart"]:
 		informa_frontend.shutdown()
-	elif argv[1] == "-restart":
-		informa_frontend.shutdown()
-		sleep(5)
+	
+	if argv[1] in ["-start", "-firstuse", "-restart"]:
 		informa_frontend.startup()

@@ -10,6 +10,7 @@ jQuery(document).ready(function($) {
 			app.docid = id_rx.exec(window.location)[1];
 
 			new app.InformaCamJ3MAppView;
+			$("#unveil_document").prop('href', "/unveil/" + app.docid + "/");
 		} catch(err) {
 			console.warn(err);
 			console.warn("no updateConf()");

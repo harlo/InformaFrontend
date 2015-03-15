@@ -311,7 +311,7 @@ div.ic_module {
 	cursor:pointer;
 }
 
-#ic_document_viewer_holder ul {
+#ic_document_viewer_holder ul, #ic_doc_opts {
 	width:100%;
 	padding:0.75em 0.5em;
 	margin:0;

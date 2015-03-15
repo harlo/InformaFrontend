@@ -2,7 +2,8 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 	constructor: function() {
 		Backbone.Model.apply(this, arguments);
 		this.set('group_tmpl', getTemplate("document_browser_group.html"));
-		this.set('preview_tmpls', {})
+		this.set('preview_tmpls', {});
+		this.set('imports_in_progress', []);
 
 		if(!this.has('root_el')) {
 			this.set('root_el', $('body'));
@@ -78,5 +79,17 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 
 			$(li).find('a').html(Mustache.to_html(this.get('preview_tmpls')[doc.mime_type], doc));
 		}, this);
+	},
+	onImportProgress: function(message) {
+		console.info(message);
+		
+
+		// get id
+		// check if in 'imports in progress'
+		// if not, set up the ui for it
+		// push messages and assets according to status
+	},
+	resolveInport: function(new_doc) {
+		console.info(new_doc);
 	}
 })
