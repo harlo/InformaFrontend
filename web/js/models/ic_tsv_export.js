@@ -99,7 +99,9 @@ when row model changes, rowView alerts collectionView to update rendering
 					$('#ic_tsv_download_view_holder').addClass("rendered");
 					html = Mustache.to_html(this.template, json);
 					this.$el.html(html);
+					app.initColumnToggle();
 				} else {
+					$('#export_link').html('');
 					this.$el.html('');
 				}
 			}
@@ -152,13 +154,31 @@ when row model changes, rowView alerts collectionView to update rendering
 							}
 						}
 						this.$el.html(html);
+						app.initColumnToggle();
 					}, this);
 				}, this);
+				$('#export_link').html('<a class="export">download</a>');
+				$(".export").on('click', function (event) {
+					  app.exportTableToCSV.apply(this);
+				});
 			} else {
 				this.$el.html(html);
 			}
 		},
 	});
+	
+	app.initColumnToggle = function() {
+		$('.tsv_export input[type=checkbox]').change(function() {
+			var table = $(this).parents('table');
+			var index = $(this).parent().index();
+			var cells = table.find('tr td:nth-child(' + (index + 1) + ')').add($(this).parent());
+			if ($(this).is(':checked')) {
+				cells.removeClass('no_export');
+			} else {
+				cells.addClass('no_export');
+			}
+		});
+	}
 	
 	
 	
@@ -185,6 +205,7 @@ when row model changes, rowView alerts collectionView to update rendering
 		app.tsvHeaderTableView.collection.add(new app.HeaderDataSet({model_id: hash}));
 
 		app.timestampTablesView.collection.add(new app.TimestampDataSet({model_id: hash}));
+		$('#export_link').html('LOADING');
 	};
 
 	app.removeDatasetFromTSV = function(hash) {
@@ -206,7 +227,7 @@ when row model changes, rowView alerts collectionView to update rendering
 			// Grab text from table into CSV formatted string
 			csv = rows.map(function (i, row) {
 				var $row = $(row),
-					cols = $row.find('td');
+					cols = $row.find('td:not(.no_export)');
 
 				return cols.map(function (j, col) {
 
@@ -244,9 +265,6 @@ when row model changes, rowView alerts collectionView to update rendering
 
     };
 
-    $(".export").on('click', function (event) {
-		  app.exportTableToCSV.apply(this);
-    });
 
 
 

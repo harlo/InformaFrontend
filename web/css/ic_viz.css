@@ -188,6 +188,14 @@ g .label {
 	padding:0 10px;
 }
 
+.tsv_export input[type=checkbox] {
+	margin-right:10px;
+}
+
+.tsv_export td.no_export, .tsv_export th.no_export {
+	color:#CCC;
+}
+
 #ic_submission_view_holder #ic_tsv_timestampdata h4 {
 	display:none;
 }
