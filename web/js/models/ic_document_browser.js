@@ -76,14 +76,20 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 		}, this);
 	},
 	setPreview: function(doc, li) {
+		var href_path = "/submission/";
 		if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video], doc.mime_type)) {
+
 			var display_thumb = _.find(doc.assets, function(a) { return _.contains(a.tags, UV.ASSET_TAGS.THUMB); });
 			if(_.isObject(display_thumb) && !(_.isUndefined(display_thumb.file_name))) {
 				doc.display_thumb = "/" + ["files", doc.base_path, display_thumb.file_name].join('/');
 			}
+		} else {
+			href_path = "/source/";
 		}
 
-		$(li).find('a').html(Mustache.to_html(this.get('preview_tmpls')[doc.mime_type], doc));
+		$(li).find('a')
+			.html(Mustache.to_html(this.get('preview_tmpls')[doc.mime_type], doc))
+			.prop('href', href_path + doc._id + "/");
 		translate($(li));
 	},
 	onImportProgress: function(message) {
@@ -111,7 +117,7 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 			}
 
 			$($(progress_holder).find('span.status_label')[0]).html(message.task_path);
-			$($(progress_holder).find('span.status_bar')[0]).html(_.indexOf(message.task_queue, message.task_path) + " / " + message.task_queue.length);
+			$($(progress_holder).find('span.status_bar')[0]).html((_.indexOf(message.task_queue, message.task_path) + 1) + " / " + message.task_queue.length);
 
 			if(_.contains(this.get('finished_statuses'), message.status)) {
 				this.set('imports_in_progress', _.without(this.get('imports_in_progress'), doc._id));

@@ -46,11 +46,6 @@ function onConfLoaded() {
 				{ mime_type : "[" + UV.DEFAULT_MIME_TYPES.join() + "]", doc_type : "uv_document" }, null, false),
 			{ root_el : $("#ic_document_browser") }));
 
-		if(documents.get('result') != 200) {
-			failOut();
-			return;
-		}
-
 		documents.unset('result');
 
 		$("#ic_main_search_holder")

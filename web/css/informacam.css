@@ -257,6 +257,10 @@ div.ic_module {
 	top:4em;
 }
 
+#ic_document_browser div.ic_display_image span {
+	font-size:0.8em;
+}
+
 #ic_document_browser img.ic_display_image_thumb {
 	width:8em;
 	border:1px solid #ccc;
