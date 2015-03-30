@@ -63,6 +63,12 @@ function updateConf() {
 				
 				return val;
 			}
+		},
+		{
+			keys: ["ic_truncate_fingerprint"],
+			enc: function(val) {
+				return val.substr(-8);
+			}
 		}
 	]);
 	
