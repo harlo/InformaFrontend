@@ -153,13 +153,14 @@ class InformaFrontend(UnveillanceFrontend):
 
 	def get_browser_from_user_agent(self, request):
 		try:
-			user_agent = ua_parse(request.headers['User-Agent']).browser
+			ua_string = request.headers['User-Agent']
+			user_agent = ua_parse(ua_string).browser
 			return ("%s_%s" % (user_agent.family, user_agent.version_string)).lower().replace(" ", "_").replace(".", "_")
 
 		except Exception as e:
 			if DEBUG:
 				print e, type(e)
-				print "could not get User-Agent"
+				print "could not get User-Agent for %s" % ua_string
 
 		return ""
 
