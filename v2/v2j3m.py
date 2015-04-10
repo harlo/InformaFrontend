@@ -30,9 +30,7 @@ def getDocWrapper(self,param):
         raise gen.Return(response.body) 
     else :
         if DEBUG: print str(self) +"got otherwise: " + str(doc)
-        raise gen.Return(doc.body)    
-
-    
+        raise gen.Return(doc.body)   
 
 @gen.coroutine
 def getJ3mDoc(self,param):
@@ -41,7 +39,8 @@ def getJ3mDoc(self,param):
         handle = yield getDocWrapper(self,param)
         self.objectHandle = json_decode(handle)  
         url = "%s%s%s%s%s" % (buildServerURL(),"/documents/?doc_type=ic_j3m&_id=" ,self.objectHandle['data']['j3m_id'], '&media_id=', self.objectHandle['data']['_id'])
-        if DEBUG: print str(self) +"SENDING REQUEST TO %s" % url
+        if DEBUG:
+            print str(self) +"SENDING REQUEST TO %s" % url
         
         http_client = AsyncHTTPClient()
         future = http_client.fetch(url) 
@@ -55,9 +54,7 @@ def getJ3mDoc(self,param):
         raise gen.Return(response.body) 
     else :
         if DEBUG: print str(self) +"got j3mDoc otherwise"
-        raise gen.Return(j3mDoc.body)    
-        
-    
+        raise gen.Return(j3mDoc.body)  
 
 def getTimeValues(self,j3mDoc,*valueKey):
     sensors = j3mDoc['data']['data']['sensorCapture']

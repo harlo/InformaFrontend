@@ -1,16 +1,18 @@
-#ic_import_dropzone_holder, #uv_import_dropzone {
+#ic_import_dropzone_holder, #uv_import_dropzone, #ic_main_dropzone_holder {
 /*	position:fixed !important;
 	top:0 !important;
 	left:0 !important;
 	right:0 !important;
 	bottom:0 !important;
 */
-	width:698px !important;
-	height:298px !important;
 	position:absolute;
 	z-index:100;
 }
 
+#ic_import_dropzone_holder, #uv_import_dropzone.ic_dz_landing {
+	width:698px !important;
+	height:298px !important;
+}
 
 #uv_import_dropzone.dz-drag-hover {
 	transition:background-color 1s;

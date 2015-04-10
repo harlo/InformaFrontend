@@ -47,8 +47,10 @@ function initAnnexChannel() {
 
 		if(initDocumentBrowser()) {
 			content_sammy.run();
-			$("#content").prepend(getTemplate('default_task_update.html'));
 			initAnnexChannel();
+			
+			$($("#ic_document_viewer_holder").children('ul')[0]).append($(document.createElement('li'))
+				.html('<a href="/submission/' + document_browser.get('data')._id + '/">Document Viewer</a>'));
 		} else {
 			failOut($("#content"), "Sorry, could not find this document.");
 		}
