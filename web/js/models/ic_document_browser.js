@@ -43,8 +43,11 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 				var group_name = group[0].mime_type;
 				var group_hash = MD5(String(group_name));
 				var group_type = _.map([group_name], function(n) {
-					if(n == UV.MIME_TYPES.pgp) { return "source"; }
-					else if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video, UV.MIME_TYPES.log], n)) { return "submission"; }
+					if(n == UV.MIME_TYPES.pgp) {
+						return "source"; 
+					} else if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video, UV.MIME_TYPES.log], n)) { 
+						return "submission"; 
+					}
 				});
 				
 				group = {
@@ -77,7 +80,7 @@ var InformaCamDocumentBrowser = Backbone.Model.extend({
 	},
 	setPreview: function(doc, li) {
 		var href_path = "/submission/";
-		if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video], doc.mime_type)) {
+		if(_.contains([UV.MIME_TYPES.image, UV.MIME_TYPES.video, UV.MIME_TYPES.log], doc.mime_type)) {
 
 			var display_thumb = _.find(doc.assets, function(a) { return _.contains(a.tags, UV.ASSET_TAGS.THUMB); });
 			if(_.isObject(display_thumb) && !(_.isUndefined(display_thumb.file_name))) {
