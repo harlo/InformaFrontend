@@ -14,6 +14,7 @@ class InformaFrontend(UnveillanceFrontend):
 		UnveillanceFrontend.__init__(self)
 				
 		self.reserved_routes.extend(["ictd", "commit", "leaflet", "submissions", "v2j3mview"])
+		self.restricted_mime_types_by_status[0].extend(["application/pgp"])
 		self.routes.extend([
 			(r"/ictd/", self.ICTDHandler),
 			(r"/commit/", self.DriveHandler),
@@ -163,6 +164,15 @@ class InformaFrontend(UnveillanceFrontend):
 				print "could not get User-Agent for %s" % ua_string
 
 		return ""
+
+	"""
+		Overriden API methods
+	"""
+
+	def checkForDuplicate(self, file_hash):
+		print "OVERRIDING CHECK FOR DUPE"
+
+		return UnveillanceFrontend.checkForDuplicate(self, file_hash)
 
 	"""
 		Custom handlers
