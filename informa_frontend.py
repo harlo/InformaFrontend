@@ -71,7 +71,7 @@ class InformaFrontend(UnveillanceFrontend):
 #				'/web/js/models/ic_image.js',
 #				'/web/js/models/ic_submission.js',
 				'/web/js/modules/ic_submission.js',
-				'/web/js/models/ic_tsv_export.js',
+				'/web/js/ic_tsv_export.js',
 				'/web/css/ic_viz.css'
 			],
 			'source' : [
@@ -89,7 +89,7 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/models/ic_search.js',
 				'/web/js/models/ic_document_browser.js',
 				'/web/js/models/ic_j3m.js',
-				'/web/js/models/ic_tsv_export.js',
+				'/web/js/ic_tsv_export.js',
 				'/web/js/modules/ic_search.js',
 				'/web/css/ic_viz.css'
 			],

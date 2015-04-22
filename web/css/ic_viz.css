@@ -200,6 +200,18 @@ g .label {
 	display:none;
 }
 
+#ic_tsv_timestampdata .tsv_export input[type=checkbox] {
+	display:none;
+}
+
+#ic_tsv_timestampdata h4:first-child + .tsv_export input[type=checkbox] {
+	display:inline-block;
+}
+
+
+
+
+
 @media print {
 	#ic_linechart_view_holder svg {
 		position:static;

@@ -20,7 +20,7 @@ app.InformaCamJ3MTimeseriesMapView = Backbone.View.extend({
 		this.zoomBearingIcon = L.icon({
 			iconUrl: '/web/images/ic_map_icon_bearing.png',
 			iconRetinaUrl: '/web/images/ic_map_icon_bearing.png',
-			iconSize: [6, 8]
+			iconSize: [9, 12]
 		});
 	},
 	render: function() {
