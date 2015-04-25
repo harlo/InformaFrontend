@@ -21,10 +21,8 @@ function onConfLoaded() {
 		},
 		function(file, message) {
 			// onError
-			console.info("HERE COMES ERROR!");
-			console.error(message);
 			var message_text = '';
-			
+
 			if (typeof message !== null && typeof message === 'object') {
 				if (message.result == 403) {
 					message_text = "We could not find a match, and you cannot upload a new file from here."
