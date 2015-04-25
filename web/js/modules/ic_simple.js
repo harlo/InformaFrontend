@@ -1,3 +1,8 @@
+function updateUI(message_template) {
+	$("#ic_import_dropzone_holder").remove();
+	$("#ic_upload_instructions_desktop").html(message_template);
+}
+
 function onConfLoaded() {
 	discoverDropzones({url : "/import/"}, "#ic_import_dropzone_holder",
 		function(file, message) {
@@ -7,26 +12,32 @@ function onConfLoaded() {
 			var sp_tmpl = _.template('<a href="<%= sp %>"><%= sp_full %></a>');
 
 			$("head").append($(document.createElement('base')).prop('target', '_parent'));
-
-			$("#ic_import_dropzone_holder").remove();
-			$("#ic_upload_instructions_desktop").html(sp_tmpl({ 
+			updateUI(sp_tmpl({ 
 				sp : submission_permalink, 
 				sp_full : window.location.protocol + "//" +  window.location.host + submission_permalink
 			}));
+
+			
 		},
 		function(file, message) {
 			// onError
+			console.info("HERE COMES ERROR!");
 			console.error(message);
-			messagetext = '';
+			var message_text = '';
+			
 			if (typeof message !== null && typeof message === 'object') {
 				if (message.result == 403) {
-					messagetext = "It's not you, it's us. We're looking into the problem. Please try again later. (" + message.result + ")";
-					this.disable();
+					message_text = "We could not find a match, and you cannot upload a new file from here."
+					
 				}
 			} else {
-				messagetext = message;
+				message_text = "Sorry, that didn't work.";
 			}
-			return file.previewElement.querySelector("[data-dz-errormessage]").textContent = messagetext;
+
+			this.disable();
+			var er_tmpl = _.template('<%= mt %><br /><a href="/simple/">Try again?</a>');
+
+			return updateUI(er_tmpl({mt : message_text}));
 		}
 	);
 }
