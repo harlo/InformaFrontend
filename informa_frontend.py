@@ -95,6 +95,11 @@ class InformaFrontend(UnveillanceFrontend):
 				'/web/js/modules/uv_unveil.js',
 				'/web/js/models/unveillance_task_pipe.js',
 				'/web/js/modules/ic_unveil.js'
+			],
+			'simple' : [
+				'/web/js/modules/ic_simple.js',
+				'/web/js/lib/dropzone.js',
+				'/web/js/models/unveillance_dropzone.js'
 			]
 		})
 		
@@ -116,8 +121,7 @@ class InformaFrontend(UnveillanceFrontend):
 			'/web/js/models/ic_user_admin.js'
 		])
 
-		self.restricted_routes_by_status[0].extend([
-			'unveil', 'reindex', 'cluster'])
+		self.restricted_routes_by_status[0].extend(['unveil', 'reindex', 'cluster'])
 
 		self.get_page_load_extras.update({
 			'body_classes' : self.get_browser_from_user_agent
