@@ -1,4 +1,4 @@
-#ic_import_dropzone_holder, #uv_import_dropzone, #ic_main_dropzone_holder {
+#ic_import_dropzone_holder, #uv_import_dropzone, #ic_main_dropzone_holder, #ic_import_dropzone {
 /*	position:fixed !important;
 	top:0 !important;
 	left:0 !important;
@@ -9,12 +9,16 @@
 	z-index:100;
 }
 
-#ic_import_dropzone_holder, #uv_import_dropzone.ic_dz_landing {
-	width:698px !important;
-	height:298px !important;
+#ic_import_dropzone_holder, #uv_import_dropzone.ic_dz_landing, #ic_import_dropzone_holder div {
+	width:100% !important;
+	min-height:600px !important;
 }
 
-#uv_import_dropzone.dz-drag-hover {
+#ic_import_dropzone_holder div {
+	z-index:101;
+}
+
+#uv_import_dropzone.dz-drag-hover, #ic_import_dropzone.dz-drag-hover {
 	transition:background-color 1s;
 	-webkit-transition:background-color 1s;
 	background-color:#CCF;

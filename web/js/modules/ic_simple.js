@@ -3,7 +3,16 @@ function onConfLoaded() {
 		function(file, message) {
 			// onSuccess
 			console.log(message);
-			location.href = '/submission/' + message.data._id + '/';
+			var submission_permalink = '/submission/' + message.data._id + '/';
+			var sp_tmpl = _.template('<a href="<%= sp %>"><%= sp_full %></a>');
+
+			$("head").append($(document.createElement('base')).prop('target', '_parent'));
+
+			$("#ic_import_dropzone_holder").remove();
+			$("#ic_upload_instructions_desktop").html(sp_tmpl({ 
+				sp : submission_permalink, 
+				sp_full : window.location.protocol + "//" +  window.location.host + submission_permalink
+			}));
 		},
 		function(file, message) {
 			// onError
@@ -38,6 +47,5 @@ function onConfLoaded() {
 			console.warn("no onConfLoaded()");
 		}
 		
-		content_sammy.run();
 	});
 })(jQuery);
