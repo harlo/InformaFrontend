@@ -8,7 +8,14 @@ function onConfLoaded() {
 		function(file, message) {
 			// onSuccess
 			console.log(message);
-			var submission_permalink = '/submission/' + message.data._id + '/';
+
+			var submission_permalink = message.data._id + '/';
+			if(message.data.mime_type == UV.MIME_TYPES.pgp) {
+				submission_permalink = '/source/' + submission_permalink;
+			} else {
+				submission_permalink = '/submission/' + submission_permalink;
+			}
+			
 			var sp_tmpl = _.template('<a href="<%= sp %>"><%= sp_full %></a>');
 
 			$("head").append($(document.createElement('base')).prop('target', '_parent'));
