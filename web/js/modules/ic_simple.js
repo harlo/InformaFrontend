@@ -36,6 +36,9 @@ function onConfLoaded() {
 			var er_tmpl = _.template('<%= mt %><br /><a href="/simple/">Try again?</a>');
 
 			return updateUI(er_tmpl({mt : message_text}));
+		},
+		function(file) {
+			$("#ic_upload_instructions_desktop").html('Processing <img src="/web/images/wait_spinner.gif" />');
 		}
 	);
 }
