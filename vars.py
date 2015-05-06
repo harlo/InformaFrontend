@@ -13,6 +13,7 @@ USER_CREDENTIAL_PACK = {
 from lib.Frontend.vars import *
 
 IMPORTER_SOURCES.append("web_frontend")
+IMPORTER_SOURCES.extend(["web_frontend_status_%d" % s for s in [0, 1, 2, 3]])
 
 informacam_mime_types = {
 	'j3m' : "informacam/j3m",
