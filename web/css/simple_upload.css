@@ -9,6 +9,12 @@
 	z-index:100;
 }
 
+#ic_public_hash {
+	z-index: 101 !important;
+	position:relative;
+	display:inline;
+}
+
 #ic_import_dropzone_holder, #uv_import_dropzone.ic_dz_landing, #ic_import_dropzone_holder div {
 	width:100% !important;
 	min-height:600px !important;
