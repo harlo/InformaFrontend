@@ -122,6 +122,10 @@ class InformaFrontend(UnveillanceFrontend):
 		])
 
 		self.restricted_routes_by_status[0].extend(['unveil', 'reindex', 'cluster'])
+		self.restrict_source_files.update({
+			'restrict' : [0, 1],
+			'exempt' : ["ictd.json"]
+		})
 
 		self.get_page_load_extras.update({
 			'body_classes' : self.get_browser_from_user_agent
